@@ -60,10 +60,19 @@ block to the widgets it creates, including `<relation name="labelled-by">`,
 and that route works. `lib/convert_page.rb` builds the quality row, its
 adjustment and its scale from one builder fragment so the `labelled-by`
 relation of `window.blp:155-159` is set, and builds the resize-unit dropdown
-from another so the accessible label of `window.blp:243-247` is set. The
+from another so the accessible label of `window.blp:252-258` is set. The
 translated strings are looked up first and escaped into the markup, because
 GtkBuilder's own `translatable="yes"` support goes through GLib's gettext,
 which is finding 3.
+
+The same route carries the one accessible **property** the port would
+otherwise lose to finding 1: upstream labels every populated
+`Gtk.FlowBoxChild` in both image containers with the image's caption
+(`src/window.rs:1901`, `:1957`), so a screen reader reads "PNG · 1920×1080"
+rather than an unnamed list item. `lib/app_window.rb`'s
+`labelled_flow_box_child` builds each child from a fragment carrying
+`<property name="label">`, which works because the caption is fixed for the
+life of the child and so never needs the update call that cannot be made.
 
 ## 3. ruby-glib2 exposes no gettext entry points
 
@@ -129,25 +138,62 @@ subclasses. The project's own `ruby-gtk` skill still lists both
 ruby-gnome 4.3.9 with GTK 4.22.4 they are not, and the skill's quirks
 reference is out of date on this point.
 
-## 7. Widget vfunc overrides — **unverified**
+## 7. A `Gtk::Widget` vfunc defined in Ruby is never dispatched
 
-Upstream's `ImageThumbnail` overrides `measure()` and `size_allocate()`
-(`src/widgets/image_thumbnail.rs:120-131`). I have **not** established whether
-ruby-gnome can override a `Gtk::Widget` vfunc from a Ruby subclass; I did not
-try. The port expresses upstream's measure as a size request of 150 on the
-width with the height left natural, which produces the same tile geometry, and
-does not reproduce `size_allocate()` at all. Until someone runs the
-experiment, this is a gap with an untested excuse attached, and it is listed as
-a gap in `COMPONENT_PARITY.md`.
+The experiment the previous round owed and did not run. Three subclasses of
+`Gtk::Widget`, registered with `type_register`, each defining `measure` under
+one of ruby-gnome's three plausible override spellings, then asked for their
+own measurement:
 
-## 8. CSS node name on a subclass — **unverified**
+```ruby
+class ProbeMeasurePlain < Gtk::Widget
+  type_register
+  def measure(orientation, for_size) = [150, 150, -1, -1]
+end
+# …ProbeMeasureDo#do_measure, ProbeMeasureVfunc#measure_vfunc
+Gtk::Widget.instance_method(:measure).bind(w).call(:horizontal, -1)
+# => [0, 0, -1, -1]   for all three
+```
+
+GTK answers with GtkWidget's own zero measurement in every case and none of
+the Ruby bodies runs, so `GtkWidgetClass.measure` is not overridable from
+Ruby — and neither is `size_allocate`, which is reached the same way. (Note
+also that a registered subclass gets the generic `widget` CSS name, which is
+finding 8.)
+
+**What the user loses.** Upstream's `ImageThumbnail::measure()`
+(`src/widgets/image_thumbnail.rs:120-131`) returns min = nat = 150 across the
+horizontal orientation, so a wide photo and a tall one occupy identical room
+in the flow box.
+
+**What the port does instead.** `lib/image_thumbnail.rb` sets a size request
+of 150 on the width and leaves the height natural, which pins the minimum but
+leaves the natural width to the picture inside. That is the closest the
+bindings allow, and `COMPONENT_PARITY.md` keeps it listed as a gap — now with
+a tested reason rather than an untested excuse.
+
+## 8. A Ruby subclass cannot be given a CSS node name
 
 Upstream sets the widget's CSS node name to `dragoverlay` in `class_init`
-(`src/drag_overlay.rs:30`). I have **not** established that the bindings cannot
-do this. The port adds a `dragoverlay` style class instead and `lib/style.rb`
-matches both `dragoverlay` and `.dragoverlay` with upstream's rule body, so the
-rendered result is the same; the claim that the bindings leave no other way is
-untested.
+(`src/drag_overlay.rs:30`). Three routes exist in C and none is reachable:
+
+```ruby
+Gtk::WidgetClass                       # => NameError (no such class)
+Gtk::Widget.instance_methods.grep(/^css_name/)  # => [:css_name]  (reader only)
+class ProbeCssNamed < Adwaita::Bin
+  type_register('ProbeCssNamed', css_name: 'dragoverlay')
+end
+# ArgumentError: wrong number of arguments (given 2, expected 0..1)
+```
+
+`gtk_widget_class_set_css_name` lives on the class struct, which ruby-gnome
+does not expose; `css_name` is bound as a read-only instance property; and
+`type_register` takes a type name and nothing else, so there is no hook to
+pass one through. A registered subclass reports the name `widget`.
+
+**What the port does instead.** `lib/drag_overlay.rb` adds a `dragoverlay`
+style class and `lib/style.rb` matches both `dragoverlay` and `.dragoverlay`
+with upstream's rule body, so the rendered result is the same.
 
 ## 9. Screenshots under broadway go stale — a harness limitation
 

@@ -86,15 +86,14 @@ class Settings
     end
   end
 
-  # Upstream's AppWindow::save_window_size(), called from close-request. The
-  # size is only recorded when the window is not maximized, so the restored
-  # size is the one the user actually chose.
+  # Upstream's AppWindow::save_window_size(), called from close-request. All
+  # three keys are written on every close, maximized or not, which is what
+  # upstream does (src/window.rs:2071-2082) — a maximized window reports the
+  # size it would un-maximize to, and that is the size the next run restores.
   def remember(window)
+    self['window-width'] = window.default_width
+    self['window-height'] = window.default_height
     self['is-maximized'] = window.maximized?
-    unless window.maximized?
-      self['window-width'] = window.default_width
-      self['window-height'] = window.default_height
-    end
   end
 
   def settings

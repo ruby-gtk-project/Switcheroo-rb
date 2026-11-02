@@ -530,18 +530,32 @@ module Magick
           children.add(wait_thread.pid)
           [stdout.read, stderr.read].join.then do |output|
             children.remove(wait_thread.pid)
-            if wait_thread.value.success?
-              nil
-            else
-              output
+            reap(wait_thread).then do |status|
+              if status.nil?
+                # Upstream's wait_for_child(): a child that cannot be waited
+                # on has no stderr to report, so the one translated sentence
+                # stands in for it (src/magick.rs:301).
+                _('Unknown IO error happened')
+              elsif status.success?
+                nil
+              else
+                output
+              end
             end
           end
         end
+      rescue SystemCallError => e
+        # Every one of upstream's three spawn sites reports a failure to spawn
+        # as the program's own name followed by the OS error, so a missing
+        # `magick` or `zip` says which binary is missing
+        # (src/window.rs:1114-1124, :1291-1301, :1365-1376).
+        "#{command.first}: #{e.message}"
+      end
+
+      def reap(wait_thread)
+        wait_thread.value
       rescue SystemCallError
-        # Upstream's wait_for_child(): a spawn that never produced a child has
-        # no stderr to report, so the one translated sentence stands in for it
-        # (src/magick.rs:301).
-        _('Unknown IO error happened')
+        nil
       end
 
       def drain(options)

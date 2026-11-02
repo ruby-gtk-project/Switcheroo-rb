@@ -64,22 +64,30 @@ class ConvertPage
     @files = []
   end
 
+  # window.blp:102-104 wraps the preferences page in two nested Adw.Bins before
+  # the stack page takes it, so that is what the stack gets handed here.
   def build
-    page.tap do |p|
-      p.add(images_group)
-      p.add(output_group)
-      p.add(options_group)
-      p.add(convert_group)
+    outer_bin.tap do |outer|
+      outer.child = inner_bin
 
-      images_group.add(image_container)
+      inner_bin.child = page
 
-      build_output_group
-      build_options_group
+      page.tap do |p|
+        p.add(images_group)
+        p.add(output_group)
+        p.add(options_group)
+        p.add(convert_group)
 
-      convert_group.add(convert_button)
+        images_group.add(image_container)
 
-      load_options
-      update_resize
+        build_output_group
+        build_options_group
+
+        convert_group.add(convert_button)
+
+        load_options
+        update_resize
+      end
     end
   end
 
@@ -238,6 +246,8 @@ class ConvertPage
 
   # --- Memoized widget methods --------------------------------------------
 
+  def outer_bin = @outer_bin ||= Adwaita::Bin.new
+  def inner_bin = @inner_bin ||= Adwaita::Bin.new
   def page = @page ||= Adwaita::PreferencesPage.new
   def images_group = @images_group ||= Adwaita::PreferencesGroup.new
   def output_group = @output_group ||= Adwaita::PreferencesGroup.new
@@ -396,16 +406,15 @@ class ConvertPage
   def resize_type_bin = @resize_type_bin ||= Adwaita::Bin.new
   def resize_type_box = @resize_type_box ||= Gtk::Box.new(:horizontal, 0)
 
-  # window.blp:239-250: the dropdown carries both a tooltip and an
-  # `accessibility { label: … }` block, and the label can only be attached by
-  # the builder that creates it.
+  # window.blp:252-271: the dropdown carries an `accessibility { label: … }`
+  # block and no tooltip, and the label can only be attached by the builder
+  # that creates it.
   def resize_type_dropdown
     @resize_type_dropdown ||=
       Gtk::Builder.new(string: resize_type_markup)
                   .get_object('resize_type').tap do |dd|
         dd.valign = :center
         dd.model = Gtk::StringList.new([_('%'), _('px')])
-        dd.tooltip_text = resize_units_label
         dd.add_css_class('flat')
         dd.add_css_class('unit-drop')
       end

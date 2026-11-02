@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'fileutils'
-
 require 'adwaita'
 
 require_relative 'about_dialog'
@@ -314,8 +312,25 @@ class AppWindow
         end
       end
       @removed = []
+      raise_fd_limit
       switch_to_loading_generally
       load_frames
+    end
+
+    # Upstream calls fdlimit::raise_fd_limit() on every successful open
+    # (src/window.rs:679), because probing a large pick opens one `magick`
+    # pipe per file and the soft limit is what runs out first. Raising the
+    # soft limit to the hard one is the whole of what that crate does; a
+    # kernel that refuses is left alone, exactly as upstream ignores the
+    # result.
+    def raise_fd_limit
+      Process.getrlimit(Process::RLIMIT_NOFILE).then do |soft, hard|
+        if soft < hard
+          Process.setrlimit(Process::RLIMIT_NOFILE, hard)
+        end
+      end
+    rescue SystemCallError, NotImplementedError
+      nil
     end
 
     # Upstream's load_frames(): `magick identify` on every file, off the main
@@ -424,10 +439,14 @@ class AppWindow
       end
     end
 
+    # Upstream writes the pasted texture to JobFile::as_filename(), which is a
+    # bare relative name, so the PNG lands in the process's working directory
+    # and the save dialog that follows opens there (src/window.rs:634-637).
+    # The same name is used here for the same reason: the suggested
+    # destination a user then sees has to be the one upstream shows.
     def save_pasted_texture(texture)
       JobFile.from_clipboard.then do |job_file|
-        File.join(TempDir.parent, job_file.filename).then do |path|
-          FileUtils.mkdir_p(TempDir.parent)
+        job_file.filename.then do |path|
           texture.save_to_png(path)
           InputFile.new_for_path(path).then do |input|
             if input
@@ -550,7 +569,7 @@ class AppWindow
     end
 
     def thumbnail_child(file, index)
-      Gtk::FlowBoxChild.new.tap do |child|
+      labelled_flow_box_child(file.caption).tap do |child|
         ImageThumbnail.new(
           texture:    file.texture,
           caption:    file.caption,
@@ -560,6 +579,35 @@ class AppWindow
           thumbnail.connect_remove_clicked { on_thumbnail_removed(index) }
         end
       end
+    end
+
+    # Upstream gives every populated FlowBoxChild in both containers the
+    # image's caption as its accessible Label, so a screen reader reads out
+    # "PNG · 1920×1080" instead of an unnamed list item (src/window.rs:1901,
+    # :1957). gtk_accessible_update_property_value cannot be called from Ruby
+    # at all — FINDINGS.md §1 quotes the NotImplementedError — but GtkBuilder
+    # attaches an <accessibility> block to the widgets it builds, so the child
+    # is built from a fragment that carries the label. The caption never
+    # changes after the child is built, so there is nothing left to update.
+    def labelled_flow_box_child(caption)
+      Gtk::Builder.new(string: flow_box_child_markup(caption))
+                  .get_object('image_flow_box_child')
+    end
+
+    def flow_box_child_markup(caption)
+      <<~XML
+        <interface>
+          <object class="GtkFlowBoxChild" id="image_flow_box_child">
+            <accessibility>
+              <property name="label">#{escape_markup(caption)}</property>
+            </accessibility>
+          </object>
+        </interface>
+      XML
+    end
+
+    def escape_markup(text)
+      text.to_s.gsub('&', '&amp;').gsub('<', '&lt;').gsub('>', '&gt;')
     end
 
     def rest_child

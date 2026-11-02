@@ -21,6 +21,11 @@ class FileType
   # order — the export-format combo row shows it exactly like this.
   OUTPUT_KEYS = %i[avif bmp dds gif heic heif ico jpg jxl pdf png tiff webp].freeze
 
+  # Upstream's is_output(), which is the output_formats() list plus Jpeg — the
+  # alias is a format the app will happily write even though the combo row
+  # offers only the canonical `jpg` entry (src/filetypes.rs:93-98).
+  IS_OUTPUT_KEYS = (OUTPUT_KEYS + %i[jpeg]).freeze
+
   ANIMATION_KEYS = %i[webp gif heic heif].freeze
   LOSSY_KEYS = %i[jpg jpeg webp heif heic avif jxl tiff pdf dds].freeze
   ALPHA_KEYS = %i[png webp svg heif heic avif jxl pdf ico gif].freeze
@@ -69,7 +74,7 @@ class FileType
   def to_s = display_string
 
   def input? = KEYS.include?(@key)
-  def output? = OUTPUT_KEYS.include?(@key)
+  def output? = IS_OUTPUT_KEYS.include?(@key)
   def supports_animation? = ANIMATION_KEYS.include?(@key)
   def lossy? = LOSSY_KEYS.include?(@key)
   def supports_alpha? = ALPHA_KEYS.include?(@key)

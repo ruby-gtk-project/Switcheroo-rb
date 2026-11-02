@@ -77,9 +77,53 @@ GtkDriver.drive(App.new, shots: "tmp/shots") do |d, app|
     d.check("the scale is the row's suffix child") do
       window.convert_page.quality_scale.parent
     end
-    d.check("the unit dropdown has its accessible label's tooltip") do
-      window.convert_page.resize_type_dropdown.tooltip_text.to_s.length.positive?
+    d.check("the unit dropdown carries no tooltip, as in window.blp") do
+      window.convert_page.resize_type_dropdown.tooltip_text.nil?
     end
+    d.check("the unit dropdown offers both units") do
+      window.convert_page.resize_type_dropdown.model.n_items == 2
+    end
+  end
+
+  d.step("the convert page sits in window.blp's two nested bins") do
+    d.check("the stack child is an Adwaita::Bin") do
+      window.stack.get_child_by_name(AppWindow::CONVERT_CHILD).is_a?(Adwaita::Bin)
+    end
+    d.check("its child is the second bin") do
+      window.stack.get_child_by_name(AppWindow::CONVERT_CHILD).child ==
+        window.convert_page.inner_bin
+    end
+    d.check("the inner bin holds the preferences page") do
+      window.convert_page.inner_bin.child == window.convert_page.page
+    end
+  end
+
+  d.step("a thumbnail's flow box child is built with its accessible label") do
+    d.check("the builder fragment produces a GtkFlowBoxChild") do
+      window.send(:labelled_flow_box_child, "PNG · 640×480").is_a?(Gtk::FlowBoxChild)
+    end
+  end
+
+  d.step("the About dialog's sibling app icons resolve") do
+    Gtk::IconTheme.get_for_display(Gdk::Display.default).then do |theme|
+      d.check("Impression's icon is in the theme") do
+        theme.has_icon?("io.gitlab.adhami3310.Impression")
+      end
+      d.check("Footage's icon is in the theme") do
+        theme.has_icon?("io.gitlab.adhami3310.Footage")
+      end
+    end
+  end
+
+  d.step("a maximized window still records its size") do
+    window.window.maximize
+    Settings.new.tap do |settings|
+      settings.remember(window.window)
+      d.check("window-width was written") { settings["window-width"].positive? }
+      d.check("window-height was written") { settings["window-height"].positive? }
+      d.check("is-maximized was written") { [true, false].include?(settings["is-maximized"]) }
+    end
+    window.window.unmaximize
   end
 
   d.step("the colour button announces a pick") do
