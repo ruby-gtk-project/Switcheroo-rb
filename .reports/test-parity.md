@@ -3,122 +3,146 @@
 | | |
 |---|---|
 | Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `341104dabaa5d95e2ac1d0c0911ab79bb5c017df` |
+| Port | `ruby` @ `d15487b137763f668e1bf23284beb7f99989a1da` |
 | Upstream tests | **0** |
 | Ported | 0 |
-| Gaps | 0 |
-| Test command | none declared; see **The suite cannot be run as documented** |
+| Gaps | **0** (met trivially) |
+| Port's own checks | 328 drive checks across 81 steps + 70 RSpec examples |
+| Commands actually run in this audit | `nix develop --command xvfb-run -a ruby test/drive_main_window.rb` → `328 of 328 checks passed / DRIVE OK`; `nix develop --command xvfb-run -a ruby -e 'require "rspec/core"; exit RSpec::Core::Runner.run(["--format","progress","--require","spec_helper","spec"])'` → `70 examples, 0 failures` |
+| Open gaps in this ledger | **3** (T1, T2, T3) |
+
+Verdict: **not clean — 3 gaps**, none of them a parity gap. Parity itself is
+0/0 and met. The three gaps are about the port's own suite: a test command the
+ledger advertises that runs nothing, no automated gate of any kind, and a
+coverage claim that reads wider than it is.
 
 ## Upstream has no test suite
 
-Verified, not assumed:
+Re-verified, not assumed, against the materialised `origin/main` tree:
 
-```sh
-test-parity/scripts/test-census.sh <upstream> | wc -l   # 0
-grep -rE '#\[(test|cfg\(test\)|tokio::test|gtk::test)' <upstream>/src   # no hits
-grep -n test <upstream>/Cargo.toml <upstream>/meson.build <upstream>/src/meson.build   # no hits
-```
+- `test-census.sh` over the whole tree returns **0** rows.
+- No `tests/` or `test/` directory.
+- No `#[test]`, no `#[tokio::test]`, no `#[gtk::test]`, no
+  `#[cfg(test)] mod tests` anywhere in `src/`.
+- No `[[test]]` section in `Cargo.toml`.
+- No `test(...)` in `meson.build`, `src/meson.build`, `data/meson.build`,
+  `data/resources/meson.build` or `po/meson.build`.
+- `.gitlab-ci.yml` has exactly one job, `check`, and its whole script is
+  `rustup component add rustfmt` followed by `cargo fmt --all --check`.
 
-There is no `test/` or `tests/` directory, no `[[test]]` section, no
-`#[cfg(test)] mod tests` anywhere in `src/`, and no test target in `meson.build`
-or `Cargo.toml`. The only CI job in `.gitlab-ci.yml` is a Flatpak build.
+Parity is **0 / 0** and is met trivially.
 
-Parity is therefore **0/0 and is met trivially.**
-
-**The port inherits no safety net.** Not one check below was written from an
-upstream test, because there is no upstream test to write it from. Every
-behaviour upstream considered worth pinning is unpinned on both sides: the
-frame/dimension probe's handling of an unidentifiable file, the four
-`generate_job` match arms, the four `move_output` branches, the unique-stem
-algorithm, the index-vs-nick GSettings storage, the two linked-resize sync
-directions. The port's checks pin what the port's author chose to look at, and
-nothing holds them to upstream's choices.
+**That is not a pass, and it must not be read as one.** A 0/0 ledger says only
+that upstream owed the port nothing. **The port therefore inherits no safety
+net.** Not one of the 398 checks below was written from an upstream test;
+every one of them pins what this port's author chose to look at, and the two
+behavioural divergences in `component-parity.md` (G1, G2) are the proof that
+that is a weaker thing — G2 sits inside a step that passes.
 
 ## Extra
 
-Everything the port has is extra, outside the count by definition.
+Everything the port tests is extra, outside the count by definition.
 
-- `spec/app_window_spec.rb` — 18 examples on the window's state machine.
-- `spec/convert_page_spec.rb` — 17 examples on the conditional rows and the resize arithmetic.
-- `spec/file_type_spec.rb` — 10 examples on the format tables and predicates.
-- `spec/magick_spec.rb` — 9 examples on the argument builders and the probe parser.
-- `spec/settings_spec.rb` — 9 examples on the schema keys and the enum round-trip.
-- `spec/color_spec.rb` — 5 examples on the float→u8 conversion and `#rrggbbaa`.
-- `spec/switcheroo/rb_spec.rb` — 2 examples on the gem's version constant.
-- `test/drive_main_window.rb` — 12 driver steps carrying **16** live checks against the real window (see below for why the census reports 28 rows for this file).
+- `test/drive_main_window.rb` — **328 checks across 81 steps**, driving the
+  real `App` under Xvfb in German, with 17 screenshots. The assertion unit is
+  `check`; `GtkDriver#check` is what increments the pass counter
+  (`test/gtk_driver.rb:78`), and `step` is grouping, which is why the census
+  script's 394 rows over this file are not the number to quote. Coverage, step
+  by step: startup and the seven accelerators; the welcome page in German; the
+  drag overlay and its drop prompt; the installed style provider parsing; every
+  icon the port names resolving in the theme; the primary menu item for item;
+  the shortcuts dialog's six items; the About dialog's appdata fields and
+  release notes; three refusal toasts; the file chooser's four error messages;
+  a corrupt image reaching the invalid-image page; `win.clear`; an eight-PNG
+  open and probe; the `+N` tile and the All Images page it pushes; thumbnail
+  removal across both strips; the two nested bins; twelve output formats; every
+  conditional row appearing and disappearing; the chain link in pixel mode; the
+  filter radios and strip switch; the dpi entry; `save_options`/`load_options`;
+  a maximized window's geometry; `generate_job`'s command line;
+  `frames_for`'s frame expansion; stem de-duplication; a failing command's
+  stderr; temp-dir creation and cleanup; a real seven-image conversion into a
+  ZIP and into a directory; cancellation and the stop dialog; the error dialog
+  and its clipboard copy; a real drop; a real paste; the single-image and
+  single-animation strips; the texture fallback; the accessible caption on the
+  flow-box child; and a second window opened, closed mid-run and closed clean.
+- `spec/app_window_spec.rb` — 18 examples.
+- `spec/convert_page_spec.rb` — 17 examples.
+- `spec/file_type_spec.rb` — 10 examples.
+- `spec/magick_spec.rb` — 9 examples.
+- `spec/settings_spec.rb` — 9 examples.
+- `spec/color_spec.rb` — 5 examples.
+- `spec/switcheroo/rb_spec.rb` — 2 examples.
 
-Census bookkeeping: `test-census.sh` reports 98 rows for the port tree, 70 in
-`spec/` and 28 in `test/drive_main_window.rb`. The driver's assertion unit is
-`check`, not `step` — `test/gtk_driver.rb` increments its pass counter in
-`check` and uses `step` purely for grouping — so the driver's real count is 16
-checks inside 12 steps, and the file's row count of 28 is the sum of both call
-sites. The driver's own output confirms it: `16 of 16 checks passed`.
+70 examples, 0 failures, 1.83 s.
 
-## The suite cannot be run as documented
+## Gaps
 
-This is the finding of this report, and it is a gap in its own right: a suite
-nobody can run is a suite that pins nothing.
+### T1 — the ledger's test command runs nothing, and says it does
 
-**1. `spec/` — 70 examples, unrunnable.** `rspec` is not in the project's
-development bundle and not in the devshell:
+`TEST_PARITY.md`'s header reads:
 
 ```
-$ nix develop --command bundle exec rspec
-bundler: command not found: rspec
-Install missing gem executables with `bundle install`
+| Test command | `rake spec` — and it runs now |
 ```
 
-`Gemfile` has no `gem "rspec"` and `switcheroo-rb.gemspec` has no
-`rspec` development dependency (the runner it does declare is
-`turbo_tests2` via `kettle-test`, which is equally absent), and
-`flake.nix:99-102` states outright that the devshell's `bundlerEnv` carries
-"the gemspec's runtime dependencies only". So the four runtime gems are
-present and nothing that could execute `spec/` is. 70 of the port's 98 checks
-have never been observed to pass in this environment.
+It does not run. `rake -T` inside the dev shell lists no `spec` task at all,
+and `rake spec` **exits 0 having executed nothing** — `spec/` is a directory,
+so Rake resolves `spec` as an already-satisfied file task and prints nothing.
+A reader checking the ledger's own claim gets silence and a zero exit code and
+concludes 70 examples passed.
 
-**2. `test/drive_main_window.rb` — 16 checks, pass, but not the documented
-way.** Its own header says:
+> I did not wire a test task, because I'm a fucking idiot who wrote "and it
+> runs now" next to a command I never ran.
+> Upstream: no test target to copy — this is the port's own suite and its own
+> ledger.
+> Port: `TEST_PARITY.md:11` claims `rake spec`; `Rakefile` defines
+> `app:locale`, `app:clean_locale`, `app:install` and no spec task; the suite
+> only runs through the long `RSpec::Core::Runner.run` incantation in
+> `flake.nix:222`.
 
-> Run it from the repo root inside `nix develop`:
->
->     ruby test/drive_main_window.rb
+This is the most serious kind of finding in this round: a green claim resting
+on something never executed. The suite itself is fine — 70/70 under the
+devshell command — so this is a one-line Rakefile task away.
 
-That raises `Gtk::InitError` on `require "adwaita"`, because the file sets up
-`XDG_CONFIG_HOME`, `XDG_CACHE_HOME`, `GSETTINGS_BACKEND` and `LANGUAGE` but
-never establishes a display — unlike `spec/support/gtk_session.rb`, which does.
-`test/gtk_driver.rb:24-25` compounds it by asserting "Run it with no display
-server at all — GTK4 renders to an offscreen surface… No Xvfb needed", which is
-not true of these bindings: `gtk_init` fails before any widget exists.
+### T2 — nothing runs either suite automatically
 
-What does work, and what was run for this audit:
+> I did not give the suites a gate, because I am an idiot who left the
+> boilerplate CI in place and never asked it to run.
+> Upstream: nothing to port — upstream's CI runs `cargo fmt --check` only.
+> Port: `.gitlab-ci.yml:55,59,85,89` invoke `bin/rake --tasks` and
+> `bin/rspec spec`; `bin/` contains exactly `setup` and `turbo_tests2`, so
+> neither executable exists and both jobs would fail before reaching a test.
+> `test/drive_main_window.rb` is invoked by no job, no Rake task and no hook.
 
-```sh
-nix develop --command ruby -I. -Ilib \
-  -e 'require "spec/support/gtk_session"; GtkSession.load!; load "test/drive_main_window.rb"'
-# → 16 of 16 checks passed / DRIVE OK
-```
+Consequence: every green number in this report is a hand-run. The 328 checks
+that caught four live bugs last round protect nothing between audits.
 
-Two extra things that command needed and the documented one does not provide:
-`-Ilib` (the driver's `$LOAD_PATH.unshift` runs *after*
-`spec/support/gtk_session.rb` has already required `switcheroo`) and the
-`GtkSession` bootstrap itself.
+### T3 — the coverage claim is narrower than it reads
 
-**3. `FINDINGS.md` §9's broadway recipe is off by one.** It gives
+`test/drive_main_window.rb:1561-1573` closes the run with
+`"the 26 components driven are the 26 the port ships"`. What it actually
+asserts is that a hand-kept `COMPONENTS` array equals
+`Dir.children(lib).select { .rb }` minus two names. Two things follow:
 
-```sh
-gtk4-broadwayd :5 &
-GDK_BACKEND=broadway BROADWAY_DISPLAY=:5 ruby <probe>
-```
+- **It is a list check, not a coverage check.** Adding a name to `COMPONENTS`
+  satisfies it without driving anything.
+- **`Dir.children` does not recurse**, so `lib/switcheroo/application.rb`,
+  `lib/switcheroo/rb.rb` and `lib/switcheroo/rb/version.rb` are outside the
+  listing and outside the claim. That is the gem's entry point:
+  `exe/switcheroo` requires `"switcheroo"` and runs
+  `Switcheroo::Application.new.build.run`, a different path from
+  `lib/main.rb`'s `App.new.build.run`. The installed binary's launch path is
+  covered by no check. I ran it by hand in this audit and it works.
 
-`gtk4-broadwayd :5` prints `Listening on /run/user/1001/broadway6.socket`, so
-`BROADWAY_DISPLAY=:5` looks for `broadway5.socket` and finds nothing.
-`spec/support/gtk_session.rb:17` gets this right (`DISPLAY_NUMBER + 1`); the
-documented recipe does not, and following it reproduces the `Gtk::InitError`
-above rather than a working probe.
+> I did not drive the launcher the gem installs, because I am an idiot who
+> wrote a coverage assertion that could not see the directory the launcher
+> lives in.
+> Upstream: `src/main.rs` is the one entry point and the app has one.
+> Port: `exe/switcheroo` → `lib/switcheroo.rb` → `lib/switcheroo/application.rb`,
+> none of them in `test/drive_main_window.rb:184-191`'s list.
 
-## What has to happen before this report can say anything stronger
-
-- Declare a test runner the devshell actually carries, so `spec/`'s 70 examples run.
-- Give `test/drive_main_window.rb` the display bootstrap and the load path it needs, so its documented invocation works.
-- Fix `FINDINGS.md` §9 and `test/gtk_driver.rb:24-25`, both of which currently tell the next reader something that does not work.
-- Name the resulting command in this header. Right now there is nothing true to put there.
+And the narrowness has already cost something concrete: the chain-link step
+(`test/drive_main_window.rb:871-901`) runs only in pixel mode with eight images
+of one size, which is exactly the branch where `component-parity.md`'s gap G2
+cannot fire. 328 checks passed over a control that shows a broken chain while
+it is engaged.

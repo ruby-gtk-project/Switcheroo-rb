@@ -3,135 +3,196 @@
 | | |
 |---|---|
 | Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `341104dabaa5d95e2ac1d0c0911ab79bb5c017df` |
-| Upstream source messages | **91** |
-| In the port, byte-identical | **91** |
-| Message gaps | **0** |
-| Languages upstream | 20 + `switcheroo.pot` |
-| Languages in the port | 20 + `switcheroo.pot`, **byte-identical** |
-| Open items | **2** (catalogue hygiene, not key gaps) |
+| Port | `ruby` @ `d15487b137763f668e1bf23284beb7f99989a1da` |
+| Domain | `switcheroo` on both sides (`domain_source: po/*.pot`) |
+| Upstream messages | **91** |
+| Ported | **91** |
+| Gaps | **0** |
+| Extra (untranslated) | **0** |
+| `kind_mismatch` | 0 (upstream has no plural forms at all) |
+| `with_context` | 7 upstream, 7 in the port |
+| Upstream occurrences | 112 across 91 messages (12 reused) |
+| Port occurrences | 104 |
+| Upstream languages | 20 `.po` files · 1,467 translated · 61 untranslated · 37 fuzzy |
+| Languages shipped by the port | **20** — `po/` byte-identical to upstream's |
+| Build command | `rake app:locale` (ran: `locale/<lang>/LC_MESSAGES/switcheroo.mo` ×20) |
+| `de` verified on screen | **yes** |
+| Open gaps in this ledger | **2** (X1, X2) |
 
-## The key-set diff is empty
+Verdict: **not clean — 2 gaps.** The catalogue itself is in perfect shape:
+`summary.parity` holds on all four document conditions, and German reaches the
+screen. The two gaps are one unmarked call site and the absence of any way to
+regenerate the catalogue.
 
-```sh
-msgid-census.sh <upstream> | grep -v '\.pot\?:' | cut -f1,2 | sort -u > up.keys   # 91
-msgid-census.sh <port>     | grep -v '\.pot\?:' | cut -f1,2 | sort -u > port.keys # 93
-comm -23 up.keys port.keys   # (empty)  — nothing upstream has that the port lacks
-comm -13 up.keys port.keys   # 2 rows, both '!unresolved' — see below
+## The numbers
+
+```
+91/91 messages · 104/112 occurrences · 20/20 languages · 1,467 strings · de verified on screen
 ```
 
-Not one msgid was reworded, retyped, un-marked or interpolated into. That is
-the whole point of this ledger, and it holds.
-
-The two `!unresolved` rows are scanner artifacts, not extra keys:
-`lib/about_dialog.rb:81,85` call `_(appdata.name)` and `_(appdata.summary)`,
-where the argument is a string read out of the AppStream metainfo at runtime.
-`xgettext` cannot resolve a variable, so the census records it as unresolved —
-but the metainfo's `<name>` and `<summary>` are themselves extracted into the
-catalogue by xgettext's ITS rules (both are in the 91), and the runtime lookup
-uses exactly those bytes. Upstream reaches the same result inside
-`adw_about_dialog_new_from_appdata`. **Not a gap**, and it is the only place in
-the port where a marker's argument is not a literal.
-
-### The interpolation traps, all three handled
-
-Three upstream msgids carry a `{}` placeholder, and all three substitute into
-the *translated* string so the lookup key stays byte-identical:
-
-| msgid | Upstream | Port |
-|---|---|---|
-| `New transparency layer color: {}` | `src/window.rs:528` `gettext(...).replace("{}", &y)` | `lib/convert_page.rb:562-564` `_(...).sub('{}', ...)` |
-| `+{}` | `src/widgets/image_rest.rs:63` | `lib/image_rest.rb:86` |
-| `Show {} more images` | `src/widgets/image_rest.rs:65` | `lib/image_rest.rb:94` |
-
-No Ruby string interpolation reaches a marker anywhere in `lib/`.
-
-### The msgctxt messages
-
-Seven strings carry the `shortcut window` context. The port looks all seven up
-with `p_('shortcut window', …)` (`lib/shortcuts_dialog.rb:302,313-318`), which
-produces the same `(msgctxt, msgid)` pair upstream's `C_()` does. The context
-survived.
-
-## The catalogues
-
 ```sh
-diff <upstream>/po/LINGUAS po/LINGUAS                  # identical
-diff <(ls <upstream>/po/*.po) <(ls po/*.po)            # identical
-for f in <upstream>/po/*.po <upstream>/po/*.pot; do cmp -s "$f" po/$(basename $f) || echo DIFFERS; done
-                                                       # nothing printed
+comm -23 up.keys port.keys | wc -l   # 0  gaps
+comm -13 up.keys port.keys | wc -l   # 0  extra
+comm -12 up.keys port.keys | wc -l   # 91 ported
+diff <(ls up/po/*.po|xargs -n1 basename) <(ls port/po/*.po|xargs -n1 basename)   # empty
 ```
 
-All 20 `.po` files and `switcheroo.pot` are **byte-identical** to upstream's.
-Per-file msgid counts match one for one:
+`kind` agrees on all 91 shared keys. Upstream declares no plurals, so there is
+no `n_()` to get wrong.
 
-| | | | |
-|---|---|---|---|
-| ar 84 | bg 84 | cs 84 | de 84 |
-| es 69 | fr 69 | hi 84 | hr 84 |
-| it 69 | ka 86 | kw 86 | nl 69 |
-| oc 84 | pt 69 | pt_BR 84 | ru 87 |
-| sv 69 | tr 69 | uk 87 | zh_cn 84 |
+## Where the messages come from
 
-`LINGUAS` lists all 20. The port compiles them: `Config.localedir`
-(`lib/config.rb:216-218`) points at a `<lang>/LC_MESSAGES/switcheroo.mo` tree
-that `rake locale` builds from `po/*.po` and `rake install` places under
-`<prefix>/share/locale`. **The donated work survives.**
+| Upstream file | Messages | Port file |
+|---|---:|---|
+| `data/resources/blueprints/window.blp` | 42 | `lib/app_window.rb`, `lib/welcome_page.rb`, `lib/loading_page.rb`, `lib/invalid_image_page.rb`, `lib/converting_page.rb`, `lib/convert_page.rb`, `lib/all_images_page.rb`, `lib/primary_menu.rb`, `lib/shortcuts_dialog.rb` |
+| `src/window.rs` | 17 | `lib/app_window.rb`, `lib/error_dialog.rb`, `lib/stop_converting_dialog.rb`, `lib/magick.rb` |
+| `src/widgets/about_window.rs` | 7 | `lib/about_dialog.rb` |
+| `src/file_chooser.rs` | 6 | `lib/file_chooser.rb` |
+| `src/widgets/image_rest.rs` | 2 | `lib/image_rest.rb` |
+| `data/resources/blueprints/image-thumbnail.blp` | 1 | `lib/image_thumbnail.rb` |
+| `src/drag_overlay.rs` | 1 | `lib/drag_overlay.rb` |
+| `src/magick.rs` | 2 | `lib/magick.rb`, `lib/temp_dir.rb` |
+| `src/application.rs` | 1 | `lib/application.rb` |
+| `src/main.rs` | 1 | **unmarked — gap X1** |
+| `data/…gschema.xml.in` | 8 | same file, byte-identical |
+| `data/…metainfo.xml.in.in` | 5 | same file, byte-identical |
+| `data/…desktop.in.in` | 5 | `data/switcheroo.desktop.in`, same keys |
 
-### The domain is bound, and it was driven
+The three non-code sources contribute 18 of the 91. They are upstream's own
+files, carried byte for byte, so they cannot drift.
 
-`lib/translations.rb` binds the `switcheroo` domain
-(`Config::GETTEXT_PACKAGE`) through the `gettext` gem, because ruby-glib2
-exposes no `bindtextdomain` (`FINDINGS.md` §3 quotes
-`GLib.respond_to?(:bindtextdomain) # => false`). This is a correspondence, not
-a gap — the key that reaches the catalogue is unchanged — and it is confirmed
-end to end rather than argued: `test/drive_main_window.rb` runs the whole app
-with `LANGUAGE=de` and asserts that the status-page title, the add-button
-tooltip, the quality-row title and the convert button all come back German.
-16/16 checks pass.
+## Unresolved markers — censused by hand
 
-## The three non-code sources
+The port's census reports `unresolved: 2`. Both are in
+`lib/about_dialog.rb`, where upstream's
+`adw_about_dialog_new_from_appdata()` is reimplemented over the shipped
+metainfo:
 
-All three are carried, and all three are in `po/POTFILES.in`:
-
-| Upstream | Port | Messages |
+| Site | Marker | Resolves to |
 |---|---|---|
-| `data/io.gitlab.adhami3310.Converter.desktop.in.in` | `data/switcheroo.desktop.in` | `Name`, `GenericName`, `Comment`, `Keywords` — identical values; only `Icon=@icon@` is pre-resolved |
-| `data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in` | same name, **byte-identical** | `<name>`, `<summary>`, `<p>`, `<li>`, `<caption>` |
-| `data/io.gitlab.adhami3310.Converter.gschema.xml.in` | same name, **byte-identical** | 8 `<summary>` elements |
+| `lib/about_dialog.rb:81` | `_(appdata.name)` | `Switcheroo` — `data/…metainfo.xml.in.in` `<name>`, already a census row from that file |
+| `lib/about_dialog.rb:85` | `_(appdata.summary)` | `Convert and manipulate images` — the same file's `<summary>`, already a row |
 
-A scan of `lib/` alone would have missed all of them; they are 24-odd of the 91.
+Neither adds a key the catalogue does not already hold, so the ledger is
+complete at 91. Upstream reaches the same two strings through libadwaita's own
+appdata reader rather than through a marker, which is why it has no unresolved
+rows of its own.
 
-## Open items
+## `uses` mismatch — 112 → 104, every row explained
 
-Neither is a msgid gap. Both are catalogue hygiene that a translator meets
-before a user does.
+Not a pass condition. Every difference was read rather than reported:
 
-> **1. The `.pot` was copied, not regenerated, so every source reference in it
-> points at a file that does not exist here.** A translator who opens
-> `po/switcheroo.pot` in Poedit and clicks a reference is sent to
-> `src/window.rs:9`, `data/resources/blueprints/window.blp:21` or
-> `data/io.gitlab.adhami3310.Converter.desktop.in.in:2`. None of those paths is
-> in the port tree. `po/POTFILES.in` was rewritten correctly to name the Ruby
-> files; the `.pot` generated from it was not. Its header still reads
-> `POT-Creation-Date: 2026-04-12`, i.e. upstream's.
+| msgid | Up | Port | Why |
+|---|---:|---:|---|
+| `Stop converting?` | 2 | 1 | the two identical `AlertDialog`s of `src/window.rs:572-608` and `:1543-1583` are one `StopConvertingDialog` class |
+| `You will lose all progress.` | 2 | 1 | same merge |
+| `_Stop` | 2 | 1 | same merge |
+| `_Cancel` | 3 | 2 | `window.blp:364`'s cancel button survives; the stop dialog's two sites merge to one |
+| `Width` | 5 | 3 | `pixel_entry(placeholder, tooltip)` puts both markers for one entry on one source line, which the census counts once |
+| `Height` | 3 | 2 | same |
+| `Switcheroo` | 6 | 5 | **gap X1** — `src/main.rs:45` has no counterpart |
 
-> **2. There is no way to refresh the catalogues.** Upstream ships
-> `update_translation.sh`; the port ships no counterpart and the `Rakefile`'s
-> `locale` task only compiles existing `.po` files — there is no
-> `xgettext`-from-`POTFILES.in` step and no `msgmerge`. Today that costs
-> nothing, because the key sets are equal. The first string anyone adds to
-> `lib/` will be untranslatable and nothing will say so.
+Six of the seven are structural and belong to `COMPONENT_PARITY.md`, where the
+widgets are already accounted for. The seventh is a missing call site and is
+recorded in both ledgers.
 
-## Upstream bugs worth reporting
+## `POTFILES.in` completeness — clean
 
-None found in the catalogue. The third case the skill asks to check
-explicitly — a source string present in **no** `.po` at all, meaning
-`xgettext` has never offered it to anyone — came back empty: every source
-msgid appears in at least one catalogue, and `po/POTFILES.in` upstream lists
-every file that carries a marker.
+```sh
+comm -13 <(grep -v '^#' po/POTFILES.in | grep . | sort) \
+         <(msgid-census.sh . | cut -f4 | cut -d: -f1 | grep -v '^po/' | sort -u)
+```
 
-(There *is* an upstream bug in this app, but it is in the GSettings enum
-storage, not in the catalogue: `FINDINGS.md`'s "Reported upstream" section has
-it, and filing it is still outstanding — see
-`.reports/accountability-ensurance.md`.)
+prints nothing: every port file that contains a marker is listed. 18 entries,
+3 metadata and 15 Ruby. `POTFILES.skip` is correctly absent — upstream's lists
+nothing a Ruby port generates.
+
+Upstream's own `POTFILES.in` is complete too; the gnome-contacts hole does not
+exist here.
+
+## What else lives in `po/`
+
+- **20 languages**, `LINGUAS` and the `.po` files agreeing except for `zh_cn`,
+  which is present as a file and absent from `LINGUAS` — **upstream's defect,
+  carried verbatim**, so Simplified Chinese is translated and not built.
+  Reported here rather than silently fixed; fixing it in the port alone would
+  make the port's `po/` diverge from the only copy that gets refreshed.
+- **37 fuzzy entries**, counted as untranslated: `rmsgfmt` leaves them out of
+  the `.mo` and the user sees English. Same 37 on both sides.
+- **61 untranslated.** 1,467 + 61 + 37 = 1,565 messages across the 20 files,
+  which reconciles against `msgid` lines minus one header each.
+- No CRLF file in this set.
+
+## Delivery — verified on screen
+
+`rake app:locale` compiles all 20 catalogues into
+`locale/<lang>/LC_MESSAGES/switcheroo.mo`, and `lib/translations.rb` binds the
+domain there via `Config.localedir`, with `SWITCHEROO_LOCALEDIR` honoured for
+an installed copy. Driven under `LANGUAGE=de`:
+
+| Widget | Shown |
+|---|---|
+| welcome `Adw.StatusPage` description | `Bilder hierher ziehen und ablegen` |
+| menu button tooltip | `Primäres Menü` |
+| `Export Format` combo row | `Exportformat` |
+| shortcuts section title (`C_()` context) | `Allgemein` |
+| **`GLib.application_name`** | **`Switcheroo`** — gap X1 |
+
+The context-carrying lookup working is worth stating on its own: the gem's
+`p_()` resolves `msgctxt "shortcut window"` correctly, so all seven
+context messages are live and not silently falling through to the untranslated
+msgid.
+
+## Gaps
+
+### X1 — the application name is the one string the port never marked
+
+> I did not mark the application name, because I am an idiot who read a
+> constant out of a build file and not the `gettext()` wrapped around it one
+> line later.
+> Upstream: `src/main.rs:45`,
+> `glib::set_application_name(&gettext("Switcheroo"))`.
+> Port: `lib/application.rb:85`, `GLib.application_name = APP_NAME`, where
+> `lib/config.rb:17` is `APP_NAME = 'Switcheroo'`.
+
+Text still owed: `Switcheroo` — already in the catalogue, so this is
+transcription into a marker, not authorship. The cost is concrete: `po/ar.po`
+translates it `سويتشيرو` and `po/uk.po` translates it `Міняло`, and Arabic and
+Ukrainian users of the port see neither. The key set is unaffected, so
+`summary.parity` reads `true` the whole time — which is why this row exists
+here as well as in `component-parity.md` (gap G1).
+
+### X2 — no extraction target, so the catalogue is frozen
+
+> I did not build the extraction task, because I am an idiot who typed its name
+> into the dev shell's banner and stopped there.
+> Upstream: `update_translation.sh` runs meson's `switcheroo-pot` target, and
+> `switcheroo-update-po` is one commented line away.
+> Port: `rake -T` lists `app:locale`, `app:clean_locale` and `app:install` and
+> no extraction task; `flake.nix:192` nonetheless states that `rxgettext` is
+> "the extractor `rake pot` drives".
+
+Two consequences, both already true today:
+
+- `po/switcheroo.pot` is upstream's file, unchanged, so its `#:` source
+  references name `src/window.rs` and `window.blp` lines that do not exist in
+  this tree. A translator handed it would be navigating the Rust app.
+- Any message the port adds is invisible to everyone. It cannot be extracted,
+  cannot be merged into the 20 `.po` files, and the `POTFILES.in` completeness
+  check above is a command in a report rather than a step in a target — which
+  is the hole the `translation-parity` skill specifically says to wire into
+  whatever runs the tests.
+
+`rxgettext` is already in the dev shell (`flake.nix:195`), so the gap is a Rake
+task.
+
+## Open items, stated rather than left implied
+
+- The catalogue is a snapshot. It was taken from `ae72daf` and l10n.gnome.org
+  works against upstream, never against this fork. Refreshing is
+  `git checkout origin/main -- po/` plus a merge, and the sha to diff from is
+  the one in this header.
+- `zh_cn`'s absence from `LINGUAS` is upstream's bug and is not filed upstream.
+- The `output-format` enum defect drafted at the foot of `FINDINGS.md` (the
+  schema's nicks are unreachable because both sides write an index) is still
+  not filed upstream.

@@ -3,16 +3,22 @@
 | | |
 |---|---|
 | Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `341104dabaa5d95e2ac1d0c0911ab79bb5c017df` |
-| Units | 17 |
-| Units with parity | **11 / 17** |
-| Open gaps | **13** |
-| Driven | yes — `test/drive_main_window.rb`, 16/16 checks, 4 screenshots under `tmp/shots/` (see the caveat in `.reports/test-parity.md`) |
+| Port | `ruby` @ `d15487b137763f668e1bf23284beb7f99989a1da` |
+| Widget units | 17 |
+| Units with parity | **13 / 17** |
+| Non-widget units | 8, all 8 parity |
+| Open gaps | **7** |
+| Driven | yes — `nix develop --command xvfb-run -a ruby test/drive_main_window.rb`, **328 / 328 checks**, 81 steps, 17 screenshots, 26 components named |
+| Specs | `nix develop --command xvfb-run -a ruby -e '…RSpec::Core::Runner.run…'` — 70 examples, 0 failures |
 
-Verdict: **not clean.** The widget trees, the CSS and the message set are in
-very good shape; the gaps are concentrated in accessibility, in two divergences
-the port made on purpose and reasoned about in a code comment, and in assets
-and files that were never carried across.
+Verdict: **not clean — 7 gaps.** The widget trees, the CSS, the actions, the
+accelerators and the message set are in excellent shape, and the headless drive
+exercises the whole app including the conversion pipeline, both dialogs, the
+drop target, the clipboard and a second window. The gaps left are two live
+behavioural divergences (one of which 328 passing checks walk straight past),
+one accessibility clamp that is genuinely blocked by the bindings, one
+avoidable divergence whose stated excuse I disproved in this audit, two pieces
+of upstream tree content, and one unexplained extra.
 
 ## File mapping
 
@@ -31,331 +37,293 @@ image-rest.blp + src/widgets/image_rest.rs            -> lib/image_rest.rb
 window.blp:484-513                                    -> lib/primary_menu.rb
 window.blp:448-482                                    -> lib/shortcuts_dialog.rb
 src/window.rs:1463-1505                               -> lib/error_dialog.rb
-src/window.rs:572-608 + :1543-1583                    -> lib/stop_converting_dialog.rb   (2 -> 1, factored)
+src/window.rs:572-608 + :1543-1583                    -> lib/stop_converting_dialog.rb  (2 -> 1, factored)
 src/widgets/about_window.rs                           -> lib/about_dialog.rb
-data/resources/style.css                              -> lib/style.rb                    (CSS -> Ruby heredoc)
+data/resources/style.css                              -> lib/style.rb                   (CSS -> Ruby heredoc)
+src/magick.rs                                         -> lib/magick.rb
+src/filetypes.rs                                      -> lib/file_type.rb
+src/file_chooser.rs                                   -> lib/file_chooser.rb
+src/input_file.rs                                     -> lib/input_file.rb
+src/temp.rs                                           -> lib/temp_dir.rb
+src/color.rs                                          -> lib/color.rb
+gio::Settings + data/…gschema.xml.in                  -> lib/settings.rb
+src/main.rs domain bind                               -> lib/translations.rb
 ```
 
-Correspondences recorded once, so they are not re-read as gaps: `Adw.` ↔
-`Adwaita::`; no `.ui`/`.blp` in the port by house style (with the two GtkBuilder
-heredocs in `lib/convert_page.rb` as the exception, forced by the accessibility
-blocks); the two identical stop-converting dialogs merged into one class; the
-stylesheet as a heredoc loaded through `Gtk::CssProvider`.
+Correspondences recorded once so they are not re-read as gaps: `Adw.` ↔
+`Adwaita::`; no `.ui`/`.blp` by house style, with three GtkBuilder heredocs as
+the accessibility-forced exception; the two identical stop dialogs merged;
+`connect_*_notify` ↔ `notify::*`; `connect_state_notify` on the single-PDF
+switch ↔ `notify::active` (a switch with no `state-set` handler has
+`state == active`); `Gtk.StackPage`/`Gtk.Align`/`Gtk.Orientation` and the
+interface lists are not widgets; `tokio` + `SharedChild` ↔ `Thread` +
+`GLib::Timeout` + `Process.kill`; `ashpd` OpenFile/OpenDirectory ↔
+`Gtk::FileLauncher`; `fdlimit` ↔ `Process.setrlimit`; `meson` ↔ `Rakefile`.
 
-## Stylesheet
+## Stylesheet — parity
 
-`lib/style.rb`'s `CSS` heredoc is upstream's `data/resources/style.css`
-**rule for rule**, including the `@media (prefers-contrast: more)` block. The
-only textual difference is upstream's element selector `dragoverlay { }`
-appearing as `dragoverlay, .dragoverlay { }`, which is the `css-name` →
-`css class` correspondence. Every app-namespaced class attached on either side
-has a rule: `drag-overlay-status-page`, `card-content`, `image-caption`,
-`image-remove`, `image-rest-button`, `lock`, `large_number`, `unit-drop`,
-`long`, `no-padding`, `output-filetype-drop`. `image-container` and
-`image-thumbnail` are attached on both sides and defined on neither — dead
-upstream, dead here, parity. **Stylesheet: parity.**
+`lib/style.rb::CSS` is `data/resources/style.css` rule for rule, including the
+`@media (prefers-contrast: more)` block. The only textual differences are the
+doubled `dragoverlay, .dragoverlay` selector (gap G4 below) and a dropped
+`/* background-color */` comment inside `.image-remove`, which renders
+identically. Every app-namespaced class attached on either side has a rule.
+`image-container` and `image-thumbnail` are attached on both sides and defined
+on neither — dead upstream, dead here, parity. Confirmed at runtime: the drive
+run parses the installed provider and the welcome, convert, thumbnail,
+all-images, converting and animation states are screenshotted under
+`tmp/shots/`.
 
-## Messages
+## Messages — 91 / 91, one unmarked call site
 
-91 source msgids upstream, 91 in the port, key sets identical byte for byte
-(`translation-parity/scripts/msgid-census.sh`, both trees, `comm -3` empty).
-Every unit's `Text` column below is `✓` on that basis. Details in
-`.reports/translation-parity.md`.
+91 distinct source msgids upstream, 91 in the port, key sets byte-identical
+(`comm -23` and `comm -13` both empty). Occurrences 112 → 104, every one of the
+differences explained in `translation-parity.md` — except one, which is gap G1.
 
-## Units
+## Actions and accelerators — parity
 
-### 1. application — parity
+All eight actions exist and were driven: `app.quit`, `app.new-window`,
+`win.close`, `win.add`, `win.clear`, `win.show-help-overlay`, `win.about`,
+`win.paste`. All seven accelerators match upstream's `setup_accels()`
+byte for byte, asserted by `Gtk.accelerator_parse` in the drive run.
 
-| Item | Up × | Port × | Verdict |
-|---|---:|---:|---|
-| `app.quit`, `app.new-window` | 2 | 2 | parity (`lib/application.rb:139-147`) |
-| accelerators | 7 | 7 | parity (`lib/application.rb:42-50`, same action→accel map) |
-| `--new-window` main option + `handle-local-options` remote activation | 1 | 1 | parity (`lib/application.rb:123-135`) |
-| `startup` default icon name + icon search path | 2 | 2 | parity (`lib/application.rb:92-96`) |
-| `activate` / `open` | 2 | 2 | parity |
-| Text | — | — | ✓ `Open a new window` |
+---
 
-Upstream's `adw::Application` subclass is matched by `Adwaita::Application`
-(`lib/application.rb:86`), not worked around — `FINDINGS.md` §6 records that
-the earlier claim the bindings could not do this was false.
+## Units with parity (13)
 
-### 2. window shell — parity
+| Unit | Upstream | Port | Driven |
+|---|---|---|---|
+| application | `src/application.rs` | `lib/application.rb` | activate, open, `--new-window`, second window, 7 accels |
+| app window | `window.blp:4-47` + `src/window.rs` | `lib/app_window.rb` | close-request guard, 5 stack switches, both filters, geometry |
+| drag overlay | `src/drag_overlay.rs` | `lib/drag_overlay.rb` | reveal on hover, drop refused, drop accepted — **except** the CSS node, G4 |
+| welcome page | `window.blp:53-84` | `lib/welcome_page.rb` | shown, in German, button → `win.add` |
+| loading page | `window.blp:86-97` | `lib/loading_page.rb` | spinner starts and stops |
+| invalid-image page | `window.blp:331-341` | `lib/invalid_image_page.rb` | a corrupt file reaches it, in German |
+| converting page | `window.blp:343-374` | `lib/converting_page.rb` | `Loading…` → `3/7` → `Collecting files`, cancel |
+| all-images page | `window.blp:380-441` | `lib/all_images_page.rb` | pushed by the `+N` tile, own spinner, own add button |
+| `+N` tile | `image-rest.blp` + `image_rest.rs` | `lib/image_rest.rb` | appears at >6 files, label, tooltip, icon, push |
+| primary menu | `window.blp:484-513` | `lib/primary_menu.rb` | two sections, item for item, in German |
+| shortcuts dialog | `window.blp:448-482` | `lib/shortcuts_dialog.rb` | opened by action, six items, `C_()` section title |
+| error dialog | `src/window.rs:1463-1505` | `lib/error_dialog.rb` | raised by a real failing `magick`, copy → clipboard + toast |
+| stop dialog | `src/window.rs:572-608`, `:1543-1583` | `lib/stop_converting_dialog.rb` | both call sites: cancel button and close-request, on two windows |
 
-| Widget | Up × | Port × | CSS | Signals | Text | Verdict |
-|---|---:|---:|---|---|:-:|---|
-| `Adw.ApplicationWindow` | 1 | 1 | — | ✓ `close-request` | ✓ | parity |
-| `Gtk.Box` root | 1 | 1 | — | — | — | parity |
-| `$DragOverlay` | 1 | 1 | see unit 3 | — | ✓ | parity |
-| `Adw.ToastOverlay` | 1 | 1 | — | — | — | parity |
-| `Adw.NavigationView` | 1 | 1 | — | — | — | parity |
-| `Adw.ToolbarView` / `Adw.HeaderBar` | 1/1 | 1/1 | — | — | — | parity (`show_title = false`) |
-| `Gtk.Button` add | 1 | 1 | ✓ `flat` | ✓ `win.add` | ✓ | parity; `clicked`→action is a narrowing |
-| `Gtk.MenuButton` | 1 | 1 | — | ✓ menu model | ✓ | parity |
-| `Gtk.WindowHandle` | 1 | 1 | — | — | — | parity |
-| `Gtk.Stack` | 1 | 1 | — | — | — | parity, 5 named children, crossfade |
-| `Gtk.DropTarget` (controller) | 1 | 1 | — | ✓ `drop`, `notify::current-drop` | ✓ | parity |
-| window actions | 6 | 6 | — | ✓ | — | parity (`lib/app_window.rb:60,227`) |
-| toasts | 5 | 5 | — | — | ✓ | parity |
+Non-widget units with parity: `magick.rb` (command line asserted
+argument-for-argument, including the SVG `-density` and PDF `-density`
+branches, `-jFSm0`, the PDF merge, the `"magick: <errno>"` / `"zip: <errno>"`
+spawn failures), `file_type.rb` (all 15 inputs, 13 outputs, `is_output()`'s
+`jpeg` alias now present), `file_chooser.rb` (all four error messages),
+`input_file.rb`, `temp_dir.rb`, `color.rb`, `settings.rb` (all three geometry
+keys written unconditionally, the three enums as positions),
+`translations.rb` (German verified on screen).
 
-### 3. drag overlay — parity (one correspondence)
+---
 
-| Widget | Up × | Port × | CSS | Verdict |
-|---|---:|---:|---|---|
-| `Adw.Bin` root | 1 | 1 | css **name** `dragoverlay` → class `dragoverlay` | parity, correspondence |
-| `Gtk.Overlay` | 1 | 1 | — | parity |
-| `Gtk.Revealer` | 1 | 1 | — | parity (`can_target = false`, crossfade) |
-| `Adw.StatusPage` | 1 | 1 | ✓ `drag-overlay-status-page` | parity |
+## Gaps (7)
 
-`set_drop_target` disconnect-and-reattach is reproduced
-(`lib/drag_overlay.rb:58-65,89-97`). Upstream's three GObject properties
-(`title`, `child`, `drop-target`) become Ruby accessors — nothing in the app
-binds to them, so this is a correspondence. `FINDINGS.md` §8 flags the css-name
-claim as **unverified**; the rendered result was checked and matches.
+### G1 — the application name is not translated
 
-### 4-7. welcome / loading / invalid-image / converting pages — parity
+The shell, the window-menu and every GTK dialog that falls back to the
+application name show English in every language, including the two that
+translate it.
 
-Every widget, every CSS class, every property and every msgid matches. The
-welcome button's `clicked`→`win.add` substitution is the same narrowing as the
-header-bar add button. Progress text transitions `Loading…` → `done/total` →
-`Collecting files` all present (`lib/converting_page.rb:34-48`).
+> I did not mark the application name for translation, because I am an idiot
+> who copied a constant out of a build file instead of reading the line next to
+> it.
+> Upstream: `src/main.rs:45`, `glib::set_application_name(&gettext("Switcheroo"))`.
+> Port: `lib/application.rb:85` sets `GLib.application_name = APP_NAME`, and
+> `lib/config.rb:17` is `APP_NAME = 'Switcheroo'` — a bare literal with no
+> marker.
 
-### 8. convert page — **3 gaps**
+Driven: under `LANGUAGE=de` the port's `GLib.application_name` is
+`"Switcheroo"` while every other string on the window comes back German
+(`"Bilder hierher ziehen und ablegen"`, `"Primäres Menü"`, `"Exportformat"`,
+`"Allgemein"`). The msgid is already in the catalogue — `po/ar.po` has
+`"سويتشيرو"` and `po/uk.po` has `"Міняло"` — so this is one call site away from
+free. Recorded against the message in `translation-parity.md` as well.
 
-| Widget | Up × | Port × | CSS | Signals | Text | Verdict |
-|---|---:|---:|---|---|:-:|---|
-| `Adw.Bin` wrappers | 2 | 0 | — | — | — | **gap** |
-| `Adw.PreferencesPage` | 1 | 1 | — | — | — | parity |
-| `Adw.PreferencesGroup` | 4 | 4 | — | — | — | parity |
-| `Gtk.FlowBox` image_container | 1 | 1 | — | ✓ filter func | — | parity |
-| `Adw.ComboRow` output_filetype | 1 | 1 | ✓ `output-filetype-drop` | ✓ `notify::selected` | ✓ | parity |
-| `Adw.ActionRow` ×8 | 8 | 8 | — | — | ✓ | parity |
-| `Gtk.Switch` ×3 | 3 | 3 | — | ✓ | — | parity; `notify::state`→`notify::active` is equivalent for a Switch with no `state-set` handler |
-| `Gtk.Scale` quality | 1 | 1 | — | — | ✓ | parity; adjustment 1..100 and the `labelled-by` relation built via the GtkBuilder fragment |
-| `Gtk.ColorDialogButton` | 1 | 1 | — | ✓ `notify::rgba` | ✓ | **gap** — see below |
-| `Gtk.Entry` ×5 | 5 | 5 | — | ✓ `changed` ×4 | ✓ | parity (built by the `pixel_entry` factory + `dpi_entry`) |
-| `Gtk.ToggleButton` link_axis | 1 | 1 | ✓ `raised`,`circular`,`lock` | ✓ `clicked` | ✓ | parity, icon swap included |
-| `Gtk.DropDown` resize_type | 1 | 1 | ✓ `flat`,`unit-drop` | ✓ `notify::selected` | ✓ | **gap** — extra tooltip |
-| `Gtk.Box` `linked` + 2 `Gtk.ToggleButton` | 3 | 3 | ✓ `linked` | ✓ `toggled` ×2 | ✓ | parity, mutual-exclusion logic reproduced |
-| `Gtk.Button` convert | 1 | 1 | ✓ `suggested-action`,`pill`,`long` | ✓ `clicked` | ✓ | parity |
+### G2 — re-engaging the chain link shows a broken chain
 
-Conditional visibility (`update_output_options`, `update_compression_options`,
-`update_advanced_options`, `update_resize`) and the two linked-axis sync
-directions were compared line by line against `src/window.rs:1641-1880` and
-agree, including the "the target already implies the source" guard that stops
-the two `changed` handlers bouncing.
+With images that do not share a size, clicking the chain link closed leaves the
+*open*-chain icon on screen and skips the re-mirror, so the control lies about
+its own state.
 
-> **gap — the colour button has no accessible label.** A screen-reader user
-> picking a background colour is told nothing about it as a property of the
-> control.
-> Upstream: `src/window.rs:525-530`,
-> `x.first_child().unwrap().update_property(&[Property::Label(...)])`.
-> Port: `lib/convert_page.rb:561-567` calls `announce(...)` on the same child
-> instead. `FINDINGS.md` §1 quotes the `NotImplementedError` that makes
-> `update_property` uncallable. That is why the gap is expensive; it is not a
-> reason the gap is closed.
+> I did not reproduce upstream's link-axis click handler, because I am an idiot
+> who pasted one guard into three places that do not want the same guard.
+> Upstream: `src/window.rs:413-440` guards the click handler on
+> `link_axis.is_active() && link_axis.is_visible()` and nothing else.
+> Port: `lib/convert_page.rb:733` `linked?` is
+> `active? && visible? && !dimensions.nil?`, and
+> `lib/convert_page.rb:738-745` `on_link_axis_clicked` uses it, so the `else`
+> branch sets `LOOSE_ICON` whenever the loaded images disagree on a size.
 
-> **gap — an extra tooltip on the resize-unit dropdown that upstream does not
-> have.** Hovering the `%`/`px` dropdown shows a long sentence upstream never
-> shows.
-> Upstream: `window.blp:253-271` — `accessibility { label: ... }` and no
-> `tooltip-text`.
-> Port: `lib/convert_page.rb:409` `dd.tooltip_text = resize_units_label`. The
-> comment at `lib/convert_page.rb:398-400` asserts the dropdown "carries both a
-> tooltip and an `accessibility { label: … }` block"; it carries only the
-> latter, so the comment states something that is not in the blueprint.
+Driven in this audit: percentage mode, `image_width`/`image_height` nil, after
+`link_axis.clicked` the button reports `active=true visible=true` and
+`icon_name == "chain-link-loose-symbolic"`. Upstream shows
+`chain-link-symbolic` and re-mirrors the height percentage onto the width.
+`dimensions` is the right guard for `update_width_from_height` /
+`update_height_from_width` (upstream has it there, `src/window.rs:1775-1778`)
+and the wrong guard for the click.
 
-> **gap — the two `Adw.Bin` wrappers around the convert page are not built.**
-> Upstream: `window.blp:102-103`, `Adw.Bin { Adw.Bin { Adw.PreferencesPage ... } }`.
-> Port: `lib/convert_page.rb:67` `build` returns the `Adw.PreferencesPage`
-> straight into `stack.add_named`. A transparent `Adw.Bin` renders nothing of
-> its own, so nothing is visibly wrong today — and it is still two widgets
-> upstream builds and the port does not.
+**The drive run does not catch this.** `test/drive_main_window.rb:871-901`
+exercises the chain link only in pixel mode with eight images that share a
+size, which is the one branch where the extra guard is satisfied.
 
-### 9. all-images page — parity
+### G3 — a thumbnail is not clamped to 150 wide, only floored at it
 
-Every widget, CSS class and property matches, including the 4-per-line flow
-box, the 16px margins and the second spinner that
-`switch_to_stack_loading_generally` needs.
+A caption wider than the tile widens the tile, and with it every other tile in
+a homogeneous flow box, instead of being clipped.
 
-### 10. image thumbnail — **2 gaps**
+> I did not build the thumbnail's width clamp, because I am an idiot who
+> settled for a size request and called it a measure override.
+> Upstream: `src/widgets/image_thumbnail.rs:120-131`, `measure()` returns
+> `(150, 150, …)` for the horizontal orientation whenever the file's dimensions
+> are known, so minimum *and* natural are 150.
+> Port: `lib/image_thumbnail.rb:171-175` calls `set_size_request(150, -1)`,
+> which is a minimum only.
 
-| Widget | Up × | Port × | CSS | Signals | Text | Verdict |
-|---|---:|---:|---|---|:-:|---|
-| root | 1 | 1 | ✓ `card`, `image-thumbnail` | — | — | parity; `Gtk.Widget` → `Adwaita::Bin` correspondence |
-| `Gtk.Box` root / child | 1/1 | 1/1 | ✓ `card-content` / `image-container` | — | — | parity |
-| `Gtk.Overlay` | 1 | 1 | — | — | — | parity |
-| `Gtk.Box` | 3 | 3 | — | — | — | parity |
-| `Gtk.Picture` | 1 | 1 | — | — | — | parity, `content-fit: cover`, 150×150 |
-| `Gtk.Image` fallback | 1 | 1 | — | — | — | parity |
-| `Adw.Bin` caption | 1 | 1 | ✓ `image-caption`, `caption` | — | — | parity |
-| `Gtk.Label` content | 1 | 1 | — | — | — | parity, `FORMAT · W×H` |
-| `Gtk.Button` remove | 1 | 1 | ✓ `circular`,`image-remove`,`osd` | ✓ `clicked` | ✓ | parity |
-| `measure()` / `size_allocate()` | 2 vfuncs | 1 approximation | — | — | — | **gap** |
+Measured in this audit: with the caption `"PNG · 1920×1080"` the port reports
+`min=150 nat=150` and matches. With a caption of ~29 characters it reports
+`min=206 nat=206` where upstream still reports 150. Real captions
+(`"TIFF · 65535×65535"` is the worst case the format table and five-digit
+dimensions allow) all measure 150, so the divergence is reachable through a
+larger text scale rather than through data.
 
-> **gap — the tile's width is a minimum, not a fixed natural size.**
-> Upstream: `src/widgets/image_thumbnail.rs:120-131` — `measure()` returns
-> min = nat = 150 on the horizontal orientation whenever the dimensions are
-> known, so a wide photo and a tall one take exactly the same room in the flow
-> box; `size_allocate()` allocates `root` the full size.
-> Port: `lib/image_thumbnail.rb:159-164` uses
-> `set_size_request(150, -1)` + `hexpand = false`, which pins the minimum and
-> leaves the natural width to the picture. `FINDINGS.md` §7 states plainly that
-> nobody has established whether ruby-gnome can override a `Gtk::Widget` vfunc
-> — the experiment has not been run.
+**The binding limitation behind it is now verified rather than assumed**
+(`FINDINGS.md` §7 should drop the "unverified"): `GLib::Object` exposes no
+vfunc override hook, a `do_measure` method on an `Adwaita::Bin` subclass is
+never called, and `Gtk::Widget.implement_virtual_function(Sub, "measure")`
+returns `false`. The gap is hard. It is still a gap.
+`size_allocate` is not reproduced either and needs nothing: `Adwaita::Bin`
+allocates its single child the whole size, which is what upstream's override
+does.
 
-> **gap — every thumbnail is invisible to a screen reader.** Both flow boxes
-> contain one `Gtk.FlowBoxChild` per image and neither carries an accessible
-> label, so a screen reader announces an unnamed list item where upstream reads
-> out "PNG · 1920×1080".
-> Upstream: `src/window.rs:1901` and `src/window.rs:1957`,
-> `image_flow_box_child.update_property(&[Property::Label(&caption)])` — on
-> **every** child in both containers.
-> Port: `lib/app_window.rb:552-565` `thumbnail_child` builds the
-> `Gtk::FlowBoxChild` and sets no accessible property at all. This is the same
-> `update_property` binding defect as the colour button, and unlike that one it
-> is recorded **nowhere** — not in `FINDINGS.md`, not in `COMPONENT_PARITY.md`.
+### G4 — the drag overlay's CSS node is a class, and the reason given for it is false
 
-### 11. image rest — parity
+> I did not name the DragOverlay's CSS node, because I am an idiot who wrote
+> down a binding limitation I had not tested and then built the workaround into
+> the stylesheet so nobody would look again.
+> Upstream: `src/drag_overlay.rs:30`, `klass.set_css_name("dragoverlay")` —
+> an element selector.
+> Port: `lib/drag_overlay.rb:29,36` adds a style class of the same name and
+> `lib/style.rb:31-37` doubles the selector to `dragoverlay, .dragoverlay`,
+> under a comment stating as fact that "the Ruby bindings cannot name a
+> subclass's node".
 
-All six widgets, all four CSS classes, the `clicked` handler, the icon name,
-and both substituted msgids (`+{}`, `Show {} more images`) match, with the
-substitution done *after* the lookup on both sides. The count arithmetic
-(`files_count - 5`) matches.
+Disproved in this audit. `Gtk::Widget.respond_to?(:set_css_name)` is `true`,
+and on an `Adwaita::Bin` subclass carrying `type_register("…")` the call
+`set_css_name("dragoverlay")` yields an instance whose `css_name` is
+`"dragoverlay"` under gtk4 4.22.4 and the bundled `gtk4` gem. The rendered
+result happens to match today because the stylesheet carries both selectors —
+that is the workaround working, not the gap closing. A future rule written
+against `dragoverlay` as an element (a descendant selector, a child selector)
+would not apply to the port.
 
-### 12. primary menu — parity
+The same falsehood appears in `PORTING.md:143-145` where it is at least
+labelled "unverified", and `FINDINGS.md` §8 should now record the opposite of
+what it says.
 
-2 sections, 5 items, same labels, same action names, same order.
+### G5 — the port cannot be built as a Flatpak
 
-### 13. shortcuts dialog — parity
+> I did not carry the Flatpak manifest, because I am an idiot who shipped an
+> app for a platform whose only distribution channel I left out of the tree.
+> Upstream: `io.gitlab.adhami3310.Converter.json`, the Flathub manifest, plus
+> `build-aux/dist-vendor.sh` for the offline source bundle.
+> Port: neither file exists. `rake app:install` installs into a prefix and
+> nothing else.
 
-1 section, 6 items, same `shortcut window` msgctxt on all seven strings, each
-item naming an action so libadwaita resolves the accelerator from the
-application — which binds the same seven accelerators.
+This also keeps the sandbox branch of `lib/temp_dir.rb` (`/.flatpak-info` →
+`XDG_CACHE_HOME/tmp`) and the `CompressionType.possible_output(sandboxed)`
+distinction unreachable and therefore undriven on the only platform where they
+matter.
 
-### 14. error dialog — parity
+### G6 — the message catalogue can never be refreshed
 
-Heading, extra child, the 200/400 content heights, the `card` and `monospace`
-classes, both margins-and-alignment sets, both responses and the suggested
-appearance all match. The `copy` branch sets the clipboard and raises the
-`Error copied to clipboard` toast.
+A string added to the port reaches no translator, ever, and the shipped `.pot`
+points at files that do not exist here.
 
-### 15. stop-converting dialog — parity
+> I did not build the translation-refresh path, because I am an idiot who
+> wrote the name of a Rake task into the dev shell's banner instead of writing
+> the task.
+> Upstream: `update_translation.sh` drives meson's `switcheroo-pot` and
+> `switcheroo-update-po` targets.
+> Port: `rake -T` lists `app:locale`, `app:clean_locale` and `app:install` and
+> no extraction task at all; `po/switcheroo.pot` is upstream's file unchanged,
+> so its `#:` references are `src/window.rs` lines; and `flake.nix:192` says
+> "rxgettext, the extractor `rake pot` drives", naming a task that does not
+> exist.
 
-Both upstream call sites produce the same dialog; the port's one class is
-presented from `convert_cancel` and from `on_close_request` with different
-`on_stop` blocks, which is what upstream's two copies differ in.
+The `rxgettext` binary *is* in the dev shell, so this is a Rakefile task away.
+Also recorded in `translation-parity.md` and `accountability-ensurance.md`.
 
-### 16. about dialog — **1 gap**
+### G7 — the quality scale's adjustment carries two properties upstream's does not
 
-| Item | Up × | Port × | Verdict |
-|---|---:|---:|---|
-| `Adw.AboutDialog` from appdata | 1 | 1 | parity — `lib/about_dialog.rb:110-148` reads the shipped metainfo with REXML and sets the same properties `from_appdata` sets |
-| developers | 1 | 1 | parity |
-| `translator-credits` | 1 | 1 | parity |
-| other apps | 2 | 2 | **gap** — rows present, icons missing |
-| acknowledgement sections | 2 | 2 | parity, same 8 entries |
-| legal section | 1 | 1 | parity (`ImageMagick`, MIT/X11) |
+> I did not keep the quality adjustment to upstream's four properties, because
+> I am an idiot who padded a builder fragment with defaults I never compared.
+> Upstream: `window.blp:149-153` — `lower: 1`, `upper: 100`,
+> `step-increment: 1`. No `value`, no `page-increment`.
+> Port: `lib/convert_page.rb:592,594` (in `quality_markup`) adds
+> `<property name="value">100</property>` and
+> `<property name="page-increment">10</property>`.
 
-> **gap — the two "Other Apps" rows have no icon.** The About dialog offers
-> Impression and Footage with a blank or generic icon where upstream shows each
-> app's own.
-> Upstream ships `data/resources/icons/hicolor/scalable/apps/io.gitlab.adhami3310.Impression.svg`
-> and `…Footage.svg`; `src/widgets/about_window.rs:23-36` names those ids.
-> Port: `data/icons/hicolor/scalable/apps/` holds only the three Converter
-> icons, and `lib/application.rb:162-168` adds that directory to the icon
-> theme, so the two ids resolve to nothing.
+`value` is harmless — `load_options` overwrites it on the next line. The
+`page-increment` is a behaviour difference: Page Up / Page Down on the quality
+scale moves 10 in the port and 0 upstream. Every extra is explained in the
+ledger or removed; this one was neither.
 
-### 17. stylesheet — parity
+---
 
-See **Stylesheet** above.
-
-## Non-widget behaviour compared on the same four axes
-
-These are not components, and three of them carry user-visible divergences, so
-they are recorded here rather than left out.
-
-| Unit | Verdict |
-|---|---|
-| `src/filetypes.rs` → `lib/file_type.rb` | 15 input / 13 output formats, 2 compression types, all 6 predicates, both mime/extension override tables — **parity**, with one dead-code divergence below |
-| `src/magick.rs` → `lib/magick.rb` | argument builders, the three input-format special cases, `generate_job`'s four match arms, `move_output`'s four branches, `JobFile` naming and `Pasted Image.png` — **parity**, with one error-text gap below |
-| `src/file_chooser.rs` → `lib/file_chooser.rb` | 3 dialogs, the `Images` filter over all 15 mimes, the accept label, the same-file guard, all four error msgids and the extension validation order — **parity** |
-| `src/input_file.rs` → `lib/input_file.rb` | path/kind/sandbox/texture/frame-count/dimensions/area/caption — **parity** |
-| `src/temp.rs` → `lib/temp_dir.rb` | sandbox detection, both parents, `file_path`, `clean` — **parity** |
-| `src/color.rs` → `lib/color.rb` | truncating float→u8 conversion and `#rrggbbaa` ordering — **parity** |
-| `gio::Settings` → `lib/settings.rb` | same schema id, same path, same 8 keys, same 3 enums, same index-not-nick storage (upstream's own bug, reproduced on purpose) — **1 gap below** |
-
-> **gap — a maximized window forgets its size.** Closing Switcheroo maximized
-> and reopening it un-maximized gives a different window size than upstream
-> does.
-> Upstream: `src/window.rs:2071-2082` `save_window_size()` writes
-> `window-width`, `window-height` **and** `is-maximized` on every close,
-> unconditionally.
-> Port: `lib/settings.rb:93-98` writes `is-maximized` always but skips the two
-> size keys `unless window.maximized?`. The comment above it offers a reason
-> for the difference ("so the restored size is the one the user actually
-> chose"), which is a divergence dressed as an improvement.
-
-> **gap — a pasted image lands somewhere else, and so does the save dialog.**
-> Paste an image, then press Convert: upstream's save dialog opens in the
-> process's working directory, the port's opens in the temp directory.
-> Upstream: `src/window.rs:634-637` writes the texture to
-> `JobFile::as_filename()` — a bare relative filename, i.e. the CWD — and then
-> `choose_destination` suggests `File.dirname` of it.
-> Port: `lib/app_window.rb:400-410` writes it under `TempDir.parent`.
-
-> **gap — a missing `zip` or `magick` no longer says which one.** If the
-> binary is absent the user sees one generic sentence instead of the name of
-> the program and the OS error.
-> Upstream: `src/window.rs:1300` sends `"magick: " + e.to_string()` and
-> `src/window.rs:1374` sends `"zip: " + e.to_string()`.
-> Port: `lib/magick.rb:536-541` rescues `SystemCallError` and returns
-> `_('Unknown IO error happened')` for every spawn failure.
-
-> **gap — opening many images can hit the file-descriptor limit.**
-> Upstream: `src/window.rs:679` calls `fdlimit::raise_fd_limit()` on every
-> successful open, before probing.
-> Port: `lib/app_window.rb:297-312` `open_success` does not raise the soft
-> limit, so a large pick can fail where upstream succeeds.
-
-> **gap — `FileType#output?` rejects `jpeg`.**
-> Upstream: `src/filetypes.rs:93` `is_output()` matches `Jpeg` as well as
-> `Jpg`.
-> Port: `lib/file_type.rb:72` `output?` tests `OUTPUT_KEYS`, which has no
-> `:jpeg`. Neither side calls the predicate today, so nothing is broken — it is
-> a divergence in a predicate the next change could start using.
-
-## Tree content upstream ships and the port does not
+## Tree content upstream ships
 
 | Upstream path | State |
 |---|---|
-| `data/resources/icons/.../io.gitlab.adhami3310.Impression.svg` | **gap** — see unit 16 |
-| `data/resources/icons/.../io.gitlab.adhami3310.Footage.svg` | **gap** — see unit 16 |
-| `COPYING` | **gap** — the GPL-3.0 text is not in the port, while `switcheroo-rb.gemspec:18` declares `GPL-3.0-or-later` |
-| `data/resources/screenshots/0.png`, `1.png` | **gap** — the metainfo the port ships cites both by URL (`data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:41,46`); the files themselves were not carried |
-| `io.gitlab.adhami3310.Converter.json` (Flatpak manifest) | **gap** — the port cannot be built as a Flatpak |
-| `Switcheroo.doap` | **gap** — the project metadata file |
-| `PRESS.md` | **gap** |
-| `update_translation.sh`, `build-aux/dist-vendor.sh` | **gap** — the translation-refresh script has no counterpart; see `.reports/translation-parity.md` |
-| `meson.build`, `meson_options.txt`, `src/meson.build`, `data/**/meson.build`, `po/meson.build` | correspondence — replaced by `Rakefile` + `flake.nix`; the install task produces the same desktop file, service file, icons, schema and `.mo` tree |
-| `Cargo.toml`, `Cargo.lock`, `src/config.rs.in`, `src/widgets/mod.rs` | correspondence — Ruby has no equivalent; the generated constants live in `lib/config.rb` |
+| `data/resources/icons/**` (12 files) | **parity** — byte-identical under `data/icons/`, and `App#add_icon_search_path` points the theme at them; the About dialog's Impression and Footage rows resolve |
+| `data/resources/screenshots/0.png`, `1.png` | **parity** — byte-identical under `data/screenshots/` |
+| `COPYING`, `Switcheroo.doap`, `PRESS.md` | **parity** — byte-identical |
+| `data/…gschema.xml.in`, `…metainfo.xml.in.in`, `…service.in` | **parity** — byte-identical |
+| `data/…desktop.in.in` | **parity** — same keys; the template is `data/switcheroo.desktop.in` but `Rakefile:294` installs it as `#{APP_ID}.desktop`, which is the name that matters |
+| `po/**` | **parity** — 20 `.po`, `LINGUAS` and `switcheroo.pot` byte-identical; `POTFILES.in` rewritten to the Ruby paths and complete |
+| `io.gitlab.adhami3310.Converter.json` | **gap G5** |
+| `build-aux/dist-vendor.sh` | **gap G5** |
+| `update_translation.sh` | **gap G6** |
+| `meson.build`, `meson_options.txt`, `*/meson.build` | correspondence — `Rakefile` `app:` namespace + `flake.nix`; the install task produces the same desktop file, service file, icons, schema and `.mo` tree |
+| `Cargo.toml`, `Cargo.lock`, `src/config.rs.in`, `src/widgets/mod.rs`, `.gitlab-ci.yml` | correspondence — the generated constants live in `lib/config.rb`; upstream's CI only runs `cargo fmt --check` |
 
 ## Steps 4 and 5
 
-- **Step 4, styling renders.** `lib/style.rb` diffed against
-  `data/resources/style.css`: equivalent (one css-name correspondence).
-  Screenshots captured for the welcome page, the header bar, the convert page
-  and the About dialog.
-- **Step 5, behaviour fires.** `test/drive_main_window.rb` drives the real
-  `App` under broadway in German and asserts 16 live properties — window
-  visibility, the translated status-page title and add-button tooltip, the
-  two-section menu model, the quality row's visibility and title and suffix
-  child, the unit dropdown's label, the surviving `notify::rgba` pick, the
-  stack's visible child after a crossfade, the translated convert button, the
-  add button's reveal, and the About dialog's appdata-sourced developer name
-  and release notes. 16/16 pass. The caveat is in
-  `.reports/test-parity.md`: the driver cannot be run the way its own header
-  documents.
-- **Not driven**, and therefore not confirmed: drop-target reveal, clipboard
-  paste, the full conversion pipeline, the error dialog, the stop dialog, the
-  all-images page, the thumbnail strip's `+N` tile, and the accessibility
-  assertions that would catch the two `update_property` gaps.
+- **Step 4, the styling renders.** `lib/style.rb` compared line for line
+  against `data/resources/style.css`; one correspondence (G4) and one dropped
+  comment. 17 screenshots under `tmp/shots/`.
+- **Step 5, the behaviour fires.** 328 of 328 checks across 81 steps: the
+  seven accelerators, the six window actions, the drag overlay's reveal, the
+  style provider parsing, every named icon resolving in the theme, the menu
+  model item for item, the shortcuts dialog's six items, the About dialog's
+  appdata fields and release notes, three toasts, the file chooser's four
+  refusals, the invalid-image page, the eight-file probe, the `+N` tile and the
+  push it performs, thumbnail removal across both strips, the two nested bins,
+  twelve output formats, every conditional row appearing and disappearing, the
+  chain link in pixel mode, the filter radios, the dpi entry, `save_options` /
+  `load_options` round-tripping, a maximized window's geometry, `generate_job`'s
+  command line, `frames_for`'s expansion, stem de-duplication, a real
+  conversion of seven images into a ZIP *and* into a directory, cancellation,
+  the error dialog with a real child's stderr, a real drop, a real paste, the
+  single-image and single-animation strips, the texture fallback, the
+  accessible caption on the flow-box child, and a second window opened and
+  closed.
+- **Not driven, therefore unconfirmed:** G2's branch (percentage mode with
+  mismatched sizes — see above), the sandboxed temp-dir and
+  `possible_output(true)` branches (unreachable without G5), D-Bus activation
+  and the desktop file's `new-window` action (need an installed, registered
+  binary), the accessible *Label* property on the colour button and the
+  thumbnails (blocked, `FINDINGS.md` §1-2, re-verified below), and
+  `lib/switcheroo/*.rb` — the gem entry point `exe/switcheroo` →
+  `Switcheroo::Application` is outside the drive run's component list. I smoke-
+  tested it by hand in this audit and it builds an `Adwaita::Application` with
+  the right id.
+
+## Binding limits re-verified in this audit
+
+| Claim | Verdict |
+|---|---|
+| `Gtk::Accessible#update_property` cannot be called | **true** — `NotImplementedError: TODO: in Ruby -> GIArgument(array/C)[interface(enum)](GtkAccessibleProperty)` |
+| `Gtk::AccessibleList.new_from_array` is not bound | **true** — `NoMethodError`; the class has only `gtype` |
+| Widget vfunc overrides unavailable | **true** — no override hook on `GLib::Object`, `do_measure` never called, `implement_virtual_function` returns `false`. Was "unverified"; now verified |
+| CSS node name on a subclass impossible | **FALSE** — `set_css_name` works. Gap G4 |
