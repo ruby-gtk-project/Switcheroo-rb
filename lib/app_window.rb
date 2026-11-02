@@ -419,9 +419,13 @@ class AppWindow
     # first, because every later step works on paths.
     def load_clipboard
       window.clipboard.then do |clipboard|
-        if clipboard.formats.contain_mime_type?(PASTEABLE_IMAGE_MIME)
+        # `contain_mime_type`, with no question mark: Gdk::ContentFormats is a
+        # boxed type whose predicates the bindings expose under their C names,
+        # so the Ruby-looking spelling raised NoMethodError and win.paste
+        # aborted the process the first time it was ever pressed.
+        if clipboard.formats.contain_mime_type(PASTEABLE_IMAGE_MIME)
           paste_texture(clipboard)
-        elsif clipboard.formats.contain_mime_type?(PASTEABLE_FILES_MIME)
+        elsif clipboard.formats.contain_mime_type(PASTEABLE_FILES_MIME)
           paste_file_list(clipboard)
         end
       end

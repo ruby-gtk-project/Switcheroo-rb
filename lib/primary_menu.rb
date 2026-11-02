@@ -11,6 +11,15 @@ require_relative 'translations'
 # window's images and the second on the app itself.
 #
 module PrimaryMenu
+  # The gettext gem resolves a bound text domain through the *ancestors of the
+  # receiver*, and for a message looked up from a class method the receiver is
+  # this module itself. Including Translations only in `class << self` puts it
+  # in the singleton's ancestors, where that lookup never looks, so every
+  # message below came back as its own English msgid — with the German
+  # catalogue loaded and every instance-side lookup in the port translating
+  # correctly. It is included here as well so #ancestors carries it.
+  include Translations
+
   class << self
     include Translations
 

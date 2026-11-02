@@ -199,6 +199,11 @@
             # carries one it can start itself: `xvfb-run ruby exe/<app>` both
             # launches the app and is how test/drive_*.rb is run.
             pkgs.xvfb-run
+            # The app shells out to `magick` for every probe and conversion
+            # and to `zip` for a ZIP bundle, so neither the app nor
+            # test/drive_*.rb can get past loading a file without them.
+            pkgs.imagemagick
+            pkgs.zip
             pkgs.gsettings-desktop-schemas
             pkgs.adwaita-icon-theme
           ] ++ gtkStack;

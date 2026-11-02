@@ -206,6 +206,35 @@ reliable, later screenshots are not.
 
 ---
 
+## 10. `Gdk::ContentFormats` predicates keep their C names, with no `?`
+
+```
+NoMethodError: undefined method 'contain_mime_type?' for an instance of Gdk::ContentFormats
+  lib/app_window.rb:422:in 'block in AppWindow#load_clipboard'
+```
+
+Not a gap — a naming one. Most ruby-gnome predicates are rewritten to the
+Ruby spelling (`Gtk::Widget#visible?`, `Gdk::ContentFormats#empty?`), so
+`contain_mime_type?` looks right and is not. `Gdk::ContentFormats` is a boxed
+type whose introspected methods come through under their C names:
+
+```ruby
+Gdk::ContentFormats.instance_methods(false).sort
+# => [:contain_gtype, :contain_mime_type, :empty?, :gtypes, :inspect, :match,
+#     :match_gtype, :match_mime_type, :mime_types, :print, :ref, :to_s,
+#     :union, ...]
+```
+
+The port had `contain_mime_type?` in `AppWindow#load_clipboard`, so pressing
+`win.paste` (Ctrl+V) raised out of a GObject callback and took the process
+down. Nothing static caught it: `ruby -c` passes, the require passes, and the
+line is only reached when the clipboard is actually read.
+`test/drive_main_window.rb` found it the first time it fired the action, and
+now covers both the format test and a real pasted texture.
+
+Rule of thumb for this binding: check `instance_methods(false)` on a boxed
+type before assuming the `?` form exists.
+
 ## Reported upstream
 
 Nothing yet. One suspected upstream bug is owed a report and has not had one:

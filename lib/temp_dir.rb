@@ -69,6 +69,15 @@ end
 # path and the probe path use.
 #
 class JobFile
+  # The gettext gem resolves a bound text domain through the *ancestors of the
+  # receiver*, and for a message looked up from a class method the receiver is
+  # this class itself. Including Translations only in `class << self` puts it
+  # in the singleton's ancestors, where that lookup never looks, so every
+  # message below came back as its own English msgid — with the German
+  # catalogue loaded and every instance-side lookup in the port translating
+  # correctly. It is included here as well so #ancestors carries it.
+  include Translations
+
   @count = 0
   @mutex = Mutex.new
 

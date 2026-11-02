@@ -16,12 +16,26 @@ begin
   end
 rescue LoadError => error
   # check the error message and re-raise when unexpected
-  raise error unless error.message.include?("kettle")
+  unless error.message.include?("kettle")
+    raise error
+  end
 end
 
 # External RSpec & related config
-require "kettle/test/rspec"
-# `kettle/test/rspec` installs harness helpers documented in spec/README.md.
+#
+# `kettle/test/rspec` installs the harness helpers documented in
+# spec/README.md. It is a development-bundle gem, and the Nix dev shell the
+# flake builds carries only the runtime closure plus rspec, so the suite the
+# dev-shell banner names has to be able to run without it. Nothing in the
+# suite calls a kettle helper today, so a missing kettle is tolerated exactly
+# the way kettle-soup-cover above is — any other LoadError is still fatal.
+begin
+  require "kettle/test/rspec"
+rescue LoadError => error
+  unless error.message.include?("kettle")
+    raise error
+  end
+end
 
 # This library
 require "switcheroo/rb"
