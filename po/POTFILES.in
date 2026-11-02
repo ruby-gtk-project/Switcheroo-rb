@@ -1,0 +1,22 @@
+# List of source files containing translatable strings.
+#
+# Carried over from upstream's po/POTFILES.in, with the Rust sources and
+# blueprint files replaced by the Ruby files that now hold the same strings.
+lib/about_dialog.rb
+lib/all_images_page.rb
+lib/application.rb
+lib/app_window.rb
+lib/convert_page.rb
+lib/converting_page.rb
+lib/drag_overlay.rb
+lib/error_dialog.rb
+lib/file_chooser.rb
+lib/image_rest.rb
+lib/image_thumbnail.rb
+lib/invalid_image_page.rb
+lib/primary_menu.rb
+lib/shortcuts_dialog.rb
+lib/stop_converting_dialog.rb
+lib/temp_dir.rb
+lib/welcome_page.rb
+data/switcheroo.desktop
