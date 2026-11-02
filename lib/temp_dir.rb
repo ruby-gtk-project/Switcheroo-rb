@@ -3,6 +3,8 @@
 require 'fileutils'
 require 'securerandom'
 
+require_relative 'translations'
+
 require_relative 'file_type'
 
 # TempDir is the scratch directory a conversion run writes its output into
@@ -67,19 +69,19 @@ end
 # path and the probe path use.
 #
 class JobFile
-  PASTED_IMAGE_NAME = 'Pasted Image'
-
   @count = 0
   @mutex = Mutex.new
 
   class << self
+    include Translations
+
     def next_id = @mutex.synchronize { @count += 1 }
 
     # Upstream's JobFile::from_clipboard().
     def from_clipboard
       new(
         file_type:    FileType.from_string('png'),
-        desired_name: "#{PASTED_IMAGE_NAME}.png",
+        desired_name: "#{_('Pasted Image')}.png",
       )
     end
   end

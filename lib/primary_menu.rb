@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # PrimaryMenu is the model behind the hamburger button in the header bar.
 #
 # Ported from the `menu primary_menu` block of upstream's
@@ -9,26 +11,32 @@ require 'adwaita'
 # window's images and the second on the app itself.
 #
 module PrimaryMenu
-  WINDOW_ITEMS = [
-    ['Paste From Clipboard', 'win.paste'],
-    ['New Window', 'app.new-window'],
-    ['Clear Window', 'win.clear'],
-  ].freeze
-
-  ABOUT_ITEMS = [
-    ['Keyboard Shortcuts', 'win.show-help-overlay'],
-    ['About Switcheroo', 'win.about'],
-  ].freeze
-
   class << self
+    include Translations
+
     def build
       Gio::Menu.new.tap do |menu|
-        menu.append_section(nil, section(WINDOW_ITEMS))
-        menu.append_section(nil, section(ABOUT_ITEMS))
+        menu.append_section(nil, section(window_items))
+        menu.append_section(nil, section(about_items))
       end
     end
 
     private
+
+      def window_items
+        [
+          [_('Paste From Clipboard'), 'win.paste'],
+          [_('New Window'), 'app.new-window'],
+          [_('Clear Window'), 'win.clear'],
+        ]
+      end
+
+      def about_items
+        [
+          [_('Keyboard Shortcuts'), 'win.show-help-overlay'],
+          [_('About Switcheroo'), 'win.about'],
+        ]
+      end
 
       def section(items)
         Gio::Menu.new.tap do |menu|

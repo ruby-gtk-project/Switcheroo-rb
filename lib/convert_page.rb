@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 require_relative 'color'
 require_relative 'file_type'
 require_relative 'magick'
@@ -30,37 +32,27 @@ require_relative 'magick'
 #   file, i.e. several inputs, or several frames the export format cannot keep
 #   as an animation.
 #
-# The one upstream behaviour not reproduced here is the accessible label
-# refreshed on the colour button after each pick ("New transparency layer
-# color: #rrggbbaa"): gtk_accessible_update_property is a C varargs function,
-# which GObject Introspection does not expose, so the Ruby bindings have no
-# call for it.
+# The colour button tells a screen-reader user which colour was picked, on
+# every pick, through the `notify::rgba` handler below. It is not the same
+# mechanism upstream uses and that difference is not hidden: upstream writes
+# the accessible Label *property* of the button's first child
+# (src/window.rs:525-530), and ruby-gobject-introspection cannot call
+# gtk_accessible_update_property_value — it raises NotImplementedError on the
+# GtkAccessibleProperty array, and Gtk::AccessibleList is bound without
+# new_from_array, so the labelled-by relation cannot be written either.
+# FINDINGS.md records both with the errors they raise. What is here instead is
+# gtk_accessible_announce on the same child with the same msgid, so the colour
+# reaches the screen reader as an announcement rather than as a label.
+#
+# The quality scale's `labelled-by` relation and the resize-unit dropdown's
+# accessible label (window.blp:155-159, :243-247) are set here, through the
+# GtkBuilder fragments below — the only route the bindings leave open.
 #
 class ConvertPage
-  EXPORT_FORMAT_TITLE = 'Export Format'
-  SINGLE_PDF_TITLE = 'Save as multi-page PDF'
-  COMPRESSION_TITLE = 'Save To ZIP'
-  QUALITY_TITLE = 'Quality'
-  BGCOLOR_TITLE = 'Background Color'
-  BGCOLOR_SUBTITLE = 'Replaces original transparency layer'
-  DPI_TITLE = 'Pixel Density Per Inch'
-  RESIZE_TITLE = 'Resize'
-  RESIZE_FILTER_TITLE = 'Resize Algorithm'
-  STRIP_TITLE = 'Remove Metadata'
-  CONVERT_LABEL = '_Convert'
+  include Translations
 
-  WIDTH_PLACEHOLDER = 'Width'
-  HEIGHT_PLACEHOLDER = 'Height'
-  LINK_TOOLTIP = 'Preserve aspect ratio'
   LINKED_ICON = 'chain-link-symbolic'
   LOOSE_ICON = 'chain-link-loose-symbolic'
-  RESIZE_UNITS = ['%', 'px'].freeze
-  RESIZE_UNITS_LABEL = 'Choose between resizing with percentages or using exact pixels'
-  FILTER_LABELS = ['Default', 'Pixel Art'].freeze
-
-  # The nicks the resize-type setting is stored under, in the order the unit
-  # dropdown lists them.
-  RESIZE_TYPE_KEYS = %w[percentage exact-pixels].freeze
 
   QUALITY_MINIMUM = 1
   QUALITY_MAXIMUM = 100
@@ -177,15 +169,16 @@ class ConvertPage
   def save_options
     @settings['quality'] = quality
     @settings['dpi'] = dpi
-    @settings['resize-type'] = RESIZE_TYPE_KEYS[resize_type_dropdown.selected]
+    @settings['resize-type'] = resize_type_dropdown.selected
     selected_output.then do |output|
       if output
-        @settings['output-format'] = output.extension
+        @settings['output-format'] = FileType.output_formats.index(output)
       end
     end
     selected_compression.then do |compression|
       if compression
-        @settings['compression-format'] = compression.extension
+        @settings['compression-format'] =
+          CompressionType.possible_output(false).index(compression)
       end
     end
   end
@@ -194,7 +187,7 @@ class ConvertPage
   def load_options
     quality_scale.value = @settings['quality']
     dpi_entry.text = @settings['dpi'].to_s
-    resize_type_dropdown.selected = RESIZE_TYPE_KEYS.index(@settings['resize-type']).to_i
+    resize_type_dropdown.selected = @settings['resize-type']
   end
 
   # --- Conditional visibility ---------------------------------------------
@@ -270,14 +263,14 @@ class ConvertPage
 
   def output_filetype
     @output_filetype ||= Adwaita::ComboRow.new.tap do |row|
-      row.title = EXPORT_FORMAT_TITLE
+      row.title = _('Export Format')
       row.add_css_class('output-filetype-drop')
     end
   end
 
   def single_pdf_row
     @single_pdf_row ||= Adwaita::ActionRow.new.tap do |row|
-      row.title = SINGLE_PDF_TITLE
+      row.title = _('Save as multi-page PDF')
       row.activatable_widget = single_pdf_switch
     end
   end
@@ -291,7 +284,7 @@ class ConvertPage
 
   def output_compression_row
     @output_compression_row ||= Adwaita::ActionRow.new.tap do |row|
-      row.title = COMPRESSION_TITLE
+      row.title = _('Save To ZIP')
       row.activatable_widget = output_compression_switch
     end
   end
@@ -303,25 +296,20 @@ class ConvertPage
     end
   end
 
-  def quality_row
-    @quality_row ||= Adwaita::ActionRow.new.tap do |row|
-      row.title = QUALITY_TITLE
-    end
-  end
+  # window.blp:146-170. The scale, its adjustment and the row it is labelled by
+  # come from one builder fragment because the `labelled-by` relation can only
+  # be attached by whatever creates the pair; everything else about the scale is
+  # set here as usual.
+  def quality_builder = @quality_builder ||= Gtk::Builder.new(string: quality_markup)
+
+  def quality_row = @quality_row ||= quality_builder.get_object('quality_row')
 
   def quality_adjustment
-    @quality_adjustment ||= Gtk::Adjustment.new(
-      QUALITY_MAXIMUM,
-      QUALITY_MINIMUM,
-      QUALITY_MAXIMUM,
-      1,
-      10,
-      0,
-    )
+    @quality_adjustment ||= quality_builder.get_object('percentage')
   end
 
   def quality_scale
-    @quality_scale ||= Gtk::Scale.new(:horizontal, quality_adjustment).tap do |scale|
+    @quality_scale ||= quality_builder.get_object('quality').tap do |scale|
       scale.hexpand = true
       scale.vexpand = true
       scale.digits = 0
@@ -332,8 +320,8 @@ class ConvertPage
 
   def bgcolor_row
     @bgcolor_row ||= Adwaita::ActionRow.new.tap do |row|
-      row.title = BGCOLOR_TITLE
-      row.subtitle = BGCOLOR_SUBTITLE
+      row.title = _('Background Color')
+      row.subtitle = _('Replaces original transparency layer')
       row.activatable_widget = bgcolor_button
     end
   end
@@ -353,7 +341,7 @@ class ConvertPage
 
   def dpi_row
     @dpi_row ||= Adwaita::ActionRow.new.tap do |row|
-      row.title = DPI_TITLE
+      row.title = _('Pixel Density Per Inch')
       row.activatable_widget = dpi_entry
     end
   end
@@ -368,24 +356,37 @@ class ConvertPage
 
   def resize_amount_row
     @resize_amount_row ||= Adwaita::ActionRow.new.tap do |row|
-      row.title = RESIZE_TITLE
+      row.title = _('Resize')
     end
   end
 
   def resize_box = @resize_box ||= Gtk::Box.new(:horizontal, RESIZE_SPACING)
 
-  def resize_width_entry = @resize_width_entry ||= pixel_entry(WIDTH_PLACEHOLDER)
-  def resize_height_entry = @resize_height_entry ||= pixel_entry(HEIGHT_PLACEHOLDER)
+  # The four entries carry upstream's placeholder and tooltip pairs exactly as
+  # window.blp:200-247 sets them — including resize_scale_height_value, whose
+  # placeholder reads "Width" while its tooltip reads "Height".
+  def resize_width_entry
+    @resize_width_entry ||= pixel_entry(_('Width'), _('Width'))
+  end
 
-  def resize_scale_width_entry = @resize_scale_width_entry ||= pixel_entry(WIDTH_PLACEHOLDER)
-  def resize_scale_height_entry = @resize_scale_height_entry ||= pixel_entry(HEIGHT_PLACEHOLDER)
+  def resize_height_entry
+    @resize_height_entry ||= pixel_entry(_('Height'), _('Height'))
+  end
+
+  def resize_scale_width_entry
+    @resize_scale_width_entry ||= pixel_entry(_('Width'), _('Width'))
+  end
+
+  def resize_scale_height_entry
+    @resize_scale_height_entry ||= pixel_entry(_('Width'), _('Height'))
+  end
 
   def link_axis
     @link_axis ||= Gtk::ToggleButton.new.tap do |btn|
       btn.active = true
       btn.valign = :center
       btn.icon_name = LINKED_ICON
-      btn.tooltip_text = LINK_TOOLTIP
+      btn.tooltip_text = _('Preserve aspect ratio')
       btn.add_css_class('raised')
       btn.add_css_class('circular')
       btn.add_css_class('lock')
@@ -395,19 +396,24 @@ class ConvertPage
   def resize_type_bin = @resize_type_bin ||= Adwaita::Bin.new
   def resize_type_box = @resize_type_box ||= Gtk::Box.new(:horizontal, 0)
 
+  # window.blp:239-250: the dropdown carries both a tooltip and an
+  # `accessibility { label: … }` block, and the label can only be attached by
+  # the builder that creates it.
   def resize_type_dropdown
-    @resize_type_dropdown ||= Gtk::DropDown.new.tap do |dd|
-      dd.valign = :center
-      dd.model = Gtk::StringList.new(RESIZE_UNITS)
-      dd.tooltip_text = RESIZE_UNITS_LABEL
-      dd.add_css_class('flat')
-      dd.add_css_class('unit-drop')
-    end
+    @resize_type_dropdown ||=
+      Gtk::Builder.new(string: resize_type_markup)
+                  .get_object('resize_type').tap do |dd|
+        dd.valign = :center
+        dd.model = Gtk::StringList.new([_('%'), _('px')])
+        dd.tooltip_text = resize_units_label
+        dd.add_css_class('flat')
+        dd.add_css_class('unit-drop')
+      end
   end
 
   def resize_filter_row
     @resize_filter_row ||= Adwaita::ActionRow.new.tap do |row|
-      row.title = RESIZE_FILTER_TITLE
+      row.title = _('Resize Algorithm')
     end
   end
 
@@ -420,21 +426,21 @@ class ConvertPage
 
   def resize_filter_default
     @resize_filter_default ||= Gtk::ToggleButton.new.tap do |btn|
-      btn.label = FILTER_LABELS[0]
+      btn.label = _('Default')
       btn.active = true
     end
   end
 
   def resize_filter_pixel
     @resize_filter_pixel ||= Gtk::ToggleButton.new.tap do |btn|
-      btn.label = FILTER_LABELS[1]
+      btn.label = _('Pixel Art')
       btn.active = false
     end
   end
 
   def strip_row
     @strip_row ||= Adwaita::ActionRow.new.tap do |row|
-      row.title = STRIP_TITLE
+      row.title = _('Remove Metadata')
       row.activatable_widget = strip_switch
     end
   end
@@ -448,7 +454,7 @@ class ConvertPage
 
   def convert_button
     @convert_button ||= Gtk::Button.new.tap do |btn|
-      btn.label = CONVERT_LABEL
+      btn.label = _('_Convert')
       btn.use_underline = true
       btn.valign = :center
       btn.halign = :end
@@ -483,8 +489,8 @@ class ConvertPage
         group.add(resize_filter_row)
         group.add(strip_row)
 
-        quality_row.add_suffix(quality_scale)
         bgcolor_row.add_suffix(bgcolor_button)
+        bgcolor_button.signal_connect('notify::rgba') { announce_bgcolor }
         strip_row.add_suffix(strip_switch)
 
         dpi_row.add_suffix(dpi_bin)
@@ -550,11 +556,71 @@ class ConvertPage
       update_resize
     end
 
-    def pixel_entry(placeholder)
+    # Upstream's bgcolor rgba-notify handler: the hex string is substituted into
+    # the *translated* message, so the lookup happens before the sub.
+    def announce_bgcolor
+      bgcolor_button.first_child&.announce(
+        _('New transparency layer color: {}')
+          .sub('{}', Color.from_rgba(bgcolor_button.rgba).hex_string),
+        :medium,
+      )
+    end
+
+    def resize_units_label
+      _('Choose between resizing with percentages or using exact pixels')
+    end
+
+    # The builder fragments the two accessibility blocks need. The strings are
+    # looked up first and escaped into the markup, rather than left to
+    # GtkBuilder's own translation-domain support, which goes through GLib's
+    # gettext — an entry point ruby-glib2 does not expose here.
+    def quality_markup
+      <<~XML
+        <interface>
+          <object class="GtkAdjustment" id="percentage">
+            <property name="lower">#{QUALITY_MINIMUM}</property>
+            <property name="upper">#{QUALITY_MAXIMUM}</property>
+            <property name="value">#{QUALITY_MAXIMUM}</property>
+            <property name="step-increment">1</property>
+            <property name="page-increment">10</property>
+          </object>
+          <object class="AdwActionRow" id="quality_row">
+            <property name="title">#{escape_markup(_('Quality'))}</property>
+            <child type="suffix">
+              <object class="GtkScale" id="quality">
+                <property name="orientation">horizontal</property>
+                <property name="adjustment">percentage</property>
+                <accessibility>
+                  <relation name="labelled-by">quality_row</relation>
+                </accessibility>
+              </object>
+            </child>
+          </object>
+        </interface>
+      XML
+    end
+
+    def resize_type_markup
+      <<~XML
+        <interface>
+          <object class="GtkDropDown" id="resize_type">
+            <accessibility>
+              <property name="label">#{escape_markup(resize_units_label)}</property>
+            </accessibility>
+          </object>
+        </interface>
+      XML
+    end
+
+    def escape_markup(text)
+      text.gsub('&', '&amp;').gsub('<', '&lt;').gsub('>', '&gt;')
+    end
+
+    def pixel_entry(placeholder, tooltip)
       Gtk::Entry.new.tap do |entry|
         entry.valign = :center
         entry.placeholder_text = placeholder
-        entry.tooltip_text = placeholder
+        entry.tooltip_text = tooltip
         entry.input_purpose = :digits
         entry.max_width_chars = ENTRY_WIDTH_CHARS
         entry.hexpand = false
@@ -644,8 +710,16 @@ class ConvertPage
       )
     end
 
-    def stored_output = FileType.from_string(@settings['output-format'])
-    def stored_compression = CompressionType.from_string(@settings['compression-format'])
+    # Upstream's load_selected_output() and load_selected_compression(): the
+    # stored enum value is used as a *position* in the lists the combo row and
+    # the compression switch offer, which is the same number its
+    # save_selected_* counterparts wrote (src/window.rs:2119-2160).
+    def stored_output = FileType.output_formats[@settings['output-format']]
+
+    def stored_compression
+      CompressionType.possible_output(false)[@settings['compression-format']] ||
+        CompressionType::DIRECTORY
+    end
 
     def linked? = link_axis.active? && link_axis.visible? && !dimensions.nil?
 

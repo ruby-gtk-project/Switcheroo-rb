@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # AllImagesPage is the second navigation page: every loaded image, four to a
 # row, reachable from the "+N / Show All" tile.
 #
@@ -12,12 +14,12 @@ require 'adwaita'
 # picks whichever of the two spinners the user can actually see.
 #
 class AllImagesPage
+  include Translations
+
   TAG = 'all_images'
-  TITLE = 'All Images'
   IMAGES_CHILD = 'all_images'
   LOADING_CHILD = 'stack_loading'
   ADD_ICON = 'plus-large-symbolic'
-  ADD_TOOLTIP = 'Add Images (Ctrl+O)'
   SPINNER_SIZE = 32
   CHILDREN_PER_LINE = 4
   SPACING = 12
@@ -58,7 +60,7 @@ class AllImagesPage
   # NavigationPage takes its child and title positionally in the Ruby
   # bindings, so the toolbar view has to exist first.
   def page
-    @page ||= Adwaita::NavigationPage.new(toolbar_view, TITLE).tap do |nav|
+    @page ||= Adwaita::NavigationPage.new(toolbar_view, _('All Images')).tap do |nav|
       nav.tag = TAG
     end
   end
@@ -69,7 +71,7 @@ class AllImagesPage
   def add_button
     @add_button ||= Gtk::Button.new.tap do |btn|
       btn.icon_name = ADD_ICON
-      btn.tooltip_text = ADD_TOOLTIP
+      btn.tooltip_text = _('Add Images (Ctrl+O)')
       btn.action_name = 'win.add'
       btn.add_css_class('flat')
     end

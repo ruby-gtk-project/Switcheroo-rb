@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # StopConvertingDialog asks whether to abandon a running conversion.
 #
 # Ported from the two identical adw::AlertDialog blocks of upstream's
@@ -11,13 +13,7 @@ require 'adwaita'
 # happens afterwards differs, so the caller passes that in.
 #
 class StopConvertingDialog
-  HEADING = 'Stop converting?'
-  BODY = 'You will lose all progress.'
-
-  RESPONSES = {
-    'cancel' => '_Cancel',
-    'stop'   => '_Stop',
-  }.freeze
+  include Translations
 
   def initialize(parent, &on_stop)
     @parent = parent
@@ -26,7 +22,7 @@ class StopConvertingDialog
 
   def present
     dialog.tap do |alert|
-      RESPONSES.each { |id, label| alert.add_response(id, label) }
+      responses.each { |id, label| alert.add_response(id, label) }
       alert.set_response_appearance('stop', :destructive)
 
       alert.signal_connect('response') do |_, response|
@@ -39,5 +35,19 @@ class StopConvertingDialog
     end
   end
 
-  def dialog = @dialog ||= Adwaita::AlertDialog.new(HEADING, BODY)
+  def dialog
+    @dialog ||= Adwaita::AlertDialog.new(
+      _('Stop converting?'),
+      _('You will lose all progress.'),
+    )
+  end
+
+  private
+
+    def responses
+      {
+        'cancel' => _('_Cancel'),
+        'stop'   => _('_Stop'),
+      }
+    end
 end

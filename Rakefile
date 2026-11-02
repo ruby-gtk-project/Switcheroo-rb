@@ -55,7 +55,9 @@
 #
 
 # simplecov:disable
-require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
+if !Dir[File.join(__dir__, "*.gemspec")].empty?
+  require "bundler/gem_tasks"
+end
 # simplecov:enable
 
 # Define a base default task early so other files can enhance it.
@@ -74,14 +76,26 @@ task docs: "yard"
 ### MONOREPO FAMILY TASKS
 if Dir.exist?(File.join(__dir__, "gems"))
   def family_gem_dirs
-    Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec"))
+    Dir.glob(
+      File.join(
+        __dir__,
+        "gems",
+        "*",
+        "*.gemspec",
+      ),
+    )
       .map { |path| File.dirname(path) }
       .uniq
       .sort_by { |path| File.basename(path) }
   end
 
   def run_kettle_family(*args)
-    sh("bundle", "exec", "kettle-family", *args)
+    sh(
+      "bundle",
+      "exec",
+      "kettle-family",
+      *args,
+    )
   end
 
   namespace :family do
@@ -131,7 +145,9 @@ end
 # External gems that define tasks - add here!
 begin
   require "kettle/dev"
-  Kettle::Dev.install_tasks unless Kettle::Dev::RUNNING_AS == "rake"
+  unless Kettle::Dev::RUNNING_AS == "rake"
+    Kettle::Dev.install_tasks
+  end
 rescue LoadError
   warn("NOTE: kettle-dev isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
 end
@@ -170,3 +186,177 @@ rescue LoadError
     warn("NOTE: stone_checksums isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
   end
 end
+
+### APPLICATION INSTALL TASKS
+# Ported from upstream's meson.build, data/meson.build and po/meson.build.
+# Upstream's `meson install` compiles the catalogues, merges the translated
+# launcher keys back into the desktop entry, installs the icons into a theme
+# directory, installs the AppStream metainfo and the D-Bus service file, and
+# compiles and registers the GSettings schema. These tasks do the same, so the
+# port can be installed instead of only run from a checkout.
+namespace :app do
+  APP_ID = "io.gitlab.adhami3310.Converter"
+  GETTEXT_PACKAGE = "switcheroo"
+  DATA_DIR = File.expand_path("data", __dir__)
+  PO_DIR = File.expand_path("po", __dir__)
+  LOCALE_DIR = File.expand_path("locale", __dir__)
+
+  def app_prefix = ENV.fetch("PREFIX", File.expand_path("~/.local"))
+  def app_datadir = File.join(app_prefix, "share")
+  def app_bindir = File.join(app_prefix, "bin")
+  def app_linguas = File.read(File.join(PO_DIR, "LINGUAS")).split
+
+  def app_sh(*command)
+    warn(command.join(" "))
+    unless system(*command)
+      raise("command failed: #{command.join(" ")}")
+    end
+  end
+
+  # Substitute the placeholders meson's configure_file would fill in. The port
+  # has one profile, so @icon@ and @app-id@ both resolve to the release id.
+  def app_configure(source, destination, substitutions)
+    require "fileutils"
+    FileUtils.mkdir_p(File.dirname(destination))
+    File.write(
+      destination,
+      substitutions.reduce(File.read(source)) { |text, (from, to)| text.gsub(from, to) },
+    )
+  end
+
+  desc "Compile po/*.po into a locale/<lang>/LC_MESSAGES/#{GETTEXT_PACKAGE}.mo tree"
+  task :locale do
+    require "fileutils"
+    app_linguas.each do |lang|
+      directory = File.join(LOCALE_DIR, lang, "LC_MESSAGES")
+      FileUtils.mkdir_p(directory)
+      app_sh(
+
+        "msgfmt",
+        "--check-format",
+        "-o",
+
+        File.join(directory, "#{GETTEXT_PACKAGE}.mo"),
+        File.join(PO_DIR, "#{lang}.po"),
+
+      )
+    end
+  end
+
+  desc "Remove the compiled locale tree"
+  task :clean_locale do
+    require "fileutils"
+    FileUtils.rm_rf(LOCALE_DIR)
+  end
+
+  desc "Install the app's data files and catalogues under PREFIX (default ~/.local)"
+  task install: :locale do
+    require "fileutils"
+
+    # Catalogues: upstream's po/meson.build.
+    app_linguas.each do |lang|
+      destination = File.join(
+        app_datadir,
+        "locale",
+        lang,
+        "LC_MESSAGES",
+      )
+      FileUtils.mkdir_p(destination)
+      FileUtils.cp(
+        File.join(
+          LOCALE_DIR,
+          lang,
+          "LC_MESSAGES",
+          "#{GETTEXT_PACKAGE}.mo",
+        ),
+        destination,
+      )
+    end
+
+    # Desktop entry: upstream's i18n.merge_file, which folds the translated
+    # Name, GenericName, Comment and Keywords into the installed file.
+    FileUtils.mkdir_p(File.join(app_datadir, "applications"))
+    app_configure(
+      File.join(DATA_DIR, "switcheroo.desktop.in"),
+      "tmp/switcheroo.desktop.in",
+      { "@icon@" => APP_ID },
+    )
+    app_sh(
+
+      "msgfmt",
+      "--desktop",
+      "--template=tmp/switcheroo.desktop.in",
+      "-d",
+
+      PO_DIR,
+      "-o",
+
+      File.join(app_datadir, "applications", "#{APP_ID}.desktop"),
+
+    )
+
+    # AppStream metainfo: upstream's i18n.merge_file with type xml.
+    FileUtils.mkdir_p(File.join(app_datadir, "metainfo"))
+    app_configure(
+      File.join(DATA_DIR, "#{APP_ID}.metainfo.xml.in.in"),
+      "tmp/#{APP_ID}.metainfo.xml.in",
+      { "@app-id@" => APP_ID, "@gettext-package@" => GETTEXT_PACKAGE },
+    )
+    app_sh(
+
+      "msgfmt",
+      "--xml",
+      "--template=tmp/#{APP_ID}.metainfo.xml.in",
+      "-d",
+
+      PO_DIR,
+      "-o",
+
+      File.join(app_datadir, "metainfo", "#{APP_ID}.metainfo.xml"),
+
+    )
+
+    # D-Bus service file, which the desktop entry's DBusActivatable=true needs.
+    FileUtils.mkdir_p(File.join(app_datadir, "dbus-1", "services"))
+    app_configure(
+      File.join(DATA_DIR, "#{APP_ID}.service.in"),
+      File.join(
+        app_datadir,
+        "dbus-1",
+        "services",
+        "#{APP_ID}.service",
+      ),
+      { "@app-id@" => APP_ID, "@bindir@" => app_bindir },
+    )
+
+    # GSettings schema, so the keys are in dconf and gsettings/dconf-editor
+    # can describe them.
+    schema_dir = File.join(app_datadir, "glib-2.0", "schemas")
+    FileUtils.mkdir_p(schema_dir)
+    app_configure(
+      File.join(DATA_DIR, "#{APP_ID}.gschema.xml.in"),
+      File.join(schema_dir, "#{APP_ID}.gschema.xml"),
+      { "@app-id@" => APP_ID, "@gettext-package@" => GETTEXT_PACKAGE },
+    )
+    app_sh("glib-compile-schemas", schema_dir)
+
+    # Icons, into a theme directory the icon theme will find.
+    FileUtils.mkdir_p(File.join(app_datadir, "icons"))
+    FileUtils.cp_r(
+      File.join(DATA_DIR, "icons", "hicolor"),
+      File.join(app_datadir, "icons"),
+      remove_destination: true,
+    )
+
+    warn(
+      "installed under #{app_prefix}; " \
+               "run with SWITCHEROO_LOCALEDIR=#{File.join(app_datadir, "locale")}",
+    )
+  end
+end
+
+desc "Compile po/*.po into locale/ (alias for app:locale)"
+task locale: "app:locale"
+
+desc "Install the app under PREFIX (alias for app:install)"
+task install: "app:install"

@@ -1,54 +1,76 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'fileutils'
 
-# Settings holds the same keys as upstream's GSettings schema
-# (data/io.gitlab.adhami3310.Converter.gschema.xml.in).
+require 'gio2'
+
+# Settings is upstream's GSettings, reached through the same schema.
 #
-# Upstream uses GSettings, which needs a compiled schema installed into the
-# system's glib-2.0/schemas directory. Requiring an install step to run the
-# app from a checkout is worse than the alternative, so — following the same
-# decision the gnome-contacts-rb port made — the same keys, defaults and
-# semantics are backed by a small JSON file under XDG_CONFIG_HOME.
+# Ported from upstream's use of `gio::Settings` in src/window.rs together with
+# data/io.gitlab.adhami3310.Converter.gschema.xml.in, which the port now ships
+# verbatim. The keys, their types, their defaults and the three enums are the
+# schema's, so a user upgrading from upstream Switcheroo keeps every stored
+# preference: both sides read and write
+# /io/gitlab/adhami3310/Converter/ in dconf, and `gsettings`, `dconf-editor`,
+# `gsettings reset-recursively` and backup tools see the same keys.
 #
-# The three enum keys are stored as their nicks rather than as integers.
-# Upstream writes them with `set_enum` passing the *position* in
-# FileType::output_formats() / CompressionType::possible_output(false), which
-# does not agree with the nick ordering declared in the schema, so a fresh
-# profile there starts on whatever format sits at the default enum's index.
-# Storing the nick keeps the declared defaults ("jpg", "directory",
-# "percentage") meaning what they say.
+# The three enum keys are read and written with get_enum/set_enum, carrying the
+# same integers upstream carries: the position of the chosen value in
+# FileType::output_formats(), CompressionType::possible_output(false) and the
+# resize-unit dropdown. Upstream's output-format indices do not line up with
+# the value numbers its own schema declares; the port reproduces that rather
+# than diverging from it, and FINDINGS.md records the suspected upstream bug.
+#
+# Running from a checkout needs the schema compiled somewhere GLib will look.
+# If the installed schema is present (the Rake install task puts it in
+# <prefix>/share/glib-2.0/schemas) it is used; otherwise the shipped
+# .gschema.xml.in is compiled into XDG_CACHE_HOME and read from there, so the
+# same dconf keys are reached either way.
 #
 class Settings
-  DEFAULTS = {
-    'window-width'       => 750,
-    'window-height'      => 750,
-    'is-maximized'       => false,
-    'quality'            => 92,
-    'dpi'                => 300,
-    'output-format'      => 'jpg',
-    'compression-format' => 'directory',
-    'resize-type'        => 'percentage',
-  }.freeze
+  SCHEMA_ID = 'io.gitlab.adhami3310.Converter'
+  SCHEMA_PATH = '/io/gitlab/adhami3310/Converter/'
+  GETTEXT_PACKAGE = 'switcheroo'
 
-  def initialize(path: nil)
-    @path = path || default_path
-    @values = DEFAULTS.merge(read)
+  SCHEMA_SOURCE_FILE = File.expand_path(
+    "../data/#{SCHEMA_ID}.gschema.xml.in",
+    __dir__,
+  )
+
+  INTEGER_KEYS = %w[window-width window-height quality dpi].freeze
+  BOOLEAN_KEYS = %w[is-maximized].freeze
+  ENUM_KEYS = %w[output-format compression-format resize-type].freeze
+  KEYS = (INTEGER_KEYS + BOOLEAN_KEYS + ENUM_KEYS).freeze
+
+  def initialize(settings: nil)
+    @settings = settings
   end
 
-  def [](key) = @values.fetch(key.to_s, DEFAULTS[key.to_s])
+  def [](key)
+    key.to_s.then do |name|
+      case kind_of_key(name)
+      when :integer then settings.get_int(name)
+      when :boolean then settings.get_boolean(name)
+      else settings.get_enum(name)
+      end
+    end
+  end
 
   def []=(key, value)
-    @values[key.to_s] = value
-    write
+    key.to_s.then do |name|
+      case kind_of_key(name)
+      when :integer then settings.set_int(name, value.to_i)
+      when :boolean then settings.set_boolean(name, value ? true : false)
+      else settings.set_enum(name, value.to_i)
+      end
+    end
     value
   end
 
-  def location = @path
+  def location = SCHEMA_PATH
 
   # Named accessors for every key, so callers do not repeat the string keys.
-  DEFAULTS.each_key do |key|
+  KEYS.each do |key|
     method_name = key.tr('-', '_')
     define_method(method_name) { self[key] }
     define_method(:"#{method_name}=") { |value| self[key] = value }
@@ -68,37 +90,61 @@ class Settings
   # size is only recorded when the window is not maximized, so the restored
   # size is the one the user actually chose.
   def remember(window)
-    @values['is-maximized'] = window.maximized?
+    self['is-maximized'] = window.maximized?
     unless window.maximized?
-      @values['window-width'] = window.default_width
-      @values['window-height'] = window.default_height
+      self['window-width'] = window.default_width
+      self['window-height'] = window.default_height
     end
-    write
+  end
+
+  def settings
+    @settings ||= Gio::Settings.new(schema: schema, path: SCHEMA_PATH)
   end
 
   private
 
-    def default_path
-      File.join(
-        ENV.fetch('XDG_CONFIG_HOME', File.expand_path('~/.config')),
-        'switcheroo-rb',
-        'settings.json',
-      )
-    end
-
-    def read
-      if File.exist?(@path)
-        JSON.parse(File.read(@path))
+    def kind_of_key(name)
+      if INTEGER_KEYS.include?(name)
+        :integer
+      elsif BOOLEAN_KEYS.include?(name)
+        :boolean
+      elsif ENUM_KEYS.include?(name)
+        :enum
       else
-        {}
+        raise ArgumentError, "#{SCHEMA_ID} has no key #{name}"
       end
-    rescue JSON::ParserError => e
-      warn "Error parsing #{@path}: #{e.message}"
-      {}
     end
 
-    def write
-      FileUtils.mkdir_p(File.dirname(@path))
-      File.write(@path, JSON.pretty_generate(@values))
+    def schema = installed_schema || compiled_schema
+
+    def installed_schema
+      Gio::SettingsSchemaSource.default&.lookup(SCHEMA_ID, true)
+    end
+
+    # The schema the port ships, compiled on demand so a checkout reaches the
+    # same dconf path an installed copy does.
+    def compiled_schema
+      compile_schema
+      Gio::SettingsSchemaSource.new(schema_cache_directory, nil, true)
+                               .lookup(SCHEMA_ID, false)
+    end
+
+    def compile_schema
+      FileUtils.mkdir_p(schema_cache_directory)
+      File.write(
+        File.join(schema_cache_directory, "#{SCHEMA_ID}.gschema.xml"),
+        File.read(SCHEMA_SOURCE_FILE)
+            .gsub('@app-id@', SCHEMA_ID)
+            .gsub('@gettext-package@', GETTEXT_PACKAGE),
+      )
+      system('glib-compile-schemas', schema_cache_directory, out: File::NULL)
+    end
+
+    def schema_cache_directory
+      File.join(
+        ENV.fetch('XDG_CACHE_HOME', File.expand_path('~/.cache')),
+        'switcheroo-rb',
+        'schemas',
+      )
     end
 end

@@ -1,7 +1,14 @@
 # List of source files containing translatable strings.
 #
-# Carried over from upstream's po/POTFILES.in, with the Rust sources and
-# blueprint files replaced by the Ruby files that now hold the same strings.
+# Carried over from upstream's po/POTFILES.in. The metadata files keep their
+# upstream names and are extracted by xgettext's ITS rules exactly as upstream
+# extracts them; the Rust sources and blueprint files are replaced by the Ruby
+# files that now hold the same strings.
+# METADATA files
+data/switcheroo.desktop.in
+data/io.gitlab.adhami3310.Converter.gschema.xml.in
+data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in
+# RUBY files
 lib/about_dialog.rb
 lib/all_images_page.rb
 lib/application.rb
@@ -14,9 +21,9 @@ lib/file_chooser.rb
 lib/image_rest.rb
 lib/image_thumbnail.rb
 lib/invalid_image_page.rb
+lib/magick.rb
 lib/primary_menu.rb
 lib/shortcuts_dialog.rb
 lib/stop_converting_dialog.rb
 lib/temp_dir.rb
 lib/welcome_page.rb
-data/switcheroo.desktop

@@ -6,6 +6,8 @@
 # the launcher. One upstream source file maps to one lib/<thing>.rb, so the
 # requires below read as the upstream file list: the format and colour models,
 # the ImageMagick backend, the window and its pages, and the dialogs.
+require_relative "config"
+require_relative "translations"
 require_relative "color"
 require_relative "file_type"
 require_relative "input_file"

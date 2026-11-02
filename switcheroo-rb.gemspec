@@ -53,13 +53,22 @@ Gem::Specification.new do |spec|
   end
   enumerate_package_glob = lambda do |glob|
     Dir.glob(glob, File::FNM_DOTMATCH).filter_map do |path|
-      next unless File.file?(path) && ![".", ".."].include?(File.basename(path))
+      unless File.file?(path) && ![".", ".."].include?(File.basename(path))
+        next
+      end
 
       relative_package_path.call(path)
     end
   end
   enumerate_package_files = lambda do |root|
-    enumerate_package_glob.call(File.join(gemspec_root, root, "**", "*"))
+    enumerate_package_glob.call(
+      File.join(
+        gemspec_root,
+        root,
+        "**",
+        "*",
+      ),
+    )
   end
   package_metadata_files = %w[
     CHANGELOG.md
@@ -108,6 +117,15 @@ Gem::Specification.new do |spec|
   #
   #       Development dependencies that require strictly newer Ruby versions should be in a "gemfile",
   #       and preferably a modular one (see gemfiles/modular/*.gemfile).
+
+  # Runtime dependencies. exe/switcheroo requires "switcheroo", which requires
+  # adwaita and gtk4 for every widget and gio2 for the GSettings schema, and
+  # gettext for the message catalogues in po/. Without these declared, an
+  # install of the built gem cannot start the app.
+  spec.add_dependency("adwaita", "~> 4.3")                                          # ruby >= 3.1
+  spec.add_dependency("gettext", "~> 3.5")                                          # ruby >= 2.6
+  spec.add_dependency("gtk4", "~> 4.3")                                             # ruby >= 3.1
+  spec.add_dependency("rexml", "~> 3.4")                                            # ruby >= 2.5
 
   # Dev, Test, & Release Tasks
   spec.add_development_dependency("kettle-dev", "~> 3.1", ">= 3.1.22")             # ruby >= 3.4

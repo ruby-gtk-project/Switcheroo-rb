@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # ShortcutsDialog lists the keyboard shortcuts.
 #
 # A direct port of the `Adw.ShortcutsDialog help_overlay` block of upstream's
@@ -12,32 +14,39 @@ require 'adwaita'
 # whichever ones Application bound.
 #
 class ShortcutsDialog < Adwaita::ShortcutsDialog
-  ITEMS = [
-    ['Show Shortcuts', 'win.show-help-overlay'],
-    ['Quit', 'app.quit'],
-    ['New Window', 'app.new-window'],
-    ['Clear Window', 'win.clear'],
-    ['Paste From Clipboard', 'win.paste'],
-    ['Add Images', 'win.add'],
-  ].freeze
+  include Translations
 
   def build
     tap do |dialog|
       dialog.add(general_section)
 
       general_section.tap do |section|
-        ITEMS.each { |title, action| section.add(item(title, action)) }
+        items.each { |title, action| section.add(item(title, action)) }
       end
     end
   end
 
   def general_section
     @general_section ||= Adwaita::ShortcutsSection.new.tap do |section|
-      section.title = 'General'
+      section.title = p_('shortcut window', 'General')
     end
   end
 
   private
+
+    # Upstream marks all seven of these with a "shortcut window" msgctxt, so
+    # they are looked up with p_() and not _(): the catalogues are keyed on the
+    # context as well as the text.
+    def items
+      [
+        [p_('shortcut window', 'Show Shortcuts'), 'win.show-help-overlay'],
+        [p_('shortcut window', 'Quit'), 'app.quit'],
+        [p_('shortcut window', 'New Window'), 'app.new-window'],
+        [p_('shortcut window', 'Clear Window'), 'win.clear'],
+        [p_('shortcut window', 'Paste From Clipboard'), 'win.paste'],
+        [p_('shortcut window', 'Add Images'), 'win.add'],
+      ]
+    end
 
   # Positional, not keyword, arguments — even though the error a no-argument
   # new raises advertises the signatures as "title: utf8, accelerator: utf8".

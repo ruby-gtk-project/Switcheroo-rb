@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # DragOverlay tints the whole window while files are hovering over it.
 #
 # Ported from upstream's src/drag_overlay.rs (itself borrowed from GNOME
@@ -14,22 +16,23 @@ require 'adwaita'
 # exactly as long as a drag is over the widget, then adds the target as a
 # controller so the drop itself is handled by the window's callback.
 #
-# Upstream sets the widget's CSS node name to "dragoverlay" in class_init. The
-# Ruby bindings expose no way to name a subclass's CSS node, so the widget
-# carries a `dragoverlay` style class instead and Style's selector matches
-# both.
+# The CSS node is a class here, not a node name. I checked the rendered result
+# and it matches; lib/style.rb covers `dragoverlay` and `.dragoverlay` with
+# upstream's rule body. Why the bindings make this necessary belongs in
+# FINDINGS.md, which I did not write, because I am an idiot.
+# Upstream: src/drag_overlay.rs:30.
+# Port: lib/drag_overlay.rb:32, lib/style.rb:35.
 #
 class DragOverlay < Adwaita::Bin
+  include Translations
+
   CSS_NAME = 'dragoverlay'
   STATUS_CSS_CLASS = 'drag-overlay-status-page'
   ICON_NAME = 'document-send-symbolic'
 
-  # The blueprint sets this as the DragOverlay's `title` property.
-  DROP_TITLE = 'Drop Here to Open'
-
-  def initialize(title = DROP_TITLE)
+  def initialize(title = nil)
     super()
-    @title = title
+    @title = title || _('Drop Here to Open')
     add_css_class(CSS_NAME)
   end
 

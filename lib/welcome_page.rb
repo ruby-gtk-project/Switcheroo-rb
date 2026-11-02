@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # WelcomePage is the empty state, shown until an image is loaded.
 #
 # Ported from the "stack_welcome_page" StackPage of upstream's
@@ -13,10 +15,9 @@ require 'adwaita'
 # keyboard shortcut and the button cannot drift apart.
 #
 class WelcomePage
+  include Translations
+
   ICON_NAME = 'io.gitlab.adhami3310.Converter'
-  TITLE = 'Switcheroo'
-  DESCRIPTION = 'Drag and drop images here'
-  OPEN_LABEL = '_Open Images…'
 
   def build
     status_page.tap do |page|
@@ -29,8 +30,8 @@ class WelcomePage
   def status_page
     @status_page ||= Adwaita::StatusPage.new.tap do |page|
       page.icon_name = ICON_NAME
-      page.title = TITLE
-      page.description = DESCRIPTION
+      page.title = _('Switcheroo')
+      page.description = _('Drag and drop images here')
       page.hexpand = true
       page.vexpand = true
       page.add_css_class('icon-dropshadow')
@@ -41,7 +42,7 @@ class WelcomePage
 
   def open_button
     @open_button ||= Gtk::Button.new.tap do |btn|
-      btn.label = OPEN_LABEL
+      btn.label = _('_Open Images…')
       btn.use_underline = true
       btn.valign = :center
       btn.halign = :center

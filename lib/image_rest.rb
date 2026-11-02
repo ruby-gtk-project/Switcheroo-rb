@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # ImageRest is the "+N / Show All" tile that ends the short thumbnail strip.
 #
 # Ported from upstream's src/widgets/image_rest.rs and its template
@@ -9,12 +11,17 @@ require 'adwaita'
 # square button whose label is the number of images the strip did not show.
 # Clicking it pushes the "All Images" navigation page.
 #
-# The blueprint gives the button both an icon name and an explicit child box;
-# the child is what GTK actually shows, so only the child is built here.
+# I dropped the `+N` tile button's `icon-name`, because I am an idiot who
+# decided a property I did not need today would never be needed. It is set
+# again now.
+# Upstream: data/resources/blueprints/image-rest.blp:9,
+# `icon-name: "view-more-horizontal-symbolic"`.
 #
 class ImageRest < Gtk::FlowBoxChild
+  include Translations
+
   TILE_SIZE = 150
-  SHOW_ALL_LABEL = 'Show All'
+  ICON_NAME = 'view-more-horizontal-symbolic'
 
   def initialize(count)
     super()
@@ -49,6 +56,7 @@ class ImageRest < Gtk::FlowBoxChild
 
   def button
     @button ||= Gtk::Button.new.tap do |btn|
+      btn.icon_name = ICON_NAME
       btn.hexpand = true
       btn.vexpand = true
       btn.width_request = TILE_SIZE
@@ -66,15 +74,19 @@ class ImageRest < Gtk::FlowBoxChild
     end
   end
 
+  # Upstream's msgid is literally `+{}` and the count is substituted into the
+  # *translated* string (src/widgets/image_rest.rs:65), so the lookup has to
+  # happen first: interpolating into the literal would build a key no
+  # catalogue holds, and `format`/`%s` would build a different one again.
   def count_label
-    @count_label ||= Gtk::Label.new("+#{@count}").tap do |label|
+    @count_label ||= Gtk::Label.new(_('+{}').sub('{}', @count.to_s)).tap do |label|
       label.add_css_class('large_number')
     end
   end
 
-  def show_all_label = @show_all_label ||= Gtk::Label.new(SHOW_ALL_LABEL)
+  def show_all_label = @show_all_label ||= Gtk::Label.new(_('Show All'))
 
   private
 
-    def tooltip = "Show #{@count} more images"
+    def tooltip = _('Show {} more images').sub('{}', @count.to_s)
 end

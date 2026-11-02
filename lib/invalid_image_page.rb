@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # InvalidImagePage is the error state for a file ImageMagick could not read.
 #
 # Ported from the "stack_invalid_image" StackPage of upstream's
@@ -10,9 +12,9 @@ require 'adwaita'
 # corrupt or the ImageMagick delegate for its format is missing.
 #
 class InvalidImagePage
+  include Translations
+
   ICON_NAME = 'im-symbolic'
-  TITLE = 'Could not Load Image'
-  DESCRIPTION = 'This image could be corrupted or may use an unsupported file format.'
 
   def build
     status_page
@@ -21,8 +23,8 @@ class InvalidImagePage
   def status_page
     @status_page ||= Adwaita::StatusPage.new.tap do |page|
       page.icon_name = ICON_NAME
-      page.title = TITLE
-      page.description = DESCRIPTION
+      page.title = _('Could not Load Image')
+      page.description = _('This image could be corrupted or may use an unsupported file format.')
       page.hexpand = true
       page.vexpand = true
     end

@@ -9,6 +9,7 @@ require 'adwaita'
 require_relative 'color'
 require_relative 'file_type'
 require_relative 'temp_dir'
+require_relative 'translations'
 
 # Magick is the ImageMagick backend: the frame/dimension probe, the argument
 # builder, and the job runner that spawns and supervises the child processes.
@@ -347,6 +348,8 @@ module Magick
   end
 
   class << self
+    include Translations
+
     # Upstream's count_frames(): `magick identify` prints one line per frame,
     # and no output at all means ImageMagick could not identify the file —
     # either it is corrupt or a delegate library is missing. That is reported
@@ -534,8 +537,11 @@ module Magick
             end
           end
         end
-      rescue SystemCallError => e
-        "#{command.first}: #{e.message}"
+      rescue SystemCallError
+        # Upstream's wait_for_child(): a spawn that never produced a child has
+        # no stderr to report, so the one translated sentence stands in for it
+        # (src/magick.rs:301).
+        _('Unknown IO error happened')
       end
 
       def drain(options)

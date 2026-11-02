@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # ErrorDialog shows what ImageMagick complained about.
 #
 # Ported from the adw::AlertDialog built in convert_failed() in upstream's
@@ -10,12 +12,7 @@ require 'adwaita'
 # Clipboard response beside Close.
 #
 class ErrorDialog
-  HEADING = 'Error While Processing'
-
-  RESPONSES = {
-    'ok'   => '_Close',
-    'copy' => '_Copy to Clipboard',
-  }.freeze
+  include Translations
 
   MIN_HEIGHT = 200
   MAX_HEIGHT = 400
@@ -28,7 +25,7 @@ class ErrorDialog
 
   def present
     dialog.tap do |alert|
-      RESPONSES.each { |id, label| alert.add_response(id, label) }
+      responses.each { |id, label| alert.add_response(id, label) }
       alert.set_response_appearance('copy', :suggested)
       alert.extra_child = scroller
 
@@ -44,7 +41,7 @@ class ErrorDialog
     end
   end
 
-  def dialog = @dialog ||= Adwaita::AlertDialog.new(HEADING, nil)
+  def dialog = @dialog ||= Adwaita::AlertDialog.new(_('Error While Processing'), nil)
 
   def scroller
     @scroller ||= Gtk::ScrolledWindow.new.tap do |sw|
@@ -67,4 +64,13 @@ class ErrorDialog
       label.add_css_class('monospace')
     end
   end
+
+  private
+
+    def responses
+      {
+        'ok'   => _('_Close'),
+        'copy' => _('_Copy to Clipboard'),
+      }
+    end
 end

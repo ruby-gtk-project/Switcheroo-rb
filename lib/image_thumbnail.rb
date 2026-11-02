@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # ImageThumbnail is one loaded image as it appears in the two flow boxes.
 #
 # Ported from upstream's src/widgets/image_thumbnail.rs and its template
@@ -10,19 +12,23 @@ require 'adwaita'
 # be loaded, a generic image icon, with the format-and-size caption on a tinted
 # strip underneath and a circular OSD trash button floating in the top right.
 #
-# Upstream's imp overrides measure() to answer 150×150 for the horizontal
-# orientation whenever the file's dimensions are known, and size_allocate() to
-# hand the whole allocation to its root box. The Ruby bindings cannot override
-# a widget's vfuncs, so the same clamp is expressed as a fixed size request on
-# the card with expansion switched off, which is what upstream's measure was
-# there to produce: every tile is exactly THUMBNAIL_SIZE wide whatever the
-# image's aspect ratio.
+# Upstream's imp overrides measure() to clamp *only* the horizontal
+# orientation to min = nat = 150 whenever the file's dimensions are known, and
+# to pass the vertical measure straight through, so the tile is 150 wide and as
+# tall as the picture plus the caption strip
+# (src/widgets/image_thumbnail.rs:120-131). I had pinned the height at 150 too,
+# which squeezed the caption strip against the bottom of every image in both
+# flow boxes; the clamp is on the width alone now and the height is left
+# natural. Why the bindings cannot carry the vfunc override itself is recorded
+# in FINDINGS.md.
 #
 class ImageThumbnail < Adwaita::Bin
+  include Translations
+
   THUMBNAIL_SIZE = 150
   FALLBACK_ICON = 'image-symbolic'
   REMOVE_ICON = 'user-trash-symbolic'
-  REMOVE_TOOLTIP = 'Remove image'
+  REMOVE_NAME = 'remove_image'
 
   def initialize(texture:, caption:, dimensions: nil)
     super()
@@ -145,8 +151,9 @@ class ImageThumbnail < Adwaita::Bin
 
   def remove_button
     @remove_button ||= Gtk::Button.new.tap do |btn|
+      btn.name = REMOVE_NAME
       btn.icon_name = REMOVE_ICON
-      btn.tooltip_text = REMOVE_TOOLTIP
+      btn.tooltip_text = _('Remove image')
       btn.valign = :start
       btn.halign = :end
       btn.add_css_class('circular')
@@ -157,14 +164,14 @@ class ImageThumbnail < Adwaita::Bin
 
   private
 
-    # Upstream's measure() override: a file whose dimensions are known is
-    # reported as exactly 150 wide, so a wide photo and a tall one take the
-    # same room in the flow box.
+    # Upstream's measure() override, which clamps the horizontal orientation
+    # only: a file whose dimensions are known is reported as exactly 150 wide,
+    # so a wide photo and a tall one take the same room in the flow box, while
+    # the height stays whatever the picture and the caption strip need.
     def clamp_to_thumbnail_size
       if @dimensions
-        set_size_request(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
+        set_size_request(THUMBNAIL_SIZE, -1)
         self.hexpand = false
-        self.vexpand = false
       end
     end
 end

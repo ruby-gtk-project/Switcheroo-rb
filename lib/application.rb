@@ -3,9 +3,11 @@
 require 'adwaita'
 
 require_relative 'app_window'
+require_relative 'config'
 require_relative 'input_file'
 require_relative 'settings'
 require_relative 'style'
+require_relative 'translations'
 
 # App is the application object.
 #
@@ -16,18 +18,25 @@ require_relative 'style'
 # uses to ask the running instance for another window; and it binds the seven
 # accelerators upstream's setup_accels() does.
 #
-# Upstream is an adw::Application subclass. The Ruby bindings' Adwaita
-# application is unusable, so this is a Gtk::Application with Adwaita
-# initialised by hand — every Adwaita widget inside it works regardless.
+# I had built this on `Gtk::Application` and written that the bindings' Adwaita
+# application is unusable, without checking, and without checking what
+# `adw_application` does for the user that a bare `Adwaita.init` does not — the
+# colour-scheme and high-contrast tracking its style manager installs, and the
+# Adwaita option group in `--help`. It is an `Adwaita::Application` now, which
+# is what upstream subclasses, and it works: `Adwaita::Application.new`,
+# `#register` and `Adwaita::ApplicationWindow.new(app)` were all driven under
+# this version of the bindings before this was written.
+# Upstream: src/application.rs, `Converter(adw::Application)`.
 #
 # The icon search path is upstream's too, added in the window's constructed():
-# the seven symbolic icons the app ships are not in the system theme, so the
-# theme has to be told where they live.
+# the nine icons the app ships are not in the system theme, so the theme has to
+# be told where they live.
 #
 class App
-  APP_ID = 'io.gitlab.adhami3310.Converter'
-  APP_NAME = 'Switcheroo'
-  GETTEXT_DOMAIN = 'switcheroo'
+  include Translations
+
+  APP_ID = Config::APP_ID
+  APP_NAME = Config::APP_NAME
 
   # Upstream's setup_accels().
   ACCELERATORS = {
@@ -41,7 +50,6 @@ class App
   }.freeze
 
   NEW_WINDOW_OPTION = 'new-window'
-  NEW_WINDOW_DESCRIPTION = 'Open a new window'
 
   def initialize(app_id: APP_ID, flags: :handles_open, settings: nil)
     @app_id = app_id
@@ -57,7 +65,7 @@ class App
         'w'.ord,
         :none,
         :none,
-        NEW_WINDOW_DESCRIPTION,
+        _('Open a new window'),
         nil,
       )
 
@@ -74,16 +82,14 @@ class App
 
   def app
     @app ||= begin
-      Adwaita.init
       GLib.application_name = APP_NAME
-      Gtk::Application.new(@app_id, @flags)
+      Adwaita::Application.new(@app_id, @flags)
     end
   end
 
   private
 
     def on_startup
-      bind_text_domain
       Style.load
       add_icon_search_path
       Gtk::Window.set_default_icon_name(@app_id)
@@ -156,22 +162,10 @@ class App
     def add_icon_search_path
       Gdk::Display.default.then do |display|
         if display
-          Gtk::IconTheme.for_display(display).add_search_path(icon_directory)
+          Gtk::IconTheme.get_for_display(display).add_search_path(icon_directory)
         end
       end
     end
 
-    def icon_directory = File.expand_path('../data/icons', __dir__)
-
-    # ruby-glib2 exposes the C gettext entry points only when it was built
-    # against libintl; where it was not, the catalogues in po/ go unused and
-    # every string stays the English literal it is in the source.
-    def bind_text_domain
-      if GLib.respond_to?(:bindtextdomain)
-        GLib.bindtextdomain(GETTEXT_DOMAIN, locale_directory)
-        GLib.textdomain(GETTEXT_DOMAIN)
-      end
-    end
-
-    def locale_directory = File.expand_path('../po', __dir__)
+    def icon_directory = Config.icon_directory
 end

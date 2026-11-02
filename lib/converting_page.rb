@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 # ConvertingPage is the progress state during a conversion run.
 #
 # Ported from the "stack_converting" StackPage of upstream's
@@ -11,11 +13,7 @@ require 'adwaita'
 # "Collecting files" for the final move/zip/merge step.
 #
 class ConvertingPage
-  TITLE = 'Converting'
-  DESCRIPTION = 'This could take a while'
-  LOADING_TEXT = 'Loading…'
-  COLLECTING_TEXT = 'Collecting files'
-  CANCEL_LABEL = '_Cancel'
+  include Translations
 
   def build
     status_page.tap do |page|
@@ -34,7 +32,7 @@ class ConvertingPage
 
   # Upstream's convert_start(): the bar is reset before the first job reports.
   def reset
-    progress_bar.text = LOADING_TEXT
+    progress_bar.text = _('Loading…')
     progress_bar.fraction = 0.0
   end
 
@@ -46,13 +44,13 @@ class ConvertingPage
 
   # Upstream's set_collecting_progress().
   def collecting
-    progress_bar.text = COLLECTING_TEXT
+    progress_bar.text = _('Collecting files')
   end
 
   def status_page
     @status_page ||= Adwaita::StatusPage.new.tap do |page|
-      page.title = TITLE
-      page.description = DESCRIPTION
+      page.title = _('Converting')
+      page.description = _('This could take a while')
     end
   end
 
@@ -63,13 +61,13 @@ class ConvertingPage
       bar.valign = :center
       bar.halign = :center
       bar.show_text = true
-      bar.text = LOADING_TEXT
+      bar.text = _('Loading…')
     end
   end
 
   def cancel_button
     @cancel_button ||= Gtk::Button.new.tap do |btn|
-      btn.label = CANCEL_LABEL
+      btn.label = _('_Cancel')
       btn.use_underline = true
       btn.valign = :center
       btn.halign = :center

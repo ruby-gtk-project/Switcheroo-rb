@@ -2,6 +2,8 @@
 
 require 'adwaita'
 
+require_relative 'translations'
+
 require_relative 'file_type'
 require_relative 'input_file'
 
@@ -24,13 +26,11 @@ require_relative 'input_file'
 # wrong filetype".
 #
 class FileChooser
-  ACCEPT_LABEL = '_Select Images'
-  IMAGES_FILTER_NAME = 'Images'
+  include Translations
 
-  UNSUPPORTED_FILETYPE = 'Unsupported filetype'
-  UNSPECIFIED_FILETYPE = 'Unspecified filetype'
-  UNKNOWN_FILETYPE = 'Unknown filetype'
-  WRONG_FILETYPE = 'Used the wrong filetype'
+  class << self
+    include Translations
+  end
 
   # Upstream's load_files(): turns the chosen GFiles into InputFiles, drops
   # everything that is not a readable input format, and reports the whole pick
@@ -41,7 +41,7 @@ class FileChooser
          .select { |input| input.kind.input? }
          .then do |inputs|
       if inputs.empty?
-        on_error.call(UNSUPPORTED_FILETYPE)
+        on_error.call(_('Unsupported filetype'))
       else
         on_success.call(inputs)
       end
@@ -104,7 +104,7 @@ class FileChooser
 
   def open_dialog
     @open_dialog ||= Gtk::FileDialog.new.tap do |dialog|
-      dialog.accept_label = ACCEPT_LABEL
+      dialog.accept_label = _('_Select Images')
       dialog.modal = true
       dialog.default_filter = images_filter
     end
@@ -112,7 +112,7 @@ class FileChooser
 
   def images_filter
     @images_filter ||= Gtk::FileFilter.new.tap do |filter|
-      filter.name = IMAGES_FILTER_NAME
+      filter.name = _('Images')
       FileType.input_formats.each { |file_type| filter.add_mime_type(file_type.mime) }
     end
   end
@@ -157,7 +157,7 @@ class FileChooser
       file.path.then do |path|
         File.extname(path).delete_prefix('.').then do |extension|
           if extension.empty?
-            [nil, UNSPECIFIED_FILETYPE]
+            [nil, _('Unspecified filetype')]
           else
             validate_extension(path, extension, format)
           end
@@ -168,9 +168,9 @@ class FileChooser
     def validate_extension(path, extension, format)
       OutputType.from_string(extension).then do |chosen|
         if chosen.nil?
-          [nil, UNKNOWN_FILETYPE]
+          [nil, _('Unknown filetype')]
         elsif chosen != format
-          [nil, WRONG_FILETYPE]
+          [nil, _('Used the wrong filetype')]
         else
           [path, nil]
         end

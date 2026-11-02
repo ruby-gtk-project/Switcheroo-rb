@@ -23,6 +23,7 @@ require_relative 'settings'
 require_relative 'shortcuts_dialog'
 require_relative 'stop_converting_dialog'
 require_relative 'temp_dir'
+require_relative 'translations'
 require_relative 'welcome_page'
 
 # AppWindow is the application window and the state machine behind it.
@@ -48,15 +49,14 @@ require_relative 'welcome_page'
 #   says to lose the progress, which is upstream's glib::Propagation::Stop.
 #
 class AppWindow
-  TITLE = 'Switcheroo'
+  include Translations
+
   DEFAULT_SIZE = 750
   MINIMUM_SIZE = 300
   MAIN_TAG = 'main'
 
   ADD_ICON = 'plus-large-symbolic'
-  ADD_TOOLTIP = 'Add Images (Ctrl+O)'
   MENU_ICON = 'open-menu-symbolic'
-  MENU_TOOLTIP = 'Primary Menu'
 
   WELCOME_CHILD = 'stack_welcome_page'
   LOADING_CHILD = 'stack_loading'
@@ -68,14 +68,6 @@ class AppWindow
 
   # Upstream's ACTION_ENTRIES; the accelerators are bound by Application.
   WINDOW_ACTIONS = %w[close add clear show-help-overlay about paste].freeze
-
-  # The five toasts of upstream's src/window.rs.
-  DROP_FAILED_TOAST = 'Unable to access dropped files'
-  UNSUPPORTED_TOAST = 'Unsupported filetype'
-  CONVERTED_TOAST = 'Image converted'
-  CONVERTED_TOAST_BUTTON = 'Open'
-  COPIED_TOAST = 'Error copied to clipboard'
-  CANCELLED_TOAST = 'Converting Cancelled'
 
   # How many thumbnails the short strip shows before it ends in a "+N" tile.
   SHORT_STRIP_LENGTH = 6
@@ -129,7 +121,7 @@ class AppWindow
   def open_files(inputs)
     inputs.compact.then do |files|
       if files.empty?
-        show_toast(UNSUPPORTED_TOAST)
+        show_toast(_('Unsupported filetype'))
       else
         open_success(files)
       end
@@ -140,7 +132,7 @@ class AppWindow
 
   def window
     @window ||= Adwaita::ApplicationWindow.new(@app).tap do |win|
-      win.title = TITLE
+      win.title = _('Switcheroo')
       win.width_request = MINIMUM_SIZE
       win.height_request = MINIMUM_SIZE
       win.set_default_size(DEFAULT_SIZE, DEFAULT_SIZE)
@@ -154,7 +146,7 @@ class AppWindow
   def navigation = @navigation ||= Adwaita::NavigationView.new
 
   def main_page
-    @main_page ||= Adwaita::NavigationPage.new(toolbar_view, TITLE).tap do |page|
+    @main_page ||= Adwaita::NavigationPage.new(toolbar_view, _('Switcheroo')).tap do |page|
       page.tag = MAIN_TAG
     end
   end
@@ -170,7 +162,7 @@ class AppWindow
   def add_button
     @add_button ||= Gtk::Button.new.tap do |btn|
       btn.icon_name = ADD_ICON
-      btn.tooltip_text = ADD_TOOLTIP
+      btn.tooltip_text = _('Add Images (Ctrl+O)')
       btn.action_name = 'win.add'
       btn.visible = false
       btn.add_css_class('flat')
@@ -180,7 +172,7 @@ class AppWindow
   def menu_button
     @menu_button ||= Gtk::MenuButton.new.tap do |btn|
       btn.icon_name = MENU_ICON
-      btn.tooltip_text = MENU_TOOLTIP
+      btn.tooltip_text = _('Primary Menu')
       btn.menu_model = PrimaryMenu.build
       btn.primary = true
     end
@@ -461,7 +453,7 @@ class AppWindow
     def on_drop(value)
       value.files.then do |files|
         if files.empty?
-          show_toast(DROP_FAILED_TOAST)
+          show_toast(_('Unable to access dropped files'))
           false
         else
           open_files(files.map { |file| InputFile.new_for_file(file) })
@@ -876,15 +868,15 @@ class AppWindow
 
     def copy_error(text)
       window.clipboard.set(text)
-      show_toast(COPIED_TOAST)
+      show_toast(_('Error copied to clipboard'))
     end
 
     # Upstream's convert_success(): a toast with an Open button on it.
     def convert_success(format, path)
       convert_clean
       @children.cancel
-      Adwaita::Toast.new(CONVERTED_TOAST).tap do |toast|
-        toast.button_label = CONVERTED_TOAST_BUTTON
+      Adwaita::Toast.new(_('Image converted')).tap do |toast|
+        toast.button_label = _('Open')
         toast.signal_connect('button-clicked') { open_result(format, path) }
         toast_overlay.add_toast(toast)
       end
@@ -920,7 +912,7 @@ class AppWindow
         @children.cancel
         convert_clean
         switch_to_convert
-        show_toast(CANCELLED_TOAST)
+        show_toast(_('Converting Cancelled'))
       end.present
     end
 
