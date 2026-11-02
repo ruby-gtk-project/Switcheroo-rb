@@ -1,22 +1,17 @@
-# Component identification — Switcheroo-rb, both sides
+# Component identification — Switcheroo-rb
 
 | | |
 |---|---|
-| Upstream | `origin/main` @ `ae72daf9fefe` (Rust, gtk-rs + libadwaita) |
-| Port | `ruby` @ `e50a6654ab1c` |
-| Scan | `.claude/skills/component-identification/scripts/component-scan.sh` with the committed `symbols.tsv` (1301 rows) |
-| Upstream rows | 176 |
-| Port rows | 145 |
+| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
+| Port | `ruby` @ `341104dabaa5d95e2ac1d0c0911ab79bb5c017df` |
+| Method | `component-identification/scripts/component-scan.sh` on both trees, then every file on both sides read |
 
-`.reports/component-inventory.md` (commit `65ec8d0`) is the upstream-only
-inventory and is **stale**: its "The `ruby` branch today has three files …
-Nothing user-facing is implemented" paragraph was written before `e50a665`
-landed the port. It is kept for its upstream reading; this document is the
-current one and covers both sides.
+This supersedes `.reports/component-inventory.md`, which was written before the
+i18n/GSettings/metainfo commit and no longer matches either tree.
 
 ## Step 1 — the declarative UI
 
-Upstream has three blueprint files and they are the component inventory:
+Upstream has three blueprint files and they *are* the component inventory:
 
 ```
 data/resources/blueprints/window.blp          513 lines
@@ -24,230 +19,269 @@ data/resources/blueprints/image-thumbnail.blp  56 lines
 data/resources/blueprints/image-rest.blp       27 lines
 ```
 
-Three `template $Name :` roots (`$AppWindow`, `$ImageThumbnail`,
-`$ImageRest`), plus two standalone top-level named objects in `window.blp`
-that no widget subclass owns — `Adw.ShortcutsDialog help_overlay` and
-`menu primary_menu` (5 `item` entries across 2 sections). The port has no
-`.ui`/`.blp` files (`find . -name '*.blp' -o -name '*.ui'` is empty), by
-design — widgets are memoized methods.
+Roots: `template $AppWindow: Adw.ApplicationWindow`,
+`template $ImageThumbnail : Widget`, `template $ImageRest : FlowBoxChild`,
+plus two standalone top-level objects in `window.blp` that belong to no widget
+subclass — `Adw.ShortcutsDialog help_overlay` and `menu primary_menu`. Those
+two are units in their own right (identification's "one unit per standalone
+object with no backing source file").
 
-## The file mapping
+The port has **no** `.blp` or `.ui` files on disk — but it is not purely
+declarative-free either: `lib/convert_page.rb` embeds **two GtkBuilder XML
+fragments as Ruby heredocs** (`quality_markup`, `resize_type_markup`) because
+the accessibility blocks of `window.blp:155-159` and `window.blp:255-259`
+cannot be written from Ruby any other way. Those heredocs are declarative UI
+and were read as such.
 
-Many-to-one on the upstream side, one-to-many on the port side: the port
-splits `window.blp`'s five stack pages and two navigation pages into one file
-each, which is the house shape.
+## Step 2/3 — scan totals
 
-| Upstream | Port |
-|---|---|
-| `src/main.rs` + `src/application.rs` + `src/config.rs.in` | `lib/main.rb`, `lib/application.rb`, `exe/switcheroo`, `lib/switcheroo/application.rb` |
-| `window.blp` (`$AppWindow` shell) + `src/window.rs` | `lib/app_window.rb` |
-| `window.blp` `stack_welcome_page` | `lib/welcome_page.rb` |
-| `window.blp` `stack_loading` | `lib/loading_page.rb` |
-| `window.blp` `stack_convert` + `window.rs` option handlers | `lib/convert_page.rb` |
-| `window.blp` `stack_invalid_image` | `lib/invalid_image_page.rb` |
-| `window.blp` `stack_converting` + `window.rs` progress helpers | `lib/converting_page.rb` |
-| `window.blp` `all_images` navigation page | `lib/all_images_page.rb` |
-| `window.blp` `menu primary_menu` | `lib/primary_menu.rb` |
-| `window.blp` `Adw.ShortcutsDialog help_overlay` | `lib/shortcuts_dialog.rb` |
-| `src/drag_overlay.rs` | `lib/drag_overlay.rb` |
-| `src/widgets/image_thumbnail.rs` + `image-thumbnail.blp` | `lib/image_thumbnail.rb` |
-| `src/widgets/image_rest.rs` + `image-rest.blp` | `lib/image_rest.rb` |
-| `src/widgets/about_window.rs` | `lib/about_dialog.rb` |
-| `src/window.rs` `close_dialog()` + `convert_cancel()` alerts | `lib/stop_converting_dialog.rb` |
-| `src/window.rs` `convert_failed()` alert | `lib/error_dialog.rb` |
-| `src/file_chooser.rs` | `lib/file_chooser.rb` |
-| `src/filetypes.rs` | `lib/file_type.rb` |
-| `src/input_file.rs` | `lib/input_file.rb` |
-| `src/magick.rs` + `src/temp.rs` | `lib/magick.rb`, `lib/temp_dir.rb` |
-| `src/color.rs` | `lib/color.rb` |
-| `data/resources/style.css` | `lib/style.rb` (heredoc + `Gtk::CssProvider`) |
-| `data/…Converter.gschema.xml.in` | `lib/settings.rb` (JSON file, **not** GSettings) |
-| `data/…Converter.desktop.in.in` | `data/switcheroo.desktop` |
-| `data/…Converter.metainfo.xml.in.in` | **nothing** |
-| `data/…Converter.service.in` | **nothing** |
-| `data/resources/resources.gresource.xml` + `data/meson.build` + `meson.build` | **nothing** (no bundle, no install) |
-| `data/resources/icons/**` | `data/icons/**` (8 of 10 svg; see below) |
-| `data/resources/screenshots/{0,1}.png` | **nothing** |
-| `po/**` | `po/**` (byte-identical, verified) |
+| Axis | Upstream | Port |
+|---|---:|---:|
+| Widget instances (summed counts) | 169 | 110 |
+| Distinct widget types | 40 | 37 |
+| `css` attachment rows | 26 | 33 |
+| `signal` rows | 13 | 23 |
+| `css-name` rows | 1 (`dragoverlay`) | 0 (expressed as a class) |
 
-Two upstream files have no port file opposite them and are gaps found here
-rather than in any diff: the AppStream metainfo and the D-Bus service file.
+The upstream widget total double-counts every template root and every
+`#[template_child]` (the blueprint declares the widget, the Rust declares the
+field), so it is not comparable to the port's directly — see
+`.reports/component-parity.md`, which unions per unit before comparing.
 
-## Per-component inventory
+The scan **under-reports the port** in two known ways, both confirmed by
+reading:
 
-### `lib/app_window.rb` — the application window and its state machine
+- `lib/convert_page.rb:619` `pixel_entry` is a shared factory called from four
+  memoized methods. The scan sees 2 `Gtk::Entry.new` call sites; the port
+  builds **five** entries (dpi, width, height, scale-width, scale-height).
+- `lib/app_window.rb:227` installs six window actions from a loop over
+  `WINDOW_ACTIONS`, so none of `win.close/add/clear/show-help-overlay/about/paste`
+  appears in the `action` stream.
 
-| Widget | × | CSS | Signals / actions | Notes |
+## The unit list
+
+Read in the order a user meets them.
+
+### 1. application — `src/application.rs` + `src/main.rs` + `src/config.rs.in` → `lib/application.rb`, `lib/main.rb`, `lib/config.rb`
+
+| Item | × | Notes |
+|---|---:|---|
+| `Gio::SimpleAction` `app.quit` | 1 | quits |
+| `Gio::SimpleAction` `app.new-window` | 1 | `present_main_window` |
+| accelerators | 7 | `app.new-window`→`<Control>n`, `app.quit`→`<Control>q`, `win.clear`→`<Control>r`, `win.add`→`<Control>o`, `win.close`→`<Control>w`, `win.paste`→`<Control>v`, `win.show-help-overlay`→`<Control>question` |
+| main option | 1 | `--new-window` / `-w`, msgid `Open a new window` |
+| signals | 4 | `startup`, `activate`, `open`, `handle-local-options` |
+
+Startup also sets the default icon name and adds `PKGDATADIR/icons` to the
+icon theme search path. No widgets.
+
+### 2. window shell — `window.blp:4-47` + `src/window.rs` → `lib/app_window.rb`
+
+| Widget | × | CSS | Signals/actions | Notes |
 |---|---:|---|---|---|
-| `Adwaita::ApplicationWindow` | 1 | — | `close-request` | 750×750 default, 300×300 minimum, title "Switcheroo" |
-| `Gtk::Box` (root, vertical) | 1 | — | — | |
-| `DragOverlay` | 1 | `dragoverlay` | — | composite, see below |
-| `Adwaita::ToastOverlay` | 1 | — | — | six toasts raised through it |
-| `Adwaita::NavigationView` | 1 | — | — | 2 pages |
-| `Adwaita::NavigationPage` | 1 | — | — | tag `main` |
-| `Adwaita::ToolbarView` | 1 | — | — | |
-| `Adwaita::HeaderBar` | 1 | — | — | `show_title = false` |
-| `Gtk::Button` (add) | 1 | `flat` | action `win.add` | `visible = false` until images load |
-| `Gtk::MenuButton` | 1 | — | `PrimaryMenu.build` | `primary = true` |
-| `Gtk::WindowHandle` | 1 | — | — | `vexpand` |
-| `Gtk::Stack` | 1 | — | — | 5 named children, crossfade |
-| `Gtk::FlowBoxChild` | repeater | — | — | one per file in each flow box, plus the `+N` tile |
-| `Gtk::DropTarget` (controller) | 1 | — | `drop` | `Gdk::FileList`, `:copy` |
-| `Adwaita::Toast` | 6 sites | — | `button-clicked` (1) | |
-| `Gtk::FileLauncher` (type) | 1 | — | — | the toast's Open button |
+| `Adw.ApplicationWindow` | 1 | — | `close-request` | 750×750 default, 300×300 minimum, title `Switcheroo` |
+| `Gtk.Box` (vertical) | 1 | — | — | root |
+| `$DragOverlay` | 1 | `dragoverlay` (css **name** upstream) | — | title `Drop Here to Open` |
+| `Adw.ToastOverlay` | 1 | — | — | host for 5 toasts |
+| `Adw.NavigationView` | 1 | — | — | two pages, tags `main` / `all_images` |
+| `Adw.ToolbarView` | 1 | — | — | |
+| `Adw.HeaderBar` | 1 | — | — | `show-title: false` |
+| `Gtk.Button` add | 1 | `flat` | `win.add` | icon `plus-large-symbolic`, tooltip `Add Images (Ctrl+O)`, starts hidden |
+| `Gtk.MenuButton` | 1 | — | model `primary_menu` | icon `open-menu-symbolic`, tooltip `Primary Menu`, `primary: true` |
+| `Gtk.WindowHandle` | 1 | — | — | `vexpand` |
+| `Gtk.Stack` | 1 | — | — | crossfade, 5 named children |
+| `Gtk.DropTarget` (controller) | 1 | — | `drop`, `notify::current-drop` | `Gdk::FileList`, COPY |
 
-Actions installed: `win.close`, `win.add`, `win.clear`, `win.show-help-overlay`,
-`win.about`, `win.paste` — built in a loop from `WINDOW_ACTIONS`, so the scan's
-`action` stream shows none of them. Read off `lib/app_window.rb:271-278`.
+Window actions installed here: `win.close`, `win.add`, `win.clear`,
+`win.show-help-overlay`, `win.about`, `win.paste`.
 
-### `lib/convert_page.rb` — the conversion options page
+Toasts: `Unsupported filetype`, `Unable to access dropped files`,
+`Error copied to clipboard`, `Image converted` (+ `Open` button),
+`Converting Cancelled`.
+
+### 3. drag overlay — `src/drag_overlay.rs` → `lib/drag_overlay.rb`
 
 | Widget | × | CSS | Signals | Notes |
 |---|---:|---|---|---|
-| `Adwaita::PreferencesPage` | 1 | — | — | |
-| `Adwaita::PreferencesGroup` | 4 | — | — | thumbnails, output, options, convert |
-| `Gtk::FlowBox` (short strip) | 1 | — | filter func | homogeneous, 12px gaps |
-| `Adwaita::ComboRow` (export format) | 1 | `output-filetype-drop` | `notify::selected` | `Gtk::StringList` model |
-| `Adwaita::ActionRow` | 8 | — | — | single-pdf, zip, quality, bgcolor, dpi, resize, filter, strip |
-| `Gtk::Switch` | 3 | — | `notify::active` (1) | single-pdf, zip, strip |
-| `Gtk::Scale` + `Gtk::Adjustment` | 1 | — | — | 1–100, digits 0, value right |
-| `Gtk::ColorDialogButton` + `Gtk::ColorDialog` | 1 | — | **none** | alpha enabled |
-| `Adwaita::Bin` | 2 | — | — | dpi wrapper, unit-dropdown wrapper |
-| `Gtk::Entry` | 5 | — | `changed` (4) | dpi, w, h, %w, %h — built by a shared `pixel_entry` factory, so the scan counts 2 |
-| `Gtk::ToggleButton` | 3 | `raised` `circular` `lock` (link); `linked` on the box | `clicked` (1), `toggled` (2) | link-axis, Default, Pixel Art |
-| `Gtk::DropDown` (unit) | 1 | `flat` `unit-drop` | `notify::selected` | `%` / `px` |
-| `Gtk::Box` | 3 | `linked` (1) | — | resize row, unit box, filter box |
-| `Gtk::Button` (Convert) | 1 | `suggested-action` `pill` `long` | `clicked` | |
+| `Adw.Bin` (root) | 1 | css **name** `dragoverlay` | — | |
+| `Gtk.Overlay` | 1 | — | — | |
+| `Gtk.Revealer` | 1 | — | — | crossfade, `can-target: false` |
+| `Adw.StatusPage` | 1 | `drag-overlay-status-page` | — | icon `document-send-symbolic` |
 
-Dynamic visibility: every row above hides itself when the loaded formats do
-not support the option (`update_options`, `lib/convert_page.rb:597-640`).
-
-### `lib/welcome_page.rb` — the empty state
+### 4. welcome page — `window.blp:53-84` → `lib/welcome_page.rb`
 
 | Widget | × | CSS | Signals | Notes |
 |---|---:|---|---|---|
-| `Adwaita::StatusPage` | 1 | `icon-dropshadow` | — | app icon, "Switcheroo", "Drag and drop images here" |
-| `Gtk::Box` | 1 | — | — | vertical, 12 |
-| `Gtk::Button` | 1 | `suggested-action` `pill` | action `win.add` | `_Open Images…`, `use_underline` |
+| `Adw.StatusPage` | 1 | `icon-dropshadow` | — | icon `io.gitlab.adhami3310.Converter`, title `Switcheroo`, description `Drag and drop images here` |
+| `Gtk.Box` | 1 | — | — | spacing 12 |
+| `Gtk.Button` | 1 | `suggested-action`, `pill` | upstream `clicked`; port `win.add` | `_Open Images…`, `use-underline` |
 
-### `lib/loading_page.rb`
+### 5. loading page — `window.blp:86-97` → `lib/loading_page.rb`
 
-`Adwaita::StatusPage` ×1 (no icon, no title) holding `Gtk::Spinner` ×1 at 32×32.
+`Adw.StatusPage` ×1, `Gtk.Spinner` ×1 (32×32, centred). No CSS, no signals.
 
-### `lib/invalid_image_page.rb` — the error state
+### 6. invalid-image page — `window.blp:331-341` → `lib/invalid_image_page.rb`
 
-`Adwaita::StatusPage` ×1, icon `im-symbolic`, title "Could not Load Image",
-description "This image could be corrupted or may use an unsupported file
-format.". No child, no signals.
+`Adw.StatusPage` ×1, icon `im-symbolic`, title `Could not Load Image`,
+description `This image could be corrupted or may use an unsupported file format.`
 
-### `lib/converting_page.rb` — the progress state
-
-| Widget | × | CSS | Signals | Notes |
-|---|---:|---|---|---|
-| `Adwaita::StatusPage` | 1 | — | — | "Converting" / "This could take a while" |
-| `Gtk::Box` | 1 | — | — | vertical, 36 |
-| `Gtk::ProgressBar` | 1 | — | — | `show_text`, text "Loading…" → `done/total` → "Collecting files" |
-| `Gtk::Button` | 1 | `destructive-action` `pill` | `clicked` | `_Cancel` |
-
-### `lib/all_images_page.rb` — the second navigation page
-
-| Widget | × | CSS | Signals / actions | Notes |
-|---|---:|---|---|---|
-| `Adwaita::NavigationPage` | 1 | — | — | tag `all_images`, title "All Images" |
-| `Adwaita::ToolbarView` | 1 | — | — | |
-| `Adwaita::HeaderBar` | 1 | — | — | |
-| `Gtk::Button` | 1 | `flat` | action `win.add` | `plus-large-symbolic` |
-| `Gtk::WindowHandle` | 1 | — | — | |
-| `Gtk::Stack` | 1 | — | — | grid / loading |
-| `Gtk::ScrolledWindow` | 1 | — | — | |
-| `Gtk::FlowBox` | 1 | — | filter func | max 4 per line, centred |
-| `Adwaita::StatusPage` + `Gtk::Spinner` | 1 + 1 | — | — | loading child |
-
-### `lib/drag_overlay.rb` — the drop target overlay
+### 7. converting page — `window.blp:343-374` → `lib/converting_page.rb`
 
 | Widget | × | CSS | Signals | Notes |
 |---|---:|---|---|---|
-| `Adwaita::Bin` (self) | 1 | `dragoverlay` | — | upstream names the CSS **node**; this is the class standing in for it |
-| `Gtk::Overlay` | 1 | — | — | |
-| `Gtk::Revealer` | 1 | — | — | `can_target = false`, crossfade |
-| `Adwaita::StatusPage` | 1 | `drag-overlay-status-page` | — | `document-send-symbolic`, "Drop Here to Open" |
-| `Gtk::DropTarget` (controller) | 1 (handed in) | — | `notify::current-drop` | added as a controller on self |
+| `Adw.StatusPage` | 1 | — | — | title `Converting`, description `This could take a while` |
+| `Gtk.Box` | 1 | — | — | spacing 36 |
+| `Gtk.ProgressBar` | 1 | — | — | `show-text`, text `Loading…` → `done/total` → `Collecting files` |
+| `Gtk.Button` cancel | 1 | `destructive-action`, `pill` | `clicked` | `_Cancel` |
 
-### `lib/image_thumbnail.rb` — one image tile (repeater)
-
-| Widget | × | CSS | Signals | Notes |
-|---|---:|---|---|---|
-| `Adwaita::Bin` (self) | 1 | `card` `image-thumbnail` | — | `overflow = :hidden` |
-| `Gtk::Box` | 5 | `card-content` (root), `image-container` (child) | — | root, child, content, image, caption |
-| `Gtk::Overlay` | 1 | — | — | |
-| `Gtk::Picture` | 1 | — | — | 150×150, `content_fit :cover`, shown only with a texture |
-| `Gtk::Image` | 1 | — | — | `image-symbolic`, large, shown only without one |
-| `Adwaita::Bin` (caption) | 1 | `image-caption` `caption` | — | |
-| `Gtk::Label` | 1 | — | — | "FORMAT w×h" |
-| `Gtk::Button` | 1 | `circular` `image-remove` `osd` | `clicked` | `user-trash-symbolic`, tooltip "Remove image" |
-
-### `lib/image_rest.rb` — the "+N / Show All" tile
+### 8. convert page — `window.blp:99-329` + the `WindowUI`/`ConvertArguments`/`SettingsStore` impls of `src/window.rs` → `lib/convert_page.rb`
 
 | Widget | × | CSS | Signals | Notes |
 |---|---:|---|---|---|
-| `Gtk::FlowBoxChild` (self) | 1 | `no-padding` | — | `focusable = false` |
-| `Adwaita::Bin` | 1 | — | — | |
-| `Gtk::Button` | 1 | `image-container` `card` `image-rest-button` | `clicked` | 150×150; **no `icon-name`** |
-| `Gtk::Box` | 1 | — | — | vertical, centred |
-| `Gtk::Label` | 2 | `large_number` (1st) | — | `+N`, "Show All" |
+| `Adw.Bin` | 2 | — | — | two nested wrappers around the page |
+| `Adw.PreferencesPage` | 1 | — | — | |
+| `Adw.PreferencesGroup` | 4 | — | — | thumbnails / output / options / convert (last `valign: end`, `halign: center`) |
+| `Gtk.FlowBox` image_container | 1 | — | filter func | homogeneous, 12/12 spacing, `selection-mode: none` |
+| `Adw.ComboRow` output_filetype | 1 | `output-filetype-drop` | `notify::selected` | title `Export Format`, `Gtk.StringList` model |
+| `Adw.ActionRow` single_pdf | 1 | — | — | `Save as multi-page PDF` |
+| `Gtk.Switch` single_pdf_value | 1 | — | upstream `notify::state`; port `notify::active` | |
+| `Adw.ActionRow` output_compression | 1 | — | — | `Save To ZIP` |
+| `Gtk.Switch` output_compression_value | 1 | — | — | |
+| `Adw.ActionRow` quality_row | 1 | — | — | `Quality`; `labelled-by` target of the scale |
+| `Gtk.Scale` quality | 1 | — | — | `Gtk.Adjustment` 1..100, digits 0, value right |
+| `Adw.ActionRow` bgcolor_row | 1 | — | — | `Background Color` / `Replaces original transparency layer` |
+| `Gtk.ColorDialogButton` bgcolor | 1 | — | `notify::rgba` | `Gtk.ColorDialog` with-alpha, rgba `#00000000` |
+| `Adw.ActionRow` dpi_row | 1 | — | — | `Pixel Density Per Inch` |
+| `Adw.Bin` + `Gtk.Entry` dpi_value | 1+1 | — | — | |
+| `Adw.ActionRow` resize_amount_row | 1 | — | — | `Resize` |
+| `Gtk.Box` | 1 | — | — | spacing 5 |
+| `Gtk.Entry` resize_width_value | 1 | — | `changed` | placeholder+tooltip `Width`, digits, 8 chars |
+| `Gtk.Entry` resize_scale_width_value | 1 | — | `changed` | placeholder `Width`, tooltip `Width` |
+| `Gtk.ToggleButton` link_axis | 1 | `raised`, `circular`, `lock` | `clicked` | `chain-link-symbolic` ↔ `chain-link-loose-symbolic`, tooltip `Preserve aspect ratio`, starts active |
+| `Gtk.Entry` resize_height_value | 1 | — | `changed` | placeholder+tooltip `Height` |
+| `Gtk.Entry` resize_scale_height_value | 1 | — | `changed` | placeholder `Width`, tooltip `Height` (upstream's own mismatch) |
+| `Adw.Bin` + `Gtk.Box` | 1+1 | — | — | holds the unit dropdown |
+| `Gtk.DropDown` resize_type | 1 | `flat`, `unit-drop` | `notify::selected` | model `%`/`px`; accessible label `Choose between resizing with percentages or using exact pixels` — **no tooltip upstream** |
+| `Adw.ActionRow` resize_filter_row | 1 | — | — | `Resize Algorithm` |
+| `Gtk.Box` | 1 | `linked` | — | |
+| `Gtk.ToggleButton` resize_filter_default | 1 | — | `toggled` | `Default`, starts active |
+| `Gtk.ToggleButton` resize_filter_pixel | 1 | — | `toggled` | `Pixel Art` |
+| `Adw.ActionRow` strip_row | 1 | — | — | `Remove Metadata` |
+| `Gtk.Switch` strip | 1 | — | — | |
+| `Gtk.Button` convert_button | 1 | `suggested-action`, `pill`, `long` | `clicked` | `_Convert` |
 
-### `lib/about_dialog.rb`
+Conditional (not repeaters): `quality_row` visible only for a lossy output;
+`bgcolor_row` only when some input carries alpha; `dpi_row` only when some
+input is a PDF; `strip_row` only when some input carries metadata;
+`resize_filter_row` hidden when every input is an SVG; `single_pdf` /
+`output_compression` only when the run produces more than one file; exactly one
+of the pixel pair / percentage pair visible; `link_axis` hidden for pixels when
+the images do not share a size.
 
-`Adwaita::AboutDialog` ×1, built field by field (no appdata). 2 other apps,
-2 acknowledgement sections, 1 legal section.
+Repeater: `image_container` holds up to 6 `Gtk.FlowBoxChild`, each wrapping an
+`ImageThumbnail`, driven by the loaded-file list; the 6th slot becomes an
+`ImageRest` when more remain.
 
-### `lib/shortcuts_dialog.rb`
+### 9. all-images page — `window.blp:380-441` → `lib/all_images_page.rb`
 
-`Adwaita::ShortcutsDialog` ×1 → `Adwaita::ShortcutsSection` ×1 ("General") →
-`Adwaita::ShortcutsItem` ×6, each carrying an `action_name`. Built in a loop
-from `ITEMS`, so the scan sees one.
+| Widget | × | CSS | Signals | Notes |
+|---|---:|---|---|---|
+| `Adw.NavigationPage` | 1 | — | — | tag `all_images`, title `All Images` |
+| `Adw.ToolbarView` + `Adw.HeaderBar` | 1+1 | — | — | |
+| `Gtk.Button` other_add_button | 1 | `flat` | `win.add` | tooltip `Add Images (Ctrl+O)` |
+| `Gtk.WindowHandle` | 1 | — | — | |
+| `Gtk.Stack` | 1 | — | — | crossfade, `all_images` / `stack_loading` |
+| `Gtk.ScrolledWindow` | 1 | — | — | |
+| `Gtk.FlowBox` full_image_container | 1 | — | filter func | 4 per line, 16px margins, 12/12 spacing |
+| `Adw.StatusPage` + `Gtk.Spinner` | 1+1 | — | — | 32×32 |
 
-### `lib/primary_menu.rb`
+Repeater: one `Gtk.FlowBoxChild` + `ImageThumbnail` per loaded file, unbounded.
 
-`Gio::Menu` with 2 sections and 5 items: `win.paste`, `app.new-window`,
-`win.clear` | `win.show-help-overlay`, `win.about`. No `custom:` slots.
+### 10. image thumbnail — `image-thumbnail.blp` + `src/widgets/image_thumbnail.rs` → `lib/image_thumbnail.rb`
 
-### `lib/stop_converting_dialog.rb` / `lib/error_dialog.rb`
+| Widget | × | CSS | Signals | Notes |
+|---|---:|---|---|---|
+| root | 1 | `card`, `image-thumbnail` (added in `new()`, not the template) | — | `overflow: hidden`; upstream's parent is bare `Gtk.Widget`, the port's is `Adwaita::Bin` |
+| `Gtk.Box` root | 1 | `card-content` | — | |
+| `Gtk.Box` child | 1 | `image-container` | — | |
+| `Gtk.Overlay` | 1 | — | — | |
+| `Gtk.Box` | 3 | — | — | vertical content, picture row |
+| `Gtk.Picture` | 1 | — | — | 150×150, `content-fit: cover`; visible only with a texture |
+| `Gtk.Image` | 1 | — | — | 150×150, `image-symbolic`, `icon-size: large`; the no-texture fallback |
+| `Adw.Bin` caption | 1 | `image-caption`, `caption` | — | `overflow: hidden` |
+| `Gtk.Label` content | 1 | — | — | `FORMAT · W×H`, untranslated by design |
+| `Gtk.Button` remove_image | 1 | `circular`, `image-remove`, `osd` | `clicked` | name `remove_image`, icon `user-trash-symbolic`, tooltip `Remove image` |
 
-`Adwaita::AlertDialog` ×1 each, instantiated at 2 and 1 call sites
-respectively. Stop: responses `cancel`/`stop`, `stop` destructive. Error:
-responses `ok`/`copy`, `copy` suggested, `extra_child` a `Gtk::ScrolledWindow`
-(`card`, 200–400px) holding a wrapping `monospace` `Gtk::Label`.
+Behaviour in the imp, not the template: `measure()` clamps the **horizontal**
+orientation to min = nat = 150 whenever the file's dimensions are known;
+`size_allocate()` allocates `root` the full size.
 
-### `lib/application.rb`
+### 11. image rest — `image-rest.blp` + `src/widgets/image_rest.rs` → `lib/image_rest.rb`
 
-Not a widget. `Gtk::Application` (not `Adwaita::Application`) with
-`:handles_open`, the `--new-window` main option, actions `app.quit` and
-`app.new-window`, and the seven accelerators. Also the icon search path, the
-stylesheet load and the (ineffective, see `translation-parity.md`) text-domain
-bind.
+| Widget | × | CSS | Signals | Notes |
+|---|---:|---|---|---|
+| `Gtk.FlowBoxChild` | 1 | `no-padding` | — | `focusable: false` |
+| `Adw.Bin` | 1 | — | — | |
+| `Gtk.Button` image | 1 | `image-container`, `card`, `image-rest-button` | `clicked` | 150×150, `view-more-horizontal-symbolic`, tooltip `Show {} more images` (set in `new()`) |
+| `Gtk.Box` | 1 | — | — | |
+| `Gtk.Label` content | 1 | `large_number` | — | `+{}` with the count substituted after lookup |
+| `Gtk.Label` | 1 | — | — | `Show All` |
 
-## Non-widget inventory, port side
+### 12. primary menu — `window.blp:484-513` → `lib/primary_menu.rb`
 
-| Item | State |
-|---|---|
-| `lib/file_type.rb` | 13 output formats, 2 compression types, 2 resize filters, alpha/animation/pixbuf predicates |
-| `lib/input_file.rb` | path, kind, frame count, dimensions, texture, caption |
-| `lib/magick.rb` | `identify` probe, job generation, parallel spawn with a pid registry, zip/dir/pdf collection |
-| `lib/temp_dir.rb` | per-run temp directory |
-| `lib/color.rb` | `Gdk::RGBA` → `#rrggbbaa` |
-| `lib/settings.rb` | JSON under `XDG_CONFIG_HOME/switcheroo-rb/settings.json`, **not** GSettings |
-| `lib/style.rb` | the stylesheet as a heredoc |
-| `data/icons` | 8 svg: 7 action icons + `io.gitlab.adhami3310.Converter.svg`. Missing upstream's `…Converter.Devel.svg` and `symbolic/apps/…Converter-symbolic.svg` (and the three sibling-app icons, which upstream bundles for the About dialog's "other apps" tiles) |
+2 sections, 5 items: `Paste From Clipboard`→`win.paste`,
+`New Window`→`app.new-window`, `Clear Window`→`win.clear`;
+`Keyboard Shortcuts`→`win.show-help-overlay`, `About Switcheroo`→`win.about`.
+No `custom:` slots.
 
-## Scan over- and under-reports read, per Step 4
+### 13. shortcuts dialog — `window.blp:448-482` → `lib/shortcuts_dialog.rb`
 
-- Struck as not widgets (classifier agrees): `Gtk.StackPage` ×7, `Adw.ShortcutsItem`/`Section`, `Gtk.ColorDialog`, `Gtk.StringList`/`StringObject`, `Gtk.Adjustment`, `Gtk.IconTheme`, `Gtk.CssProvider`/`StyleContext`/`StyleProvider`, `Gtk.FileDialog`/`FileFilter`, `Gtk.FileLauncher`, `Adw.Toast`, `Adw.ResponseAppearance`, `Gtk.Align`, `Gtk.Orientation`, `Gtk.RevealerTransitionType`, `Gtk.License`, and every interface row (`Accessible`, `Buildable`, `ConstraintTarget`, `Root`, `Native`, `ShortcutManager`).
-- `Gtk.CompositeTemplate` ×3 upstream is gtk-rs template plumbing; the widgets it stands for are in the `.blp`.
-- Controllers compared on the signal axis, never the widget axis: `Gtk.DropTarget` (1 real instance upstream, built once in `setup_drop_target` and handed to `DragOverlay`; the 4 rows in `drag_overlay.rs` and 1 in `window.rs` are type mentions).
-- Repeaters: `ImageThumbnail` (one per loaded file, two flow boxes), `Gtk::FlowBoxChild` (same), `Adwaita::ShortcutsItem` (×6 from a loop), menu `item` (×5 from two loops), `Gtk::Entry` (×5 from one factory), `Adwaita::Toast` (6 construction sites).
-- Shared factories that make the scan undercount on the port side: `ConvertPage#pixel_entry` (4 call sites), `ShortcutsDialog#item` (6), `PrimaryMenu.section` (2), `AppWindow#thumbnail_child` (2).
-- Actions built from variables on both sides and therefore absent from the `action` stream: upstream's `gio::ActionEntry::builder(...)` chain (`src/window.rs:279-337`, `src/application.rs:143`), the port's `WINDOW_ACTIONS` loop (`lib/app_window.rb:271`) and `setup_actions` (`lib/application.rb:131-145`).
-- Dynamic CSS classes: none on either side. Every class is attached literally. The only dynamic *styling* is the link-axis icon swap (`chain-link-symbolic` ↔ `chain-link-loose-symbolic`).
-- Stylesheet classes defined and never attached: none. App-namespaced classes attached: `image-container`, `image-rest-button`, `large_number`, `no-padding`, `card-content`, `image-caption`, `image-remove`, `image-thumbnail`, `drag-overlay-status-page`, `dragoverlay`, `lock`, `long`, `unit-drop`, `output-filetype-drop`. All 14 have rules in `lib/style.rb`.
-- No submodules (`.gitmodules` absent on both sides). No libraries beyond GTK4 and libadwaita.
+`Adw.ShortcutsDialog` ×1, `Adw.ShortcutsSection` ×1 (title
+`C_("shortcut window", "General")`), `Adw.ShortcutsItem` ×6: Show Shortcuts,
+Quit, New Window, Clear Window, Paste From Clipboard, Add Images — all with
+the `shortcut window` msgctxt, each naming an action rather than an accelerator.
+
+### 14. error dialog — `src/window.rs:1463-1505` → `lib/error_dialog.rb`
+
+`Adw.AlertDialog` ×1 (heading `Error While Processing`, no body),
+`Gtk.ScrolledWindow` ×1 (`card`, 200..400px),
+`Gtk.Label` ×1 (`monospace`, 12px margins, xalign/yalign 0, wrap word-char).
+Responses `ok`→`_Close`, `copy`→`_Copy to Clipboard` (suggested).
+
+### 15. stop-converting dialog — `src/window.rs:572-608` and `:1543-1583` → `lib/stop_converting_dialog.rb`
+
+`Adw.AlertDialog` ×1, heading `Stop converting?`, body
+`You will lose all progress.`, responses `cancel`→`_Cancel`,
+`stop`→`_Stop` (destructive). Upstream builds this twice, identically; the port
+factors it into one class — a correspondence, named here so the 2→1 count is
+not read as a gap.
+
+### 16. about dialog — `src/widgets/about_window.rs` → `lib/about_dialog.rb`
+
+`Adw.AboutDialog` ×1, built from the AppStream metainfo, plus: 1 developer,
+`translator-credits`, 2 other apps (`Impression` / `Create bootable drives`,
+`Footage` / `Polish your videos`), 2 acknowledgement sections
+(`Code and Design Borrowed from` ×7 entries, `Sample Image from` ×1), 1 legal
+section (`ImageMagick`, MIT/X11).
+
+### 17. stylesheet — `data/resources/style.css` → `lib/style.rb`
+
+21 rules + 1 `@media (prefers-contrast: more)` block. One element selector
+(`dragoverlay`), one pseudo-element selector (`value`), one descendant-of-row
+selector pair (`row.property label.title/.subtitle`), the rest
+app-namespaced classes. No variant stylesheet.
+
+## Non-widget units read as part of the inventory
+
+- `src/filetypes.rs` → `lib/file_type.rb` — 15 input formats, 13 output
+  formats, 2 compression types, 6 capability predicates.
+- `src/magick.rs` + `ResizeFilter`/`StripType` from `src/window.rs` →
+  `lib/magick.rb` — the probe, the argument builder, the job runner.
+- `src/file_chooser.rs` → `lib/file_chooser.rb` — 3 dialogs, 1 filter name
+  (`Images`), 1 accept label (`_Select Images`), 4 error msgids.
+- `src/input_file.rs` → `lib/input_file.rb`.
+- `src/temp.rs` → `lib/temp_dir.rb` (+ `JobFile`).
+- `src/color.rs` → `lib/color.rb`.
+- `data/*.gschema.xml.in`, `*.metainfo.xml.in.in`, `*.service.in`,
+  `*.desktop.in.in` → carried into `data/` (the desktop file renamed to
+  `switcheroo.desktop.in` and installed as `<app-id>.desktop` by the Rakefile).

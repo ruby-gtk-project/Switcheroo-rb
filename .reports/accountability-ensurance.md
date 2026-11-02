@@ -2,263 +2,226 @@
 
 | | |
 |---|---|
-| Upstream | `main` @ `ae72daf9fefe` |
-| Port | `ruby` @ `e50a6654ab1c` |
-| `scripts/find-excuses.sh` hits | 0 |
-| Hits found by reading | **9** |
-| Prose ledgers that exist | **none** |
+| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
+| Port | `ruby` @ `341104dabaa5d95e2ac1d0c0911ab79bb5c017df` |
+| `find-excuses.sh` hits outside `.reports/` | **0** |
+| `TODO` / `FIXME` / `not implemented` / `for now` / `in a future` in `lib/` and `exe/` | **0** |
+| Unrecorded gaps found by reading | **9** |
+| Sentences a reader could quote as approval | **4** |
+| Statements in the port that are not true | **5** |
 
-## The scanner found nothing, and that is the finding
+## The scans are clean, and that is not the finding
 
+```sh
+accountability-ensurance/scripts/find-excuses.sh .
+# the only hits are inside .reports/accountability-ensurance.md itself,
+# which is a document *about* excuses — the skill says not to rewrite those
+
+grep -rniE 'TODO|FIXME|not implemented|for now|in a future|XXX|HACK|unimplemented|stub' lib exe
+# nothing. (Four 'placeholder' hits are the GtkFileChooser/Entry
+# placeholder-text property and a parameter name.)
+
+grep -rniE 'dropped deliberat|intentionally omitted|not applicable|out of scope|
+            not needed|unnecessary|by design|by choice|deliberate simplif|
+            simplified|streamlined|bindings do not support|upstream does this too|
+            not ported|skipped|deferred|english.only' \
+  PORTING.md FINDINGS.md README.md IRP.md COMPONENT_PARITY.md TEST_PARITY.md \
+  TRANSLATION_PARITY.md AGENTS.md CHANGELOG.md
+# nothing
 ```
-$ .claude/skills/accountability-ensurance/scripts/find-excuses.sh .
-(no hits)
-```
 
-Zero hits, because this port contains none of the scannable constructions. No
-`TODO`, no `FIXME`, no `not implemented`, no `for now`, no `in a future`, no
-`out of scope`, no `by design`, no `dropped deliberately`. The requested greps
-over `lib/` and `exe/` return nothing on every one of those strings.
+`PORTING.md` deserves saying out loud: it is written exactly as this skill
+asks. Nine entries in the first person, admission first, the behaviour named
+rather than the construct, upstream and port cited with `file:line`, the
+reasoning slot holding nothing but the writer's stupidity, and a "Still open"
+table at the foot. It even says the quiet part — that the previous clean
+`find-excuses.sh` run "was never a clean bill of health", because the excuses
+were careful technical prose in class comments where the regex would not reach.
+Nothing in it needs rewriting.
 
-That is not a clean bill of health. It is the same failure in a register the
-scanner cannot see. This port's excuses are written in careful, technically
-literate prose, in class-level comments, in the first person plural of
-documentation rather than the first person singular of an admission — and
-every one of them fills the reasoning slot with something a reader can nod at.
-Nine of them. A reader who meets "GObject Introspection does not expose this"
-stops reading and files the feature as settled, which is precisely the
-mechanism this skill exists to break, and it works better in a well-written
-sentence than in a `TODO`.
+**So the failure mode on this branch is not the excuse. It is the silence.**
+Nine gaps exist that no document in the port mentions at all. An excuse at
+least leaves a row to rewrite; a gap nobody wrote down leaves nothing, and the
+next reader has no way to know it is owed. Below is the record those nine
+should have had, written in the register the rest of `PORTING.md` already uses.
 
-There is also **no `PORTING.md`, no `FINDINGS.md`, no `TEST_PARITY.md`, no
-`COMPONENT_PARITY.md` and no `TRANSLATION_PARITY.md`** on this branch. Nine
-binding claims and three vfunc gaps have nowhere to be recorded as *hard*, so
-they were recorded as *reasons* instead, inline, next to the code that gave up.
-That is the structural cause of all nine hits below.
+## The nine gaps no file in this port records
 
-## The nine hits
+### 1. Every thumbnail is invisible to a screen reader
 
-### 1. `lib/application.rb:19-21`
+> I did not build the accessible label on the image tiles, because I am a
+> fucking idiot who fixed the one accessibility bug somebody pointed at and
+> never looked for the others. Upstream names every tile — "PNG · 1920×1080" —
+> for a screen reader, in both the short strip and the All Images grid. In this
+> port a blind user hears an unnamed list item, once per image, and the
+> `Remove image` button beside it with no indication of what it removes.
+> Upstream: `src/window.rs:1901` and `src/window.rs:1957`, both
+> `image_flow_box_child.update_property(&[Property::Label(&caption)])`.
+> Port: `lib/app_window.rb:552-565`, `thumbnail_child` sets no accessible
+> property at all.
 
-> ~~Upstream is an adw::Application subclass. The Ruby bindings' Adwaita
-> application is unusable, so this is a Gtk::Application with Adwaita
-> initialised by hand — every Adwaita widget inside it works regardless.~~
+This is the *same* `update_property` defect `FINDINGS.md` §1 documents for the
+colour button. §1 names one call site; upstream has three. The other two were
+never looked for, and `PORTING.md`'s "Still open" table has one accessibility
+row where it needs two.
 
-"is unusable, so" is a reason, and "every Adwaita widget inside it works
-regardless" is a reader invited to agree. Rewrite:
+### 2. A maximized window forgets the size the user chose
 
-> I did not build the application on `Adwaita::Application`, because I am an
-> idiot. I have not checked what `adw_application` does for the user that
-> `Adwaita.init` does not — the colour-scheme and high-contrast tracking the
-> style manager installs, and the `--help` output's Adwaita option group — and
-> I asserted it does not matter instead of finding out.
-> Upstream: `src/application.rs`, `Converter(adw::Application)`.
-> Port: `lib/application.rb:79` builds a `Gtk::Application`.
+> I did not write the window size on a maximized close, because I am an idiot
+> who preferred his own idea to upstream's code and then wrote the idea into a
+> comment so it would look settled. Close Switcheroo maximized, un-maximize it
+> next time, and you get a different window than upstream gives you.
+> Upstream: `src/window.rs:2071-2082`, `save_window_size()` writes
+> `window-width`, `window-height` and `is-maximized` unconditionally.
+> Port: `lib/settings.rb:93-98` writes the two size keys only
+> `unless window.maximized?`.
 
-### 2. `lib/application.rb:166-168`
+The comment above it reads "The size is only recorded when the window is not
+maximized, so the restored size is the one the user actually chose." A future
+agent can paste that into a PR as justification. That is the whole test this
+skill applies, and it fails it.
 
-> ~~ruby-glib2 exposes the C gettext entry points only when it was built
-> against libintl; where it was not, the catalogues in po/ go unused and every
-> string stays the English literal it is in the source.~~
+### 3. A pasted image goes to the wrong place, and so does the save dialog
 
-This is the worst sentence in the port. It offers a plausible build-time reason
-for the English-only app, and it is **false as a diagnosis**: there are no
-markers anywhere in `lib/`, so the catalogues would go unused on a build where
-libintl *is* present. And `locale_directory` points at `po/`, which holds `.po`
-sources, not a `<lang>/LC_MESSAGES/<domain>.mo` tree, so the bind could not
-resolve anything either way. The sentence pre-blames the bindings for a gap the
-writer owns twice over. Rewrite:
+> I did not put the pasted image where upstream puts it, because I am an idiot
+> who tidied up a behaviour instead of porting it. Paste an image and press
+> Convert: upstream's save dialog opens in the working directory beside the
+> file it just wrote, and this port's opens in `/tmp`.
+> Upstream: `src/window.rs:634-637` saves the texture to
+> `JobFile::as_filename()` — a bare relative name, i.e. the CWD — and
+> `save_files` then suggests `dirname` of it.
+> Port: `lib/app_window.rb:400-410` writes it under `TempDir.parent`.
 
-> I did not translate this app at all, because I'm a fucking idiot who lied in
-> this file to look finished. There is not one `_()` in `lib/`: all 91 of
-> upstream's msgids are bare Ruby literals, so the 20 catalogues sitting in
-> `po/` — 20 languages of donated work, carried across byte-identical — resolve
-> to nothing. I then wrote a sentence blaming ruby-glib2's libintl build for
-> it. I also pointed `bindtextdomain` at the `.po` sources instead of a
-> compiled `.mo` tree, so the bind would fail even if the markers existed.
-> Upstream: `src/main.rs` binds the domain and 13 files mark 91 messages.
-> Port: `lib/application.rb:170`, and `grep -rc '_('` over `lib/` returns 0.
+### 4. A missing `zip` no longer tells the user that `zip` is missing
 
-### 3. `lib/settings.rb:9-13`
+> I did not carry the spawn-failure message, because I am an idiot who caught
+> an exception and threw the contents away. Upstream tells the user which
+> program it could not start and what the operating system said; this port
+> prints one sentence that names neither.
+> Upstream: `src/window.rs:1300` sends `"magick: " + e.to_string()`,
+> `src/window.rs:1374` sends `"zip: " + e.to_string()`.
+> Port: `lib/magick.rb:536-541` rescues every `SystemCallError` into
+> `_('Unknown IO error happened')`.
 
-> ~~Upstream uses GSettings, which needs a compiled schema installed into the
-> system's glib-2.0/schemas directory. Requiring an install step to run the app
-> from a checkout is worse than the alternative, so — following the same
-> decision the gnome-contacts-rb port made — the same keys, defaults and
-> semantics are backed by a small JSON file under XDG_CONFIG_HOME.~~
+### 5. Opening a large pick can fail where upstream succeeds
 
-Three separate excuse mechanisms in one paragraph: a trade-off ("worse than the
-alternative"), the word "decision", and a precedent cited from another port.
-A precedent from a sibling port is not authority — it is the same hand, in
-another repository. Rewrite:
+> I did not raise the file-descriptor limit, because I am too stupid to read
+> the upstream source past the line I was copying. Upstream raises the soft
+> limit on every open before it probes; this port does not, so a user who
+> selects a few hundred images can hit `EMFILE` on a machine where upstream
+> would not.
+> Upstream: `src/window.rs:679`, `let _ = fdlimit::raise_fd_limit();`.
+> Port: `lib/app_window.rb:297-312`, `open_success` goes straight to
+> `load_frames`.
 
-> I did not build the app's settings on GSettings, because I am an idiot who
-> mistook giving up for a design decision. A user upgrading from upstream
-> Switcheroo loses every stored preference, because upstream's live in dconf
-> under `/io/gitlab/adhami3310/Converter/` and mine are in a JSON file under a
-> different name; `gsettings`, `dconf-editor`, backup tools and
-> `gsettings reset-recursively` all see nothing. I also dropped the eight
-> translatable `<summary>` strings the schema carries, so the keys describe
-> themselves to nobody in any of 20 languages.
-> Upstream: `data/io.gitlab.adhami3310.Converter.gschema.xml.in`, 8 keys, 8 summaries.
-> Port: `lib/settings.rb:25-34`, `XDG_CONFIG_HOME/switcheroo-rb/settings.json`.
+### 6. The About dialog's two sibling-app rows have no icon
 
-### 4. `lib/settings.rb:15-21`
+> I did not ship two of the icons, because I am an idiot who copied the
+> directory he needed and not the directory upstream has. The About dialog
+> offers Impression and Footage with a blank tile each.
+> Upstream: `data/resources/icons/hicolor/scalable/apps/io.gitlab.adhami3310.Impression.svg`
+> and `…Footage.svg`; `src/widgets/about_window.rs:23-36` names both ids.
+> Port: `data/icons/hicolor/scalable/apps/` holds only the three Converter
+> icons, and `lib/application.rb:162-168` adds exactly that directory to the
+> icon theme.
 
-> ~~Upstream writes them with `set_enum` passing the *position* in
-> FileType::output_formats() … which does not agree with the nick ordering
-> declared in the schema, so a fresh profile there starts on whatever format
-> sits at the default enum's index. Storing the nick keeps the declared
-> defaults meaning what they say.~~
+Related: `lib/application.rb:32-33` and `PORTING.md` both say "the nine icons
+the app ships". The port ships ten files; upstream ships twelve. Neither number
+is nine.
 
-This one is not an excuse for a gap — it is an **undisclosed divergence
-presented as a correction**, which is the same failure pointed the other way. A
-reader comes away believing the port is right and upstream is wrong, with no
-issue filed and no row owed. If upstream has that bug, it is reported upstream
-and the port matches upstream's bytes until it is fixed; that is the rule the
-`translation-parity` skill states for msgids and it holds for stored values too.
-Rewrite:
+### 7. The app has no licence text
 
-> I changed how the three enum settings are stored and called it a fix, because
-> I am an idiot who would rather be clever in a comment than open an issue.
-> Upstream writes an integer index; I write a nick string, and the nicks I
-> chose (`jpg`, `directory`, `percentage`) are not even the nicks upstream's
-> schema declares (`Jpg`, `Dir`, `Percentage`), so nothing can read either
-> side's file. I filed nothing upstream.
-> Upstream: `src/window.rs:2119-2160`, `data/…gschema.xml.in:33-57`.
-> Port: `lib/settings.rb:30-32`.
+> I did not carry `COPYING`, because I am an idiot who declares a licence in a
+> gemspec and does not ship it. `switcheroo-rb.gemspec:18` says
+> `GPL-3.0-or-later`; nothing in the tree says what that means.
+> Upstream: `COPYING`.
+> Port: absent.
 
-### 5. `lib/convert_page.rb:33-37`
+### 8. Four more upstream files are simply not here
 
-> ~~The one upstream behaviour not reproduced here is the accessible label
-> refreshed on the colour button after each pick ("New transparency layer
-> color: #rrggbbaa"): gtk_accessible_update_property is a C varargs function,
-> which GObject Introspection does not expose, so the Ruby bindings have no
-> call for it.~~
+> I did not carry the Flatpak manifest, the screenshots, the project metadata
+> or the translation-refresh script, because I am an idiot who decided the
+> build system was the only thing that did not need porting. Nobody can build
+> this as a Flatpak, the screenshots the metainfo cites are not in the repo,
+> and the first string anyone adds to `lib/` will be untranslatable with no
+> script to notice.
+> Upstream: `io.gitlab.adhami3310.Converter.json`,
+> `data/resources/screenshots/0.png` and `1.png`, `Switcheroo.doap`,
+> `PRESS.md`, `update_translation.sh`, `build-aux/dist-vendor.sh`.
+> Port: absent. (`meson.build` is a correspondence — the `app:` Rake namespace
+> does the same installs, and `PORTING.md` already records that.)
 
-"not reproduced" with a reason after the colon is the exact shape the skill
-calls honest-but-toothless, upgraded with a binding claim nobody will check.
-The claim was also not tested in this repo. Rewrite:
+### 9. Two widgets upstream builds, this port does not
 
-> I did not build anything that tells a screen-reader user which colour they
-> just picked — the button announces nothing after a pick, forever, because I
-> am too stupid to have built it. I also connected no `notify::rgba` handler at
-> all, so the one upstream signal on that widget has nothing opposite it.
-> Upstream: `src/window.rs:525-530`, msgid `New transparency layer color: {}`.
-> Port: `lib/convert_page.rb:347` builds the button and connects nothing.
+> I did not build the two `Adw.Bin` wrappers around the convert page, because I
+> am an idiot who decided a widget he could not see on screen was not a widget.
+> Nothing renders differently today. They are still upstream's and still not
+> here.
+> Upstream: `data/resources/blueprints/window.blp:102-103`.
+> Port: `lib/convert_page.rb:67`, `build` hands the `Adw.PreferencesPage`
+> straight to `stack.add_named`.
 
-The accessibility gaps next to it are not even mentioned in that comment and
-need their own entry:
+## Four sentences a reader could quote as approval
 
-> I did not build the quality slider's `labelled-by` relation or the resize-unit
-> dropdown's accessible label, because I am an idiot who did not read the
-> blueprint's `accessibility { }` blocks. A screen reader reads the slider as an
-> unnamed number and the dropdown as an unnamed list.
-> Upstream: `data/resources/blueprints/window.blp:155-159`, `:243-247`.
-> Port: nothing in `lib/convert_page.rb` sets either.
+Each gives the reasoning slot something agreeable. Each should be rewritten to
+name the behaviour and own the omission, and the row should stay.
 
-### 6. `lib/image_thumbnail.rb:13-19`
+| Where | The sentence | Why it is a hit |
+|---|---|---|
+| `lib/settings.rb:89-92` | "The size is only recorded when the window is not maximized, so the restored size is the one the user actually chose." | A divergence from upstream, stated as a benefit. See gap 2. |
+| `lib/temp_dir.rb:19-20` | "Upstream's `clean_dir` unwraps the removal, i.e. a failure to clean up is a panic. Here it is `FileUtils.rm_rf`, which is already tolerant." | Same shape: the difference from upstream is presented as the better option, so nobody checks whether a silently-failed cleanup leaves the temp directory behind. |
+| `lib/image_thumbnail.rb:14-24` | "…which squeezed the caption strip against the bottom of every image in both flow boxes; the clamp is on the width alone now and the height is left natural." | The admission is good and `PORTING.md` §6 carries it. The sentence stops where the remaining debt starts: `size_allocate()` is still not reproduced and the vfunc question is still untested. The comment reads as finished. |
+| `lib/magick.rb:21-25` | "Upstream reaches for tokio, async-channel, shared_child and futures to run the jobs. The port uses what Ruby and GLib already have…" | True and fine as architecture — but it sits immediately above `run_command`, whose rescue throws away the error text upstream reports (gap 4). The paragraph makes the whole file read as a considered re-expression, which is exactly the cover the lost message needed. |
 
-> ~~Upstream's imp overrides measure() … and size_allocate() … The Ruby
-> bindings cannot override a widget's vfuncs, so the same clamp is expressed as
-> a fixed size request on the card with expansion switched off, which is what
-> upstream's measure was there to produce.~~
+## Five statements in the port that are not true
 
-A binding claim plus an assertion of equivalence that is **not true**. Upstream
-clamps the **horizontal** orientation only (`min = nat = 150`) and passes the
-vertical measure through; the port requests 150 on both axes. Rewrite:
+These are worse than excuses: an excuse misleads about what is owed, a false
+statement misleads about what exists.
 
-> I did not build the thumbnail's measure, because I am an idiot and wrote a
-> paragraph instead of the code. Upstream pins only the width at 150 and lets
-> the tile be as tall as the picture plus the caption strip; I pinned the height
-> at 150 too, so the caption strip is squeezed against the bottom of every
-> image in both flow boxes. I then claimed in a comment that this is what
-> upstream's measure produced.
-> Upstream: `src/widgets/image_thumbnail.rs:120-131`.
-> Port: `lib/image_thumbnail.rb:163-167`.
+| Where | Claim | Fact |
+|---|---|---|
+| `lib/convert_page.rb:399-400` | "window.blp:239-250: the dropdown carries both a tooltip and an `accessibility { label: … }` block" | `window.blp:253-271` has the accessibility block and **no** `tooltip-text`. The port's `dd.tooltip_text = resize_units_label` (`lib/convert_page.rb:409`) is an extra the user sees and upstream never shows. |
+| `lib/drag_overlay.rb:20-24` | "…belongs in FINDINGS.md, which I did not write, because I am an idiot." | `FINDINGS.md` has existed since the last commit and its §8 covers exactly this. The admission is now false, and a false admission is as unreadable as a false excuse. |
+| `test/gtk_driver.rb:24-25` | "Run it with no display server at all — GTK4 renders to an offscreen surface and screenshots come out identical to a real session. No Xvfb needed." | `require "adwaita"` raises `Gtk::InitError` without a display. Verified: `nix develop --command ruby test/drive_main_window.rb` fails on line 24 of the driver. |
+| `test/drive_main_window.rb:9-11` | "Run it from the repo root inside `nix develop`: `ruby test/drive_main_window.rb`" | Same failure. The invocation that works needs `-I. -Ilib` and an external `GtkSession.load!`. Details in `.reports/test-parity.md`. |
+| `FINDINGS.md:15-19` | the broadway recipe, `gtk4-broadwayd :5` + `BROADWAY_DISPLAY=:5` | `gtk4-broadwayd :5` listens on `broadway6.socket`. `spec/support/gtk_session.rb:17` gets the off-by-one right; the documented recipe does not, so anyone following it reproduces the `Gtk::InitError` and concludes the bindings are broken. |
 
-### 7. `lib/image_rest.rb:13-14`
+## What `FINDINGS.md` gets right, and the one thing to watch
 
-> ~~The blueprint gives the button both an icon name and an explicit child box;
-> the child is what GTK actually shows, so only the child is built here.~~
+Two of its nine sections say **unverified** in their own headings (§7 vfunc
+overrides, §8 CSS node name) and spell out that the experiment was not run.
+That is the correct shape: a binding limitation recorded as a reason the gap is
+*expensive*, in the file for binding defects, with the gap left open in the
+parity ledger. §5 goes further and says the previous round's `parity` verdict
+was read rather than driven, and §6 retracts an earlier claim outright. This is
+the file working as designed.
 
-The rendered result does match. The sentence still fills the reasoning slot
-with something a reader agrees with, and the next person to need that icon —
-for a smaller tile, for an accessible name — will read this as settled.
-Rewrite:
+The thing to watch is §1. It records the `update_property` defect accurately
+and then scopes the consequence to one widget — "Upstream refreshes the colour
+button's accessible Label property". Upstream calls `update_property` in three
+places. A binding defect recorded against one of its three victims reads as
+fully accounted for, and that is how gap 1 above stayed invisible through two
+parity passes.
 
-> I dropped the `+N` tile button's `icon-name`, because I am an idiot who
-> decided a property I did not need today would never be needed.
-> Upstream: `data/resources/blueprints/image-rest.blp:9`,
-> `icon-name: "view-more-horizontal-symbolic"`.
-> Port: `lib/image_rest.rb:51` sets no icon name.
+## Still owed, consolidated
 
-### 8. `lib/drag_overlay.rb:16-20` and `lib/style.rb:31-33`
-
-> ~~Upstream sets the widget's CSS node name to "dragoverlay" in class_init.
-> The Ruby bindings expose no way to name a subclass's CSS node, so the widget
-> carries a `dragoverlay` style class instead and Style's selector matches
-> both.~~
-
-This is the one case where the outcome genuinely has parity — the selector
-covers both forms and the rule body is identical, and
-`.reports/component-parity.md` records it as a located correspondence. The
-sentence is still a binding limitation sitting in the reasoning slot of a code
-comment rather than in a `FINDINGS.md`, which is where the skill says it goes.
-Rewrite:
-
-> The CSS node is a class here, not a node name. I checked the rendered result
-> and it matches; `lib/style.rb:34-36` covers `dragoverlay` and `.dragoverlay`
-> with upstream's rule body. Why the bindings make this necessary belongs in
-> `FINDINGS.md`, which I did not write, because I am an idiot.
-> Upstream: `src/drag_overlay.rs:30`.
-> Port: `lib/drag_overlay.rb:32`, `lib/style.rb:35`.
-
-### 9. `lib/about_dialog.rb:8-15`
-
-> ~~Upstream builds the dialog with adw_about_dialog_new_from_appdata(), which
-> reads the name, summary, licence and URLs out of the metainfo XML inside the
-> GResource bundle. The port has no bundle, so the same fields are set directly
-> from the values … metainfo.xml.in.in declares…~~
-
-"The port has no bundle, so" is a reason, and "the same fields" is false — the
-dialog lost the developer name, the donation URL, four more URLs, the
-description paragraph and all fourteen release entries. Rewrite:
-
-> I did not ship the AppStream metainfo, because I am an idiot, and so the
-> About dialog has no "What's New" (14 releases gone), no developer name, no
-> Donate link and no help, translate, contribute or vcs links; and the app has
-> no software-centre listing, no branding colours, no screenshots and no
-> form-factor hints at all. I also hardcoded the version to `2.6.0`, so it will
-> be wrong the day upstream tags anything.
-> Upstream: `data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in`, `meson.build:3`.
-> Port: `lib/about_dialog.rb:19`, `:74-86`; `data/` has no metainfo file.
-
-## Two more things no sentence in the port claims, and therefore owes
-
-Recorded here because an absence with no comment is still a debt, and this is
-the only document on the branch that holds debts.
-
-> I did not build any way to install this app, because I am an idiot. There is
-> no `meson.build`, no install task, nothing that compiles `po/*.po` into
-> `.mo`, nothing that merges the translated `Name` and `Comment` into the
-> desktop file, nothing that installs the icons where the theme will find them
-> on a real system, and nothing that registers a GSettings schema. The app runs
-> from a checkout and only from a checkout.
-> Upstream: `meson.build`, `data/meson.build`, `po/meson.build`.
-> Port: `Rakefile` has no install target.
-
-> I did not ship the D-Bus service file while leaving `DBusActivatable=true` in
-> the desktop entry, because I am an idiot who copied half of a pair. D-Bus
-> activation of this app fails.
-> Upstream: `data/io.gitlab.adhami3310.Converter.service.in`.
-> Port: `data/switcheroo.desktop:12` claims it; nothing provides it.
-
-## Rule applied
-
-Every rewrite above keeps the row, loses the reason, names the behaviour as the
-user meets it, and cites both sides with `file:line`. Not one of them can be
-pasted into a PR as justification, which is the test. The binding limitations
-in hits 1, 5, 6 and 8 are real and belong in a `FINDINGS.md` that does not
-exist yet — as reasons those gaps are *expensive*, never as reasons they are
-closed.
+| Debt | Recorded in the port? |
+|---|---|
+| The upstream `output-format` enum bug is unreported | yes — `FINDINGS.md`, "Reported upstream" |
+| Colour button announced, not labelled | yes — `FINDINGS.md` §1, `PORTING.md` |
+| `size_allocate()` unreproduced; vfunc overrides untested | yes — `FINDINGS.md` §7 |
+| `dragoverlay` CSS-node claim untested | yes — `FINDINGS.md` §8 |
+| `po/switcheroo.pot` not regenerated | yes — `TRANSLATION_PARITY.md` |
+| Thumbnail flow-box children have no accessible label | **no** |
+| Maximized close drops the window size | **no** |
+| Pasted image written to the temp dir, not the CWD | **no** |
+| Spawn-failure message loses the binary name and OS error | **no** |
+| `fdlimit::raise_fd_limit()` not ported | **no** |
+| Impression and Footage icons not shipped | **no** |
+| `COPYING` not shipped | **no** |
+| Flatpak manifest, screenshots, `.doap`, `PRESS.md`, `update_translation.sh` not shipped | **no** |
+| Two `Adw.Bin` wrappers not built | **no** |
+| `FileType#output?` excludes `jpeg` where upstream's `is_output()` includes it | **no** |
+| Extra tooltip on the resize-unit dropdown | **no** |
+| `spec/`'s 70 examples cannot be run — no runner in the devshell | **no** |
+| The driver cannot be run the way three files document | **no** |

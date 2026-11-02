@@ -1,3 +1,8 @@
+> **Superseded.** This file was written before the i18n/GSettings/metainfo
+> commit (`341104d`) and no longer matches either tree. The current inventory
+> is `.reports/component-identification.md`. Kept only so its history is not
+> lost; do not read it as the state of the port.
+
 # Switcheroo — upstream component inventory
 
 Upstream is **Rust (gtk-rs + libadwaita)** on `origin/main`, app id
