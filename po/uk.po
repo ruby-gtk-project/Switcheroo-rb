@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: switcheroo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-12 12:51-1000\n"
+"POT-Creation-Date: 2026-11-03 00:27+0000\n"
 "PO-Revision-Date: 2026-07-13 20:52+0300\n"
 "Last-Translator: Dymko <Dymkovych@proton.me>\n"
 "Language-Team: Ukrainian\n"
@@ -20,59 +20,42 @@ msgstr ""
 "2);\n"
 "X-Generator: Gtranslator 50.0\n"
 
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:2
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:5
-#: data/resources/blueprints/window.blp:9
-#: data/resources/blueprints/window.blp:21
-#: data/resources/blueprints/window.blp:58 src/main.rs:45
-msgid "Switcheroo"
-msgstr "Міняло"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:3
-msgid "Image Converter"
-msgstr "Конвертер зображень"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:4
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:9
-msgid "Convert and manipulate images"
-msgstr "Конвертуйте та обробляйте зображення"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:10
-msgid "converter;image;convert;converting;processing"
-msgstr "конвертер;зображення;перетворення;конвертація;обробка;converter;image;convert;converting;processing;"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:20
-#: data/resources/blueprints/window.blp:492
-msgid "New Window"
-msgstr "Нове вікно"
-
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:26
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
 msgid "Window width"
 msgstr "Ширина вікна"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:34
 msgid "Image quality"
 msgstr "Якість зображення"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:34
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:38
 msgid "Image density per inch"
 msgstr "Щільність зображення на дюйм"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:38
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:42
 msgid "Window height"
 msgstr "Висота вікна"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:42
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:46
 msgid "Window maximized state"
 msgstr "Стан розгорнутого вікна"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:46
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:50
 msgid "Output format"
 msgstr "Вихідний формат"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:50
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:54
 msgid "Compression format"
 msgstr "Формат стиснення"
+
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:58
+msgid "Resize unit (percentage or pixels)"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:9
+#: data/switcheroo.desktop.in:4
+msgid "Convert and manipulate images"
+msgstr "Конвертуйте та обробляйте зображення"
 
 #: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:15
 msgid "Convert between different image filetypes and resize them easily."
@@ -87,307 +70,326 @@ msgstr "Конвертування зразка зображення з PNG у H
 msgid "Converting multiple sample images from SVG to HEIF"
 msgstr "Конвертування кількох зразків зображень із SVG у HEIF"
 
-#: data/resources/blueprints/image-rest.blp:21
-msgid "Show All"
-msgstr "Показати все"
+#: data/switcheroo.desktop.in:3
+msgid "Image Converter"
+msgstr "Конвертер зображень"
 
-#: data/resources/blueprints/window.blp:15
-msgid "Drop Here to Open"
-msgstr "Перетягніть сюди, щоб відкрити"
+#: data/switcheroo.desktop.in:10
+msgid "converter;image;convert;converting;processing"
+msgstr "конвертер;зображення;перетворення;конвертація;обробка;converter;image;convert;converting;processing;"
 
-#: data/resources/blueprints/window.blp:28
-#: data/resources/blueprints/window.blp:389
+#: lib/about_dialog.rb:91
+msgid "translator-credits"
+msgstr "Dymko"
+
+#: lib/about_dialog.rb:155
+msgid "Create bootable drives"
+msgstr "Створення завантажувальних носіїв"
+
+#: lib/about_dialog.rb:155
+msgid "Impression"
+msgstr "Зліпок"
+
+#: lib/about_dialog.rb:157
+msgid "Footage"
+msgstr "Футаж"
+
+#: lib/about_dialog.rb:157
+msgid "Polish your videos"
+msgstr "Довершуйте видива"
+
+#: lib/about_dialog.rb:163
+msgid "Code and Design Borrowed from"
+msgstr "Код та дизайн запозичено з"
+
+#: lib/about_dialog.rb:172
+msgid "Sample Image from"
+msgstr "Зразок зображення від"
+
+#: lib/all_images_page.rb:63
+msgid "All Images"
+msgstr "Усі зображення"
+
+#: lib/all_images_page.rb:74 lib/app_window.rb:163
 msgid "Add Images (Ctrl+O)"
 msgstr "Додати зображення (Ctrl+O)"
 
-#: data/resources/blueprints/window.blp:42
+#: lib/app_window.rb:122 lib/file_chooser.rb:44
+msgid "Unsupported filetype"
+msgstr "Непідтримуваний тип файлу"
+
+#: lib/app_window.rb:133 lib/app_window.rb:147 lib/welcome_page.rb:33
+msgid "Switcheroo"
+msgstr "Міняло"
+
+#: lib/app_window.rb:173
 msgid "Primary Menu"
 msgstr "Головне меню"
 
-#: data/resources/blueprints/window.blp:59
-msgid "Drag and drop images here"
-msgstr "Перетягніть зображення сюди"
+#: lib/app_window.rb:479
+msgid "Unable to access dropped files"
+msgstr "Неможливо отримати доступ до перетягнутих файлів"
 
-#: data/resources/blueprints/window.blp:70
-msgid "_Open Images…"
-msgstr "_Відкрити зображення…"
+#: lib/app_window.rb:923
+msgid "Error copied to clipboard"
+msgstr "Помилку скопійовано в буфер"
 
-#: data/resources/blueprints/window.blp:118
+#: lib/app_window.rb:930
+msgid "Image converted"
+msgstr "Зображення конвертовано"
+
+#: lib/app_window.rb:931
+msgid "Open"
+msgstr "Відкрити"
+
+#: lib/app_window.rb:967
+msgid "Converting Cancelled"
+msgstr "Конвертування скасовано"
+
+#: lib/application.rb:68
+msgid "Open a new window"
+msgstr ""
+
+#: lib/convert_page.rb:276
 msgid "Export Format"
 msgstr "Формат експорту"
 
-#: data/resources/blueprints/window.blp:126
+#: lib/convert_page.rb:283
 msgid "Save as multi-page PDF"
 msgstr "Зберегти як багатосторінковий PDF"
 
-#: data/resources/blueprints/window.blp:136
+#: lib/convert_page.rb:297
 msgid "Save To ZIP"
 msgstr "Зберегти у ZIP"
 
-#: data/resources/blueprints/window.blp:148
-msgid "Quality"
-msgstr "Якість"
-
-#: data/resources/blueprints/window.blp:170
+#: lib/convert_page.rb:333
 msgid "Background Color"
 msgstr "Колір тла"
 
-#: data/resources/blueprints/window.blp:171
+#: lib/convert_page.rb:334
 msgid "Replaces original transparency layer"
 msgstr "Замінює початковий шар прозорості"
 
-#: data/resources/blueprints/window.blp:185
+#: lib/convert_page.rb:354
 msgid "Pixel Density Per Inch"
 msgstr "Щільність пікселів на дюйм"
 
-#: data/resources/blueprints/window.blp:196
+#: lib/convert_page.rb:369
 msgid "Resize"
 msgstr "Розмір зображення"
 
-#: data/resources/blueprints/window.blp:203
-#: data/resources/blueprints/window.blp:204
-#: data/resources/blueprints/window.blp:212
-#: data/resources/blueprints/window.blp:214
-#: data/resources/blueprints/window.blp:243
+#: lib/convert_page.rb:379 lib/convert_page.rb:387 lib/convert_page.rb:391
 msgid "Width"
 msgstr "Ширина"
 
-#: data/resources/blueprints/window.blp:223
-msgid "Preserve aspect ratio"
-msgstr "Зберегти пропорції"
-
-#: data/resources/blueprints/window.blp:234
-#: data/resources/blueprints/window.blp:235
-#: data/resources/blueprints/window.blp:244
+#: lib/convert_page.rb:383 lib/convert_page.rb:391
 msgid "Height"
 msgstr "Висота"
 
-#: data/resources/blueprints/window.blp:257
-msgid "Choose between resizing with percentages or using exact pixels"
-msgstr "Виберіть між зміною розміру у відсотках або точних пікселях"
+#: lib/convert_page.rb:399
+msgid "Preserve aspect ratio"
+msgstr "Зберегти пропорції"
 
-#: data/resources/blueprints/window.blp:262
+#: lib/convert_page.rb:417
 msgid "%"
 msgstr "%"
 
-#: data/resources/blueprints/window.blp:263
+#: lib/convert_page.rb:417
 msgid "px"
 msgstr "пікс"
 
-#: data/resources/blueprints/window.blp:277
+#: lib/convert_page.rb:425
 msgid "Resize Algorithm"
 msgstr "Алгоритм зміни розміру"
 
-#: data/resources/blueprints/window.blp:284
+#: lib/convert_page.rb:438
 msgid "Default"
 msgstr "Типовий"
 
-#: data/resources/blueprints/window.blp:289
+#: lib/convert_page.rb:445
 msgid "Pixel Art"
 msgstr "Піксель-арт"
 
-#: data/resources/blueprints/window.blp:299
+#: lib/convert_page.rb:452
 msgid "Remove Metadata"
 msgstr "Вилучити метадані"
 
-#: data/resources/blueprints/window.blp:316
+#: lib/convert_page.rb:466
 msgid "_Convert"
 msgstr "_Конвертувати"
 
-#: data/resources/blueprints/window.blp:336
+#: lib/convert_page.rb:572
+msgid "New transparency layer color: {}"
+msgstr "Новий колір шару прозорості: {}"
+
+#: lib/convert_page.rb:579
+msgid "Choose between resizing with percentages or using exact pixels"
+msgstr "Виберіть між зміною розміру у відсотках або точних пікселях"
+
+#: lib/convert_page.rb:597
+msgid "Quality"
+msgstr "Якість"
+
+#: lib/converting_page.rb:35 lib/converting_page.rb:64
+msgid "Loading…"
+msgstr "Завантаження…"
+
+#: lib/converting_page.rb:47
+msgid "Collecting files"
+msgstr "Збирання файлів"
+
+#: lib/converting_page.rb:52
+msgid "Converting"
+msgstr "Конвертування"
+
+#: lib/converting_page.rb:53
+msgid "This could take a while"
+msgstr "Це може зайняти деякий час"
+
+#: lib/converting_page.rb:70 lib/stop_converting_dialog.rb:49
+msgid "_Cancel"
+msgstr "_Скасувати"
+
+#: lib/drag_overlay.rb:35
+msgid "Drop Here to Open"
+msgstr "Перетягніть сюди, щоб відкрити"
+
+#: lib/error_dialog.rb:44
+msgid "Error While Processing"
+msgstr "Помилка під час обробки"
+
+#: lib/error_dialog.rb:72
+msgid "_Close"
+msgstr "_Закрити"
+
+#: lib/error_dialog.rb:73
+msgid "_Copy to Clipboard"
+msgstr "_Копіювати до буфера обміну"
+
+#: lib/file_chooser.rb:107
+msgid "_Select Images"
+msgstr "_Вибрати зображення"
+
+#: lib/file_chooser.rb:115
+msgid "Images"
+msgstr "Зображення"
+
+#: lib/file_chooser.rb:160
+msgid "Unspecified filetype"
+msgstr "Невизначений тип файлу"
+
+#: lib/file_chooser.rb:171
+msgid "Unknown filetype"
+msgstr "Невідомий тип файлу"
+
+#: lib/file_chooser.rb:173
+msgid "Used the wrong filetype"
+msgstr "Неправильний тип файлу"
+
+#: lib/image_rest.rb:82
+msgid "+{}"
+msgstr ""
+
+#: lib/image_rest.rb:87
+msgid "Show All"
+msgstr "Показати все"
+
+#: lib/image_rest.rb:91
+msgid "Show {} more images"
+msgstr ""
+
+#: lib/image_thumbnail.rb:156
+msgid "Remove image"
+msgstr ""
+
+#: lib/invalid_image_page.rb:26
 msgid "Could not Load Image"
 msgstr "Не вдалося завантажити зображення"
 
-#: data/resources/blueprints/window.blp:337
+#: lib/invalid_image_page.rb:27
 msgid "This image could be corrupted or may use an unsupported file format."
 msgstr ""
 "Можливо, це зображення пошкоджене або має непідтримуваний формат файлу."
 
-#: data/resources/blueprints/window.blp:347
-msgid "Converting"
-msgstr "Конвертування"
+#: lib/magick.rb:547
+msgid "Unknown IO error happened"
+msgstr "Сталася невідома помилка вводу-виводу"
 
-#: data/resources/blueprints/window.blp:348
-msgid "This could take a while"
-msgstr "Це може зайняти деякий час"
+#: lib/primary_menu.rb:37
+msgid "Paste From Clipboard"
+msgstr "Вставити з буфера"
 
-#: data/resources/blueprints/window.blp:358 src/window.rs:948
-msgid "Loading…"
-msgstr "Завантаження…"
+#: lib/primary_menu.rb:38
+msgid "New Window"
+msgstr "Нове вікно"
 
-#: data/resources/blueprints/window.blp:364 src/window.rs:578
-#: src/window.rs:1557
-msgid "_Cancel"
-msgstr "_Скасувати"
+#: lib/primary_menu.rb:39
+msgid "Clear Window"
+msgstr "Очистити вікно"
 
-#: data/resources/blueprints/window.blp:382
-msgid "All Images"
-msgstr "Усі зображення"
+#: lib/primary_menu.rb:45
+msgid "Keyboard Shortcuts"
+msgstr "Клавіатурні скорочення"
 
-#: data/resources/blueprints/window.blp:450
+#: lib/primary_menu.rb:46
+msgid "About Switcheroo"
+msgstr "Про програму"
+
+#: lib/shortcuts_dialog.rb:31
 msgctxt "shortcut window"
 msgid "General"
 msgstr "Загальні"
 
-#: data/resources/blueprints/window.blp:453
+#: lib/shortcuts_dialog.rb:42
 msgctxt "shortcut window"
 msgid "Show Shortcuts"
 msgstr "Клавіатурні скорочення"
 
-#: data/resources/blueprints/window.blp:458
+#: lib/shortcuts_dialog.rb:43
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Вийти"
 
-#: data/resources/blueprints/window.blp:463
+#: lib/shortcuts_dialog.rb:44
 msgctxt "shortcut window"
 msgid "New Window"
 msgstr "Нове вікно"
 
-#: data/resources/blueprints/window.blp:468
+#: lib/shortcuts_dialog.rb:45
 msgctxt "shortcut window"
 msgid "Clear Window"
 msgstr "Очистити вікно"
 
-#: data/resources/blueprints/window.blp:473
+#: lib/shortcuts_dialog.rb:46
 msgctxt "shortcut window"
 msgid "Paste From Clipboard"
 msgstr "Вставити з буфера"
 
-#: data/resources/blueprints/window.blp:478
+#: lib/shortcuts_dialog.rb:47
 msgctxt "shortcut window"
 msgid "Add Images"
 msgstr "Додати зображення"
 
-#: data/resources/blueprints/window.blp:487
-msgid "Paste From Clipboard"
-msgstr "Вставити з буфера"
-
-#: data/resources/blueprints/window.blp:497
-msgid "Clear Window"
-msgstr "Очистити вікно"
-
-#: data/resources/blueprints/window.blp:504
-msgid "Keyboard Shortcuts"
-msgstr "Клавіатурні скорочення"
-
-#: data/resources/blueprints/window.blp:509
-msgid "About Switcheroo"
-msgstr "Про програму"
-
-#: src/file_chooser.rs:39 src/window.rs:2157
-msgid "Unsupported filetype"
-msgstr "Непідтримуваний тип файлу"
-
-#: src/file_chooser.rs:88
-msgid "Images"
-msgstr "Зображення"
-
-#: src/file_chooser.rs:91
-msgid "_Select Images"
-msgstr "_Вибрати зображення"
-
-#: src/file_chooser.rs:182
-msgid "Unspecified filetype"
-msgstr "Невизначений тип файлу"
-
-#: src/file_chooser.rs:187
-msgid "Unknown filetype"
-msgstr "Невідомий тип файлу"
-
-#: src/file_chooser.rs:192
-msgid "Used the wrong filetype"
-msgstr "Неправильний тип файлу"
-
-#: src/magick.rs:148
-msgid "Pasted Image"
-msgstr "Вставлене зображення"
-
-#: src/magick.rs:303
-msgid "Unknown IO error happened"
-msgstr "Сталася невідома помилка вводу-виводу"
-
-#: src/widgets/about_window.rs:21
-msgid "translator-credits"
-msgstr "Dymko"
-
-#. Translators: Metainfo for the app Impression. <https://gitlab.com/adhami3310/Impression>
-#: src/widgets/about_window.rs:26
-msgid "Impression"
-msgstr "Зліпок"
-
-#. Translators: Metainfo for the app Impression. <https://gitlab.com/adhami3310/Impression>
-#: src/widgets/about_window.rs:28
-msgid "Create bootable drives"
-msgstr "Створення завантажувальних носіїв"
-
-#. Translators: Metainfo for the app Footage. <https://gitlab.com/adhami3310/Footage>
-#: src/widgets/about_window.rs:33
-msgid "Footage"
-msgstr "Футаж"
-
-#. Translators: Metainfo for the app Footage. <https://gitlab.com/adhami3310/Footage>
-#: src/widgets/about_window.rs:35
-msgid "Polish your videos"
-msgstr "Довершуйте видива"
-
-#: src/widgets/about_window.rs:38
-msgid "Code and Design Borrowed from"
-msgstr "Код та дизайн запозичено з"
-
-#: src/widgets/about_window.rs:50
-msgid "Sample Image from"
-msgstr "Зразок зображення від"
-
-#: src/window.rs:528
-#, rust-format
-msgid "New transparency layer color: {}"
-msgstr "Новий колір шару прозорості: {}"
-
-#: src/window.rs:548
-msgid "Unable to access dropped files"
-msgstr "Неможливо отримати доступ до перетягнутих файлів"
-
-#: src/window.rs:574 src/window.rs:1552
+#: lib/stop_converting_dialog.rb:40
 msgid "Stop converting?"
 msgstr "Зупинити конвертування?"
 
-#: src/window.rs:575 src/window.rs:1553
+#: lib/stop_converting_dialog.rb:41
 msgid "You will lose all progress."
 msgstr "Ви втратите весь прогрес."
 
-#: src/window.rs:579 src/window.rs:1557
+#: lib/stop_converting_dialog.rb:50
 msgid "_Stop"
 msgstr "_Зупинити"
 
-#: src/window.rs:619
-msgid "Collecting files"
-msgstr "Збирання файлів"
+#: lib/temp_dir.rb:93
+msgid "Pasted Image"
+msgstr "Вставлене зображення"
 
-#: src/window.rs:1470
-msgid "Error While Processing"
-msgstr "Помилка під час обробки"
+#: lib/welcome_page.rb:34
+msgid "Drag and drop images here"
+msgstr "Перетягніть зображення сюди"
 
-#: src/window.rs:1491
-msgid "_Close"
-msgstr "_Закрити"
-
-#: src/window.rs:1492
-msgid "_Copy to Clipboard"
-msgstr "_Копіювати до буфера обміну"
-
-#: src/window.rs:1503
-msgid "Error copied to clipboard"
-msgstr "Помилку скопійовано в буфер"
-
-#: src/window.rs:1519
-msgid "Image converted"
-msgstr "Зображення конвертовано"
-
-#: src/window.rs:1520
-msgid "Open"
-msgstr "Відкрити"
-
-#: src/window.rs:1582
-msgid "Converting Cancelled"
-msgstr "Конвертування скасовано"
+#: lib/welcome_page.rb:45
+msgid "_Open Images…"
+msgstr "_Відкрити зображення…"

@@ -55,3 +55,7 @@ Appraisal.*.gemfile.lock
 /locale/
 # Scratch directory the install task configures its templates in.
 /tmp/
+# Intermediate catalogues `rake app:pot` joins into po/switcheroo.pot. They
+# live in the source root so rxgettext writes `#:` references relative to it.
+/.pot-ruby.tmp
+/.pot-data.tmp

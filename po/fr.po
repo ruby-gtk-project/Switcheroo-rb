@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 08:05-0500\n"
+"POT-Creation-Date: 2026-11-03 00:27+0000\n"
 "PO-Revision-Date: 2023-12-27 16:33+0100\n"
 "Last-Translator: Irénée THIRION <irenee.thirion@e.email>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
@@ -19,297 +19,396 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "X-Generator: Gtranslator 45.3\n"
 
-#: ../data/resources/blueprints/help-overlay.blp:11
-msgctxt "shortcut window"
-msgid "General"
-msgstr "Général"
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
+msgid "Window width"
+msgstr ""
 
-#: ../data/resources/blueprints/help-overlay.blp:14
-msgctxt "shortcut window"
-msgid "Show Shortcuts"
-msgstr "Afficher les raccourcis"
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:34
+#, fuzzy
+#| msgid "Quality"
+msgid "Image quality"
+msgstr "Qualité"
 
-#: ../data/resources/blueprints/help-overlay.blp:19
-msgctxt "shortcut window"
-msgid "Quit"
-msgstr "Quitter"
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:38
+#, fuzzy
+#| msgid "Pixel Density Per Inch"
+msgid "Image density per inch"
+msgstr "Densité de Pixels par pouce"
 
-#: ../data/resources/blueprints/help-overlay.blp:24
-msgctxt "shortcut window"
-msgid "New Window"
-msgstr "Nouvelle fenêtre"
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:42
+msgid "Window height"
+msgstr ""
 
-#: ../data/resources/blueprints/help-overlay.blp:29
-msgctxt "shortcut window"
-msgid "Clear Window"
-msgstr "Vider le contenu de la fenêtre"
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:46
+msgid "Window maximized state"
+msgstr ""
 
-#: ../data/resources/blueprints/help-overlay.blp:34
-msgctxt "shortcut window"
-msgid "Show Less Popular Datatypes"
-msgstr "Afficher les données moins populaires"
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:50
+#, fuzzy
+#| msgid "Export Format"
+msgid "Output format"
+msgstr "Format d’exportation"
 
-#: ../data/resources/blueprints/help-overlay.blp:39
-msgctxt "shortcut window"
-msgid "Paste From Clipboard"
-msgstr "Copier depuis le presse-papiers"
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:54
+msgid "Compression format"
+msgstr ""
 
-#: ../data/resources/blueprints/help-overlay.blp:44
-msgctxt "shortcut window"
-msgid "Add Images"
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:58
+msgid "Resize unit (percentage or pixels)"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:9
+#: data/switcheroo.desktop.in:4
+msgid "Convert and manipulate images"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:15
+msgid "Convert between different image filetypes and resize them easily."
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:42
+msgid "Converting sample image from PNG to HEIF"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:47
+msgid "Converting multiple sample images from SVG to HEIF"
+msgstr ""
+
+#: data/switcheroo.desktop.in:3
+#, fuzzy
+#| msgid "Image converted"
+msgid "Image Converter"
+msgstr "Image convertie"
+
+#: data/switcheroo.desktop.in:10
+msgid "converter;image;convert;converting;processing"
+msgstr ""
+
+#: lib/about_dialog.rb:91
+msgid "translator-credits"
+msgstr "Irénée Thirion"
+
+#: lib/about_dialog.rb:155
+msgid "Create bootable drives"
+msgstr ""
+
+#: lib/about_dialog.rb:155
+msgid "Impression"
+msgstr ""
+
+#: lib/about_dialog.rb:157
+msgid "Footage"
+msgstr ""
+
+#: lib/about_dialog.rb:157
+msgid "Polish your videos"
+msgstr ""
+
+#: lib/about_dialog.rb:163
+msgid "Code and Design Borrowed from"
+msgstr "Code et Design empruntés à"
+
+#: lib/about_dialog.rb:172
+msgid "Sample Image from"
+msgstr "Image échantillon par"
+
+#: lib/all_images_page.rb:63
+msgid "All Images"
+msgstr "Toutes les images"
+
+#: lib/all_images_page.rb:74 lib/app_window.rb:163
+#, fuzzy
+#| msgctxt "shortcut window"
+#| msgid "Add Images"
+msgid "Add Images (Ctrl+O)"
 msgstr "Ajouter des images"
 
-#: ../data/resources/blueprints/image-rest.blp:21
-msgid "Show All"
-msgstr "Afficher tout"
+#: lib/app_window.rb:122 lib/file_chooser.rb:44
+msgid "Unsupported filetype"
+msgstr "Type de fichier non pris en charge"
 
-#: ../data/resources/blueprints/window.blp:9
-#: ../data/resources/blueprints/window.blp:21
-#: ../data/resources/blueprints/window.blp:57 ../src/main.rs:30
-#: ../src/widgets/about_window.rs:24
+#: lib/app_window.rb:133 lib/app_window.rb:147 lib/welcome_page.rb:33
 msgid "Switcheroo"
 msgstr "Switcheroo"
 
-#: ../data/resources/blueprints/window.blp:15
-msgid "Drop Here to Open"
-msgstr "Faites glisser une image ici pour ouvrir"
-
-#: ../data/resources/blueprints/window.blp:40
+#: lib/app_window.rb:173
 msgid "Primary Menu"
 msgstr "Menu principal"
 
-#: ../data/resources/blueprints/window.blp:58
-msgid "Drag and drop images here"
-msgstr "Glissez et déposez des images ici"
+#: lib/app_window.rb:479
+msgid "Unable to access dropped files"
+msgstr "Impossible d'accéder au fichiers déposés"
 
-#: ../data/resources/blueprints/window.blp:69
-msgid "_Open Images…"
-msgstr "_Ouvrir des images…"
+#: lib/app_window.rb:923
+msgid "Error copied to clipboard"
+msgstr "Erreur copiée vers le presse-papier"
 
-#: ../data/resources/blueprints/window.blp:122
+#: lib/app_window.rb:930
+msgid "Image converted"
+msgstr "Image convertie"
+
+#: lib/app_window.rb:931
+msgid "Open"
+msgstr "Ouvrir"
+
+#: lib/app_window.rb:967
+msgid "Converting Cancelled"
+msgstr "Conversion annulée"
+
+#: lib/application.rb:68
+msgid "Open a new window"
+msgstr ""
+
+#: lib/convert_page.rb:276
 msgid "Export Format"
 msgstr "Format d’exportation"
 
-#: ../data/resources/blueprints/window.blp:127
+#: lib/convert_page.rb:283
 msgid "Save as multi-page PDF"
 msgstr "Enregistrer en PDF multi-pages"
 
-#: ../data/resources/blueprints/window.blp:137
+#: lib/convert_page.rb:297
 msgid "Save To ZIP"
 msgstr "Enregistrer en ZIP"
 
-#: ../data/resources/blueprints/window.blp:150
-msgid "Quality"
-msgstr "Qualité"
-
-#: ../data/resources/blueprints/window.blp:170
+#: lib/convert_page.rb:333
 msgid "Background Color"
 msgstr "Couleur d’arrière-plan"
 
-#: ../data/resources/blueprints/window.blp:171
+#: lib/convert_page.rb:334
 msgid "Replaces original transparency layer"
 msgstr "Remplace la couche de transparence d’origine"
 
-#: ../data/resources/blueprints/window.blp:185
+#: lib/convert_page.rb:354
 msgid "Pixel Density Per Inch"
 msgstr "Densité de Pixels par pouce"
 
-#: ../data/resources/blueprints/window.blp:197
+#: lib/convert_page.rb:369
 msgid "Resize"
 msgstr "Redimentionner"
 
-#: ../data/resources/blueprints/window.blp:202
-#: ../data/resources/blueprints/window.blp:203
-#: ../data/resources/blueprints/window.blp:210
-#: ../data/resources/blueprints/window.blp:212
-#: ../data/resources/blueprints/window.blp:233
+#: lib/convert_page.rb:379 lib/convert_page.rb:387 lib/convert_page.rb:391
 msgid "Width"
 msgstr "Largeur"
 
-#: ../data/resources/blueprints/window.blp:220
-msgid "Preserve aspect ratio"
-msgstr "Préserver le ratio largeur/hauteur"
-
-#: ../data/resources/blueprints/window.blp:225
-#: ../data/resources/blueprints/window.blp:226
-#: ../data/resources/blueprints/window.blp:234
+#: lib/convert_page.rb:383 lib/convert_page.rb:391
 msgid "Height"
 msgstr "Hauteur"
 
-#: ../data/resources/blueprints/window.blp:245
+#: lib/convert_page.rb:399
+msgid "Preserve aspect ratio"
+msgstr "Préserver le ratio largeur/hauteur"
+
+#: lib/convert_page.rb:417
+msgid "%"
+msgstr "%"
+
+#: lib/convert_page.rb:417
+msgid "px"
+msgstr "px"
+
+#: lib/convert_page.rb:425
+msgid "Resize Algorithm"
+msgstr "Algorithme de redimensionnement"
+
+#: lib/convert_page.rb:438
+msgid "Default"
+msgstr "Par défaut"
+
+#: lib/convert_page.rb:445
+msgid "Pixel Art"
+msgstr "Pixel Art"
+
+#: lib/convert_page.rb:452
+msgid "Remove Metadata"
+msgstr ""
+
+#: lib/convert_page.rb:466
+msgid "_Convert"
+msgstr "_Convertir"
+
+#: lib/convert_page.rb:572
+msgid "New transparency layer color: {}"
+msgstr ""
+
+#: lib/convert_page.rb:579
 msgid "Choose between resizing with percentages or using exact pixels"
 msgstr ""
 "Choisissez entre un redimensionnement en utilisant des pourcentages ou un "
 "nombre précis de pixels"
 
-#: ../data/resources/blueprints/window.blp:249
-msgid "%"
-msgstr "%"
+#: lib/convert_page.rb:597
+msgid "Quality"
+msgstr "Qualité"
 
-#: ../data/resources/blueprints/window.blp:249
-msgid "px"
-msgstr "px"
+#: lib/converting_page.rb:35 lib/converting_page.rb:64
+msgid "Loading…"
+msgstr "Chargement…"
 
-#: ../data/resources/blueprints/window.blp:258
-msgid "Resize Algorithm"
-msgstr "Algorithme de redimensionnement"
+#: lib/converting_page.rb:47
+msgid "Collecting files"
+msgstr "Récupération des fichiers"
 
-#: ../data/resources/blueprints/window.blp:264
-msgid "Default"
-msgstr "Par défaut"
+#: lib/converting_page.rb:52
+msgid "Converting"
+msgstr "Conversion"
 
-#: ../data/resources/blueprints/window.blp:268
-msgid "Pixel Art"
-msgstr "Pixel Art"
+#: lib/converting_page.rb:53
+msgid "This could take a while"
+msgstr "Cela peut prendre du temps"
 
-#: ../data/resources/blueprints/window.blp:282
-msgid "_Convert"
-msgstr "_Convertir"
+#: lib/converting_page.rb:70 lib/stop_converting_dialog.rb:49
+msgid "_Cancel"
+msgstr "_Annuler"
 
-#: ../data/resources/blueprints/window.blp:308
+#: lib/drag_overlay.rb:35
+msgid "Drop Here to Open"
+msgstr "Faites glisser une image ici pour ouvrir"
+
+#: lib/error_dialog.rb:44
+msgid "Error While Processing"
+msgstr "Erreur lors du traitement"
+
+#: lib/error_dialog.rb:72
+msgid "_Close"
+msgstr "_Fermer"
+
+#: lib/error_dialog.rb:73
+msgid "_Copy to Clipboard"
+msgstr "_Copier vers le presse-papiers"
+
+#: lib/file_chooser.rb:107
+msgid "_Select Images"
+msgstr "_Sélectionnez des images"
+
+#: lib/file_chooser.rb:115
+msgid "Images"
+msgstr "Images"
+
+#: lib/file_chooser.rb:160
+msgid "Unspecified filetype"
+msgstr "Type de fichier non spécifié"
+
+#: lib/file_chooser.rb:171
+msgid "Unknown filetype"
+msgstr "Type de fichier inconnu"
+
+#: lib/file_chooser.rb:173
+msgid "Used the wrong filetype"
+msgstr "Mauvais type de fichier utilisé"
+
+#: lib/image_rest.rb:82
+msgid "+{}"
+msgstr ""
+
+#: lib/image_rest.rb:87
+msgid "Show All"
+msgstr "Afficher tout"
+
+#: lib/image_rest.rb:91
+msgid "Show {} more images"
+msgstr ""
+
+#: lib/image_thumbnail.rb:156
+msgid "Remove image"
+msgstr ""
+
+#: lib/invalid_image_page.rb:26
 msgid "Could not Load Image"
 msgstr "Impossible de charger l’image"
 
-#: ../data/resources/blueprints/window.blp:309
+#: lib/invalid_image_page.rb:27
 msgid "This image could be corrupted or may use an unsupported file format."
 msgstr ""
 "Cette image est peut-être corrompue ou utilise un format de fichier non pris "
 "en charge."
 
-#: ../data/resources/blueprints/window.blp:321
-msgid "Converting"
-msgstr "Conversion"
-
-#: ../data/resources/blueprints/window.blp:322
-msgid "This could take a while"
-msgstr "Cela peut prendre du temps"
-
-#: ../data/resources/blueprints/window.blp:332 ../src/window.rs:764
-msgid "Loading…"
-msgstr "Chargement…"
-
-#: ../data/resources/blueprints/window.blp:338 ../src/window.rs:440
-#: ../src/window.rs:1363
-msgid "_Cancel"
-msgstr "_Annuler"
-
-#: ../data/resources/blueprints/window.blp:362
-msgid "All Images"
-msgstr "Toutes les images"
-
-#: ../data/resources/blueprints/window.blp:436
-msgid "Paste From Clipboard"
-msgstr "Copier depuis le presse-papiers"
-
-#: ../data/resources/blueprints/window.blp:441
-msgid "New Window"
-msgstr "Nouvelle fenêtre"
-
-#: ../data/resources/blueprints/window.blp:446
-msgid "Clear Window"
-msgstr "Vider le contenu de la fenêtre"
-
-#: ../data/resources/blueprints/window.blp:453
-msgid "Show Less Popular Datatypes"
-msgstr "Afficher les données moins populaires"
-
-#: ../data/resources/blueprints/window.blp:460
-msgid "Keyboard Shortcuts"
-msgstr "Raccourcis clavier"
-
-#: ../data/resources/blueprints/window.blp:465
-msgid "About Switcheroo"
-msgstr "À propos de Switcheroo"
-
-#: ../src/file_chooser.rs:39
-msgid "Unsupported filetype"
-msgstr "Type de fichier non pris en charge"
-
-#: ../src/file_chooser.rs:77
-msgid "Images"
-msgstr "Images"
-
-#: ../src/file_chooser.rs:80
-msgid "_Select Images"
-msgstr "_Sélectionnez des images"
-
-#: ../src/file_chooser.rs:159
-msgid "Unspecified filetype"
-msgstr "Type de fichier non spécifié"
-
-#: ../src/file_chooser.rs:164
-msgid "Unknown filetype"
-msgstr "Type de fichier inconnu"
-
-#: ../src/file_chooser.rs:169
-msgid "Used the wrong filetype"
-msgstr "Mauvais type de fichier utilisé"
-
-#: ../src/magick.rs:156
-msgid "Pasted Image"
-msgstr "Image collée"
-
-#: ../src/magick.rs:364
+#: lib/magick.rb:547
 msgid "Unknown IO error happened"
 msgstr "Une erreur d'entrée-sortie inconnue s'est produite"
 
-#. Translators: Replace "translator-credits" with your names, one name per line
-#: ../src/widgets/about_window.rs:28
-msgid "translator-credits"
-msgstr "Irénée Thirion"
+#: lib/primary_menu.rb:37
+msgid "Paste From Clipboard"
+msgstr "Copier depuis le presse-papiers"
 
-#: ../src/widgets/about_window.rs:35
-msgid "Code and Design Borrowed from"
-msgstr "Code et Design empruntés à"
+#: lib/primary_menu.rb:38
+msgid "New Window"
+msgstr "Nouvelle fenêtre"
 
-#: ../src/widgets/about_window.rs:47
-msgid "Sample Image from"
-msgstr "Image échantillon par"
+#: lib/primary_menu.rb:39
+msgid "Clear Window"
+msgstr "Vider le contenu de la fenêtre"
 
-#: ../src/window.rs:413
-msgid "Unable to access dropped files"
-msgstr "Impossible d'accéder au fichiers déposés"
+#: lib/primary_menu.rb:45
+msgid "Keyboard Shortcuts"
+msgstr "Raccourcis clavier"
 
-#: ../src/window.rs:436 ../src/window.rs:1358
+#: lib/primary_menu.rb:46
+msgid "About Switcheroo"
+msgstr "À propos de Switcheroo"
+
+#: lib/shortcuts_dialog.rb:31
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Général"
+
+#: lib/shortcuts_dialog.rb:42
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Afficher les raccourcis"
+
+#: lib/shortcuts_dialog.rb:43
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Quitter"
+
+#: lib/shortcuts_dialog.rb:44
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "Nouvelle fenêtre"
+
+#: lib/shortcuts_dialog.rb:45
+msgctxt "shortcut window"
+msgid "Clear Window"
+msgstr "Vider le contenu de la fenêtre"
+
+#: lib/shortcuts_dialog.rb:46
+msgctxt "shortcut window"
+msgid "Paste From Clipboard"
+msgstr "Copier depuis le presse-papiers"
+
+#: lib/shortcuts_dialog.rb:47
+msgctxt "shortcut window"
+msgid "Add Images"
+msgstr "Ajouter des images"
+
+#: lib/stop_converting_dialog.rb:40
 msgid "Stop converting?"
 msgstr "Arrêter la conversion ?"
 
-#: ../src/window.rs:437 ../src/window.rs:1359
+#: lib/stop_converting_dialog.rb:41
 msgid "You will lose all progress."
 msgstr "Vous perdrez toute la progression."
 
-#: ../src/window.rs:441 ../src/window.rs:1363
+#: lib/stop_converting_dialog.rb:50
 msgid "_Stop"
 msgstr "_Arrêter"
 
-#: ../src/window.rs:477
-msgid "Collecting files"
-msgstr "Récupération des fichiers"
+#: lib/temp_dir.rb:93
+msgid "Pasted Image"
+msgstr "Image collée"
 
-#: ../src/window.rs:1286
-msgid "Error While Processing"
-msgstr "Erreur lors du traitement"
+#: lib/welcome_page.rb:34
+msgid "Drag and drop images here"
+msgstr "Glissez et déposez des images ici"
 
-#: ../src/window.rs:1307
-msgid "_Close"
-msgstr "_Fermer"
+#: lib/welcome_page.rb:45
+msgid "_Open Images…"
+msgstr "_Ouvrir des images…"
 
-#: ../src/window.rs:1308
-msgid "_Copy to Clipboard"
-msgstr "_Copier vers le presse-papiers"
+#~ msgctxt "shortcut window"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "Afficher les données moins populaires"
 
-#: ../src/window.rs:1316
-msgid "Error copied to clipboard"
-msgstr "Erreur copiée vers le presse-papier"
-
-#: ../src/window.rs:1331
-msgid "Image converted"
-msgstr "Image convertie"
-
-#: ../src/window.rs:1332
-msgid "Open"
-msgstr "Ouvrir"
-
-#: ../src/window.rs:1385
-msgid "Converting Cancelled"
-msgstr "Conversion annulée"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "Afficher les données moins populaires"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 08:05-0500\n"
+"POT-Creation-Date: 2026-11-03 00:27+0000\n"
 "PO-Revision-Date: 2022-12-10 12:10+0100\n"
 "Last-Translator: Åke Engelbrektson <eson@svenskasprakfiler.se>\n"
 "Language-Team: Svenska Språkfiler <contactform@svenskasprakfiler.se>\n"
@@ -18,337 +18,410 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#: ../data/resources/blueprints/help-overlay.blp:11
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
+#, fuzzy
+msgid "Window width"
+msgstr "Breddförhållande"
+
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:34
+#, fuzzy
+msgid "Image quality"
+msgstr "Bildtyp"
+
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:38
+msgid "Image density per inch"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:42
+#, fuzzy
+msgid "Window height"
+msgstr "Höjdförhållande"
+
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:46
+msgid "Window maximized state"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:50
+msgid "Output format"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:54
+msgid "Compression format"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:58
+msgid "Resize unit (percentage or pixels)"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:9
+#: data/switcheroo.desktop.in:4
+msgid "Convert and manipulate images"
+msgstr "Konvertera och manipulera bilder"
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:15
+msgid "Convert between different image filetypes and resize them easily."
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:42
+msgid "Converting sample image from PNG to HEIF"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:47
+msgid "Converting multiple sample images from SVG to HEIF"
+msgstr ""
+
+#: data/switcheroo.desktop.in:3
+#, fuzzy
+msgid "Image Converter"
+msgstr "Bild konverterad"
+
+#: data/switcheroo.desktop.in:10
+#, fuzzy
+msgid "converter;image;convert;converting;processing"
+msgstr "bild;konvertera;konvertering;behandling"
+
+#: lib/about_dialog.rb:91
+msgid "translator-credits"
+msgstr ""
+
+#: lib/about_dialog.rb:155
+msgid "Create bootable drives"
+msgstr ""
+
+#: lib/about_dialog.rb:155
+#, fuzzy
+#| msgid "processing"
+msgid "Impression"
+msgstr "bearbetar"
+
+#: lib/about_dialog.rb:157
+msgid "Footage"
+msgstr ""
+
+#: lib/about_dialog.rb:157
+msgid "Polish your videos"
+msgstr ""
+
+#: lib/about_dialog.rb:163
+msgid "Code and Design Borrowed from"
+msgstr "Kod och design lånad av"
+
+#: lib/about_dialog.rb:172
+msgid "Sample Image from"
+msgstr "Exempelbild från"
+
+#: lib/all_images_page.rb:63
+msgid "All Images"
+msgstr ""
+
+#: lib/all_images_page.rb:74 lib/app_window.rb:163
+#, fuzzy
+msgid "Add Images (Ctrl+O)"
+msgstr "Öppna bild"
+
+#: lib/app_window.rb:122 lib/file_chooser.rb:44
+#, fuzzy
+msgid "Unsupported filetype"
+msgstr "Bildfiler som stöds"
+
+#: lib/app_window.rb:133 lib/app_window.rb:147 lib/welcome_page.rb:33
+msgid "Switcheroo"
+msgstr ""
+
+#: lib/app_window.rb:173
+msgid "Primary Menu"
+msgstr ""
+
+#: lib/app_window.rb:479
+msgid "Unable to access dropped files"
+msgstr ""
+
+#: lib/app_window.rb:923
+msgid "Error copied to clipboard"
+msgstr ""
+
+#: lib/app_window.rb:930
+msgid "Image converted"
+msgstr "Bild konverterad"
+
+#: lib/app_window.rb:931
+msgid "Open"
+msgstr "Öppna"
+
+#: lib/app_window.rb:967
+#, fuzzy
+msgid "Converting Cancelled"
+msgstr "Konverterar…"
+
+#: lib/application.rb:68
+msgid "Open a new window"
+msgstr ""
+
+#: lib/convert_page.rb:276
+msgid "Export Format"
+msgstr ""
+
+#: lib/convert_page.rb:283
+msgid "Save as multi-page PDF"
+msgstr ""
+
+#: lib/convert_page.rb:297
+msgid "Save To ZIP"
+msgstr ""
+
+#: lib/convert_page.rb:333
+msgid "Background Color"
+msgstr "Bakgrundsfärg"
+
+#: lib/convert_page.rb:334
+msgid "Replaces original transparency layer"
+msgstr ""
+
+#: lib/convert_page.rb:354
+msgid "Pixel Density Per Inch"
+msgstr ""
+
+#: lib/convert_page.rb:369
+msgid "Resize"
+msgstr "Ändra storlek"
+
+#: lib/convert_page.rb:379 lib/convert_page.rb:387 lib/convert_page.rb:391
+msgid "Width"
+msgstr "Bredd"
+
+#: lib/convert_page.rb:383 lib/convert_page.rb:391
+msgid "Height"
+msgstr "Höjd"
+
+#: lib/convert_page.rb:399
+#, fuzzy
+msgid "Preserve aspect ratio"
+msgstr "Bevara proportioner"
+
+#: lib/convert_page.rb:417
+msgid "%"
+msgstr ""
+
+#: lib/convert_page.rb:417
+msgid "px"
+msgstr ""
+
+#: lib/convert_page.rb:425
+#, fuzzy
+msgid "Resize Algorithm"
+msgstr "Algoritmer av"
+
+#: lib/convert_page.rb:438
+msgid "Default"
+msgstr ""
+
+#: lib/convert_page.rb:445
+#, fuzzy
+msgid "Pixel Art"
+msgstr "Pixlar"
+
+#: lib/convert_page.rb:452
+msgid "Remove Metadata"
+msgstr ""
+
+#: lib/convert_page.rb:466
+msgid "_Convert"
+msgstr "_Konvertera"
+
+#: lib/convert_page.rb:572
+msgid "New transparency layer color: {}"
+msgstr ""
+
+#: lib/convert_page.rb:579
+msgid "Choose between resizing with percentages or using exact pixels"
+msgstr ""
+
+#: lib/convert_page.rb:597
+msgid "Quality"
+msgstr "Kvalitet"
+
+#: lib/converting_page.rb:35 lib/converting_page.rb:64
+msgid "Loading…"
+msgstr "Läser in…"
+
+#: lib/converting_page.rb:47
+msgid "Collecting files"
+msgstr ""
+
+#: lib/converting_page.rb:52
+#, fuzzy
+msgid "Converting"
+msgstr "konverterar"
+
+#: lib/converting_page.rb:53
+#, fuzzy
+msgid "This could take a while"
+msgstr "Detta kan ta en stund."
+
+#: lib/converting_page.rb:70 lib/stop_converting_dialog.rb:49
+msgid "_Cancel"
+msgstr ""
+
+#: lib/drag_overlay.rb:35
+msgid "Drop Here to Open"
+msgstr ""
+
+#: lib/error_dialog.rb:44
+#, fuzzy
+msgid "Error While Processing"
+msgstr "bearbetar"
+
+#: lib/error_dialog.rb:72
+msgid "_Close"
+msgstr ""
+
+#: lib/error_dialog.rb:73
+msgid "_Copy to Clipboard"
+msgstr ""
+
+#: lib/file_chooser.rb:107
+#, fuzzy
+msgid "_Select Images"
+msgstr "Välj en bild"
+
+#: lib/file_chooser.rb:115
+#, fuzzy
+msgid "Images"
+msgstr "Öppna bild"
+
+#: lib/file_chooser.rb:160
+msgid "Unspecified filetype"
+msgstr ""
+
+#: lib/file_chooser.rb:171
+msgid "Unknown filetype"
+msgstr ""
+
+#: lib/file_chooser.rb:173
+msgid "Used the wrong filetype"
+msgstr ""
+
+#: lib/image_rest.rb:82
+msgid "+{}"
+msgstr ""
+
+#: lib/image_rest.rb:87
+msgid "Show All"
+msgstr ""
+
+#: lib/image_rest.rb:91
+msgid "Show {} more images"
+msgstr ""
+
+#: lib/image_thumbnail.rb:156
+msgid "Remove image"
+msgstr ""
+
+#: lib/invalid_image_page.rb:26
+msgid "Could not Load Image"
+msgstr "Kunde inte läsa in bild"
+
+#: lib/invalid_image_page.rb:27
+msgid "This image could be corrupted or may use an unsupported file format."
+msgstr "Denna bild kan vara skadad eller i ett filformat som inte stöds."
+
+#: lib/magick.rb:547
+msgid "Unknown IO error happened"
+msgstr ""
+
+#: lib/primary_menu.rb:37
+msgid "Paste From Clipboard"
+msgstr ""
+
+#: lib/primary_menu.rb:38
+msgid "New Window"
+msgstr ""
+
+#: lib/primary_menu.rb:39
+msgid "Clear Window"
+msgstr ""
+
+#: lib/primary_menu.rb:45
+msgid "Keyboard Shortcuts"
+msgstr "Tangenbordsgenvägar"
+
+#: lib/primary_menu.rb:46
+msgid "About Switcheroo"
+msgstr ""
+
+#: lib/shortcuts_dialog.rb:31
 msgctxt "shortcut window"
 msgid "General"
 msgstr "Allmänt"
 
-#: ../data/resources/blueprints/help-overlay.blp:14
+#: lib/shortcuts_dialog.rb:42
 msgctxt "shortcut window"
 msgid "Show Shortcuts"
 msgstr "Visa genvägar"
 
-#: ../data/resources/blueprints/help-overlay.blp:19
+#: lib/shortcuts_dialog.rb:43
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Avsluta"
 
-#: ../data/resources/blueprints/help-overlay.blp:24
+#: lib/shortcuts_dialog.rb:44
 msgctxt "shortcut window"
 msgid "New Window"
 msgstr ""
 
-#: ../data/resources/blueprints/help-overlay.blp:29
+#: lib/shortcuts_dialog.rb:45
 msgctxt "shortcut window"
 msgid "Clear Window"
 msgstr ""
 
-#: ../data/resources/blueprints/help-overlay.blp:34
-#, fuzzy
-msgctxt "shortcut window"
-msgid "Show Less Popular Datatypes"
-msgstr "Visa mindre populära datatyper"
-
-#: ../data/resources/blueprints/help-overlay.blp:39
+#: lib/shortcuts_dialog.rb:46
 msgctxt "shortcut window"
 msgid "Paste From Clipboard"
 msgstr ""
 
-#: ../data/resources/blueprints/help-overlay.blp:44
+#: lib/shortcuts_dialog.rb:47
 #, fuzzy
 msgctxt "shortcut window"
 msgid "Add Images"
 msgstr "Öppna bild"
 
-#: ../data/resources/blueprints/image-rest.blp:21
-msgid "Show All"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:9
-#: ../data/resources/blueprints/window.blp:21
-#: ../data/resources/blueprints/window.blp:57 ../src/main.rs:30
-#: ../src/widgets/about_window.rs:24
-msgid "Switcheroo"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:15
-msgid "Drop Here to Open"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:40
-msgid "Primary Menu"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:58
-msgid "Drag and drop images here"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:69
-#, fuzzy
-msgid "_Open Images…"
-msgstr "_Öppna bild…"
-
-#: ../data/resources/blueprints/window.blp:122
-msgid "Export Format"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:127
-msgid "Save as multi-page PDF"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:137
-msgid "Save To ZIP"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:150
-msgid "Quality"
-msgstr "Kvalitet"
-
-#: ../data/resources/blueprints/window.blp:170
-msgid "Background Color"
-msgstr "Bakgrundsfärg"
-
-#: ../data/resources/blueprints/window.blp:171
-msgid "Replaces original transparency layer"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:185
-msgid "Pixel Density Per Inch"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:197
-msgid "Resize"
-msgstr "Ändra storlek"
-
-#: ../data/resources/blueprints/window.blp:202
-#: ../data/resources/blueprints/window.blp:203
-#: ../data/resources/blueprints/window.blp:210
-#: ../data/resources/blueprints/window.blp:212
-#: ../data/resources/blueprints/window.blp:233
-msgid "Width"
-msgstr "Bredd"
-
-#: ../data/resources/blueprints/window.blp:220
-#, fuzzy
-msgid "Preserve aspect ratio"
-msgstr "Bevara proportioner"
-
-#: ../data/resources/blueprints/window.blp:225
-#: ../data/resources/blueprints/window.blp:226
-#: ../data/resources/blueprints/window.blp:234
-msgid "Height"
-msgstr "Höjd"
-
-#: ../data/resources/blueprints/window.blp:245
-msgid "Choose between resizing with percentages or using exact pixels"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:249
-msgid "%"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:249
-msgid "px"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:258
-#, fuzzy
-msgid "Resize Algorithm"
-msgstr "Algoritmer av"
-
-#: ../data/resources/blueprints/window.blp:264
-msgid "Default"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:268
-#, fuzzy
-msgid "Pixel Art"
-msgstr "Pixlar"
-
-#: ../data/resources/blueprints/window.blp:282
-msgid "_Convert"
-msgstr "_Konvertera"
-
-#: ../data/resources/blueprints/window.blp:308
-msgid "Could not Load Image"
-msgstr "Kunde inte läsa in bild"
-
-#: ../data/resources/blueprints/window.blp:309
-msgid "This image could be corrupted or may use an unsupported file format."
-msgstr "Denna bild kan vara skadad eller i ett filformat som inte stöds."
-
-#: ../data/resources/blueprints/window.blp:321
-#, fuzzy
-msgid "Converting"
-msgstr "konverterar"
-
-#: ../data/resources/blueprints/window.blp:322
-#, fuzzy
-msgid "This could take a while"
-msgstr "Detta kan ta en stund."
-
-#: ../data/resources/blueprints/window.blp:332 ../src/window.rs:764
-msgid "Loading…"
-msgstr "Läser in…"
-
-#: ../data/resources/blueprints/window.blp:338 ../src/window.rs:440
-#: ../src/window.rs:1363
-msgid "_Cancel"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:362
-msgid "All Images"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:436
-msgid "Paste From Clipboard"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:441
-msgid "New Window"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:446
-msgid "Clear Window"
-msgstr ""
-
-#: ../data/resources/blueprints/window.blp:453
-msgid "Show Less Popular Datatypes"
-msgstr "Visa mindre populära datatyper"
-
-#: ../data/resources/blueprints/window.blp:460
-msgid "Keyboard Shortcuts"
-msgstr "Tangenbordsgenvägar"
-
-#: ../data/resources/blueprints/window.blp:465
-msgid "About Switcheroo"
-msgstr ""
-
-#: ../src/file_chooser.rs:39
-#, fuzzy
-msgid "Unsupported filetype"
-msgstr "Bildfiler som stöds"
-
-#: ../src/file_chooser.rs:77
-#, fuzzy
-msgid "Images"
-msgstr "Öppna bild"
-
-#: ../src/file_chooser.rs:80
-#, fuzzy
-msgid "_Select Images"
-msgstr "Välj en bild"
-
-#: ../src/file_chooser.rs:159
-msgid "Unspecified filetype"
-msgstr ""
-
-#: ../src/file_chooser.rs:164
-msgid "Unknown filetype"
-msgstr ""
-
-#: ../src/file_chooser.rs:169
-msgid "Used the wrong filetype"
-msgstr ""
-
-#: ../src/magick.rs:156
-#, fuzzy
-msgid "Pasted Image"
-msgstr "Öppna bild"
-
-#: ../src/magick.rs:364
-msgid "Unknown IO error happened"
-msgstr ""
-
-#. Translators: Replace "translator-credits" with your names, one name per line
-#: ../src/widgets/about_window.rs:28
-msgid "translator-credits"
-msgstr ""
-
-#: ../src/widgets/about_window.rs:35
-msgid "Code and Design Borrowed from"
-msgstr "Kod och design lånad av"
-
-#: ../src/widgets/about_window.rs:47
-msgid "Sample Image from"
-msgstr "Exempelbild från"
-
-#: ../src/window.rs:413
-msgid "Unable to access dropped files"
-msgstr ""
-
-#: ../src/window.rs:436 ../src/window.rs:1358
+#: lib/stop_converting_dialog.rb:40
 #, fuzzy
 msgid "Stop converting?"
 msgstr "konverterar"
 
-#: ../src/window.rs:437 ../src/window.rs:1359
+#: lib/stop_converting_dialog.rb:41
 msgid "You will lose all progress."
 msgstr ""
 
-#: ../src/window.rs:441 ../src/window.rs:1363
+#: lib/stop_converting_dialog.rb:50
 msgid "_Stop"
 msgstr ""
 
-#: ../src/window.rs:477
-msgid "Collecting files"
+#: lib/temp_dir.rb:93
+#, fuzzy
+msgid "Pasted Image"
+msgstr "Öppna bild"
+
+#: lib/welcome_page.rb:34
+msgid "Drag and drop images here"
 msgstr ""
 
-#: ../src/window.rs:1286
+#: lib/welcome_page.rb:45
 #, fuzzy
-msgid "Error While Processing"
-msgstr "bearbetar"
-
-#: ../src/window.rs:1307
-msgid "_Close"
-msgstr ""
-
-#: ../src/window.rs:1308
-msgid "_Copy to Clipboard"
-msgstr ""
-
-#: ../src/window.rs:1316
-msgid "Error copied to clipboard"
-msgstr ""
-
-#: ../src/window.rs:1331
-msgid "Image converted"
-msgstr "Bild konverterad"
-
-#: ../src/window.rs:1332
-msgid "Open"
-msgstr "Öppna"
-
-#: ../src/window.rs:1385
-#, fuzzy
-msgid "Converting Cancelled"
-msgstr "Konverterar…"
+msgid "_Open Images…"
+msgstr "_Öppna bild…"
 
 #, fuzzy
-#~ msgid "Image Converter"
-#~ msgstr "Bild konverterad"
+#~ msgctxt "shortcut window"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "Visa mindre populära datatyper"
 
-#~ msgid "Convert and manipulate images"
-#~ msgstr "Konvertera och manipulera bilder"
-
-#, fuzzy
-#~ msgid "converter;image;convert;converting;processing"
-#~ msgstr "bild;konvertera;konvertering;behandling"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "Visa mindre populära datatyper"
 
 #~ msgid "Shows less popular datatypes in the menu"
 #~ msgstr "Visa mindre populära datatyper i menyn"
-
-#, fuzzy
-#~ msgid "Window width"
-#~ msgstr "Breddförhållande"
-
-#, fuzzy
-#~ msgid "Image quality"
-#~ msgstr "Bildtyp"
-
-#, fuzzy
-#~ msgid "Window height"
-#~ msgstr "Höjdförhållande"
 
 #~ msgid "Khaleel Al-Adhami"
 #~ msgstr "Khaleel Al-Adhami"
@@ -361,9 +434,6 @@ msgstr "Konverterar…"
 
 #~ msgid "converting"
 #~ msgstr "konverterar"
-
-#~ msgid "processing"
-#~ msgstr "bearbetar"
 
 #, fuzzy
 #~ msgctxt "shortcut window"

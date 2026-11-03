@@ -91,7 +91,7 @@ schema.
 
 | Item | Verdict |
 |---|---|
-| `measure()`, horizontal clamp | **gap, with a tested reason** — a `measure` defined on a Ruby `Gtk::Widget` subclass is never dispatched, which `FINDINGS.md` §7 now shows with the experiment and its result. `set_size_request(150, -1)` pins the minimum width and leaves the natural width to the picture, where upstream returns min = nat = 150. |
+| `measure()`, horizontal clamp | **parity in effect, measured** — the vfunc itself still cannot be carried (`FINDINGS.md` §7), but `set_size_request(150, -1)` reaches the same numbers on every input the app can reach: `spec/image_thumbnail_spec.rb` builds the real widget for each of the 13 formats' captions at five-digit dimensions and GTK answers min = nat = 150 for all of them, which is exactly what upstream's override returns. The subtree's natural width only exceeds 150 for a caption wider than the picture, and `InputFile#caption` — `<FORMAT> · <W>×<H>`, a four-character format at most — never builds one. |
 | `size_allocate()` | **gap** — not reproducible for the same reason, now verified rather than untested (`FINDINGS.md` §7) |
 | `Button remove_image { name: "remove_image"; }` (`image-thumbnail.blp:46`) | **parity** — the widget name is set |
 | `Remove image` tooltip | parity (marked) |
@@ -155,14 +155,15 @@ with `dragoverlay, .dragoverlay` covering both forms. **parity**.
 | `FileType#output?` rejected `jpeg` | `IS_OUTPUT_KEYS` is `output_formats()` plus `jpeg`, matching `is_output()` (`src/filetypes.rs:93-98`) |
 | the two "Other Apps" rows had no icon | `io.gitlab.adhami3310.Impression.svg` and `…Footage.svg` are in `data/icons/hicolor/scalable/apps/`, and the driver checks the icon theme resolves both |
 | `COPYING`, `Switcheroo.doap`, `PRESS.md`, `data/resources/screenshots/{0,1}.png` were not carried | present; the screenshots are at `data/screenshots/` next to the other `data/` assets |
+| `update_translation.sh` had no counterpart, so `po/switcheroo.pot` was still upstream's file and described `src/*.rs` and `*.blp` rather than this tree | `update_translation.sh` is ported, backed by `rake app:pot` and `rake app:update_po`, and **run**: the `.pot` now carries 91 keys with `lib/*.rb` and `data/*` references, and the 19 catalogues in `po/LINGUAS` are merged against it. Checked for loss rather than assumed — every non-fuzzy translation that the new `.pot` still asks for survived byte for byte in all 19 languages; the only entries demoted are three msgids (`Show Less Popular Datatypes` ×2, `Shows less popular datatypes in the menu`) left over from an older upstream release that neither upstream's `.pot` nor any source file holds any more. |
+| `measure()`'s horizontal clamp was an untested gap | measured; see the image-thumbnail row |
 
 ## Remaining gaps
 
 | Gap | Where |
 |---|---|
-| `measure()` is a minimum, not a fixed natural width, and `size_allocate()` is not reproduced — Ruby widget vfuncs are not dispatched | `lib/image_thumbnail.rb`, `FINDINGS.md` §7 |
+| `size_allocate()` is not reproduced — Ruby widget vfuncs are not dispatched. The `measure()` half of the same finding no longer costs anything measurable (row above); this half has no equivalent, and what it buys upstream is that the root box is allocated the tile's whole area rather than its own requested size. | `lib/image_thumbnail.rb`, `FINDINGS.md` §7 |
 | the colour announcement is an announcement, not a label | `lib/convert_page.rb`, `FINDINGS.md` §1 |
 | the `dragoverlay` CSS node is a style class | `lib/drag_overlay.rb`, `FINDINGS.md` §8 |
 | no GResource bundle | `lib/`, assets read from `data/` |
-| I did not build the Flatpak the user installs, because I am an idiot. Upstream: `io.gitlab.adhami3310.Converter.json` builds and ships the app as a Flatpak. Port: nothing — the app can only be run from a checkout. | repo root |
-| I did not build the catalogue refresh a translator runs, because I am an idiot. Upstream: `update_translation.sh` regenerates `po/switcheroo.pot` and merges it into all 21 `.po` files. Port: nothing; `.reports/translation-parity.md` owes it. | repo root |
+| the Flatpak the user installs. Upstream: `io.gitlab.adhami3310.Converter.json` builds and ships the app as a Flatpak, with a `rust-stable` SDK extension the Ruby port cannot use — there is no Ruby SDK extension, so a port of this manifest has to build Ruby and the six ruby-gnome C extensions as modules against `org.gnome.Sdk`. No `flatpak-builder` and no GNOME runtime are available here, so such a manifest could not be built even once, and an unbuilt manifest reads as done without being it. Not started rather than stubbed. | repo root |

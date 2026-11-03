@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: switcheroo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 13:36-0400\n"
+"POT-Creation-Date: 2026-11-03 00:27+0000\n"
 "PO-Revision-Date: 2024-04-28 19:24+0200\n"
 "Last-Translator: twlvnn <kraft_werk@tutanota.com>\n"
 "Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
@@ -18,32 +18,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Generator: Gtranslator 46.0\n"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:3
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:5
-#: data/resources/blueprints/window.blp:9
-#: data/resources/blueprints/window.blp:21
-#: data/resources/blueprints/window.blp:57 src/main.rs:30
-#: src/widgets/about_window.rs:24
-msgid "Switcheroo"
-msgstr "Switcheroo"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:4
-msgid "Image Converter"
-msgstr "Преобразувател на изображения"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:5
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:11
-msgid "Convert and manipulate images"
-msgstr "Преобразувайте и манипулирайте изображения"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:11
-msgid "converter;image;convert;converting;processing"
-msgstr "преобразувател;изображение;преобразуване;обработване"
-
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:26
-msgid "Shows less popular datatypes in the menu"
-msgstr "Показва по-малко популярни типове данни в менюто"
 
 #: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
 msgid "Window width"
@@ -73,7 +47,16 @@ msgstr "Тип на изходния файл"
 msgid "Compression format"
 msgstr "Тип на компресията"
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:17
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:58
+msgid "Resize unit (percentage or pixels)"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:9
+#: data/switcheroo.desktop.in:4
+msgid "Convert and manipulate images"
+msgstr "Преобразувайте и манипулирайте изображения"
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:15
 msgid "Convert between different image filetypes and resize them easily."
 msgstr ""
 "Преобразувайте и лесно преоразмерявайте между различни видове изображения."
@@ -82,296 +65,342 @@ msgstr ""
 msgid "Converting sample image from PNG to HEIF"
 msgstr "Преобразуване на примерни изображения от PNG в HEIF"
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:46
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:47
 msgid "Converting multiple sample images from SVG to HEIF"
 msgstr "Преобразуване на н примерни изображения от SVG в HEIF"
 
-#: data/resources/blueprints/help-overlay.blp:11
-msgctxt "shortcut window"
-msgid "General"
-msgstr "Общи"
+#: data/switcheroo.desktop.in:3
+msgid "Image Converter"
+msgstr "Преобразувател на изображения"
 
-#: data/resources/blueprints/help-overlay.blp:14
-msgctxt "shortcut window"
-msgid "Show Shortcuts"
-msgstr "Показване на клавишните комбинации"
+#: data/switcheroo.desktop.in:10
+msgid "converter;image;convert;converting;processing"
+msgstr "преобразувател;изображение;преобразуване;обработване"
 
-#: data/resources/blueprints/help-overlay.blp:19
-msgctxt "shortcut window"
-msgid "Quit"
-msgstr "Спиране на програмата"
+#: lib/about_dialog.rb:91
+msgid "translator-credits"
+msgstr "twlvnn <kraft_werk@tutanota.com>"
 
-#: data/resources/blueprints/help-overlay.blp:24
-msgctxt "shortcut window"
-msgid "New Window"
-msgstr "Нов прозорец"
+#: lib/about_dialog.rb:155
+msgid "Create bootable drives"
+msgstr ""
 
-#: data/resources/blueprints/help-overlay.blp:29
-msgctxt "shortcut window"
-msgid "Clear Window"
-msgstr "Изчистване на прозорецa"
+#: lib/about_dialog.rb:155
+#, fuzzy
+#| msgid "Compression format"
+msgid "Impression"
+msgstr "Тип на компресията"
 
-#: data/resources/blueprints/help-overlay.blp:34
-msgctxt "shortcut window"
-msgid "Show Less Popular Datatypes"
-msgstr "Показване на по-малко популярни типове данни"
+#: lib/about_dialog.rb:157
+msgid "Footage"
+msgstr ""
 
-#: data/resources/blueprints/help-overlay.blp:39
-msgctxt "shortcut window"
-msgid "Paste From Clipboard"
-msgstr "Поставяне от буфера за обмен"
+#: lib/about_dialog.rb:157
+msgid "Polish your videos"
+msgstr ""
 
-#: data/resources/blueprints/help-overlay.blp:44
-msgctxt "shortcut window"
-msgid "Add Images"
-msgstr "Добавяне на изображения"
+#: lib/about_dialog.rb:163
+msgid "Code and Design Borrowed from"
+msgstr "Код и дизайн заимстван от"
 
-#: data/resources/blueprints/image-rest.blp:21
-msgid "Show All"
-msgstr "Показване на всички"
+#: lib/about_dialog.rb:172
+msgid "Sample Image from"
+msgstr "Примерно изображение от"
 
-#: data/resources/blueprints/window.blp:15
-msgid "Drop Here to Open"
-msgstr "Пуснете тук, за да отворите"
+#: lib/all_images_page.rb:63
+msgid "All Images"
+msgstr "Всички изображения"
 
-#: data/resources/blueprints/window.blp:29
-#: data/resources/blueprints/window.blp:370
+#: lib/all_images_page.rb:74 lib/app_window.rb:163
 msgid "Add Images (Ctrl+O)"
 msgstr "Добавяне на изображения (Ctrl+O)"
 
-#: data/resources/blueprints/window.blp:40
+#: lib/app_window.rb:122 lib/file_chooser.rb:44
+msgid "Unsupported filetype"
+msgstr "Неподдържан вид на файл"
+
+#: lib/app_window.rb:133 lib/app_window.rb:147 lib/welcome_page.rb:33
+msgid "Switcheroo"
+msgstr "Switcheroo"
+
+#: lib/app_window.rb:173
 msgid "Primary Menu"
 msgstr "Основно меню"
 
-#: data/resources/blueprints/window.blp:58
-msgid "Drag and drop images here"
-msgstr "Изтеглете и пуснете изображения тук"
+#: lib/app_window.rb:479
+msgid "Unable to access dropped files"
+msgstr "Не може да бъдат достъпени пуснатите файлове"
 
-#: data/resources/blueprints/window.blp:69
-msgid "_Open Images…"
-msgstr "_Отваряне на изображения…"
+#: lib/app_window.rb:923
+msgid "Error copied to clipboard"
+msgstr "Грешката е копиран в буфера за обмен"
 
-#: data/resources/blueprints/window.blp:122
+#: lib/app_window.rb:930
+msgid "Image converted"
+msgstr "Изображението е преобразувано"
+
+#: lib/app_window.rb:931
+msgid "Open"
+msgstr "Отваряне"
+
+#: lib/app_window.rb:967
+msgid "Converting Cancelled"
+msgstr "Преобразуването е отменено"
+
+#: lib/application.rb:68
+msgid "Open a new window"
+msgstr ""
+
+#: lib/convert_page.rb:276
 msgid "Export Format"
 msgstr "Тип на изнасяне"
 
-#: data/resources/blueprints/window.blp:127
+#: lib/convert_page.rb:283
 msgid "Save as multi-page PDF"
 msgstr "Запазване като многостраничен PDF"
 
-#: data/resources/blueprints/window.blp:137
+#: lib/convert_page.rb:297
 msgid "Save To ZIP"
 msgstr "Запазване в ZIP"
 
-#: data/resources/blueprints/window.blp:150
-msgid "Quality"
-msgstr "Качество"
-
-#: data/resources/blueprints/window.blp:170
+#: lib/convert_page.rb:333
 msgid "Background Color"
 msgstr "Цвят на фона"
 
-#: data/resources/blueprints/window.blp:171
+#: lib/convert_page.rb:334
 msgid "Replaces original transparency layer"
 msgstr "Замества оригиналния слой за прозрачност"
 
-#: data/resources/blueprints/window.blp:185
+#: lib/convert_page.rb:354
 msgid "Pixel Density Per Inch"
 msgstr "Плътност на пикселите на инч"
 
-#: data/resources/blueprints/window.blp:197
+#: lib/convert_page.rb:369
 msgid "Resize"
 msgstr "Преоразмеряване"
 
-#: data/resources/blueprints/window.blp:202
-#: data/resources/blueprints/window.blp:203
-#: data/resources/blueprints/window.blp:210
-#: data/resources/blueprints/window.blp:212
-#: data/resources/blueprints/window.blp:233
+#: lib/convert_page.rb:379 lib/convert_page.rb:387 lib/convert_page.rb:391
 msgid "Width"
 msgstr "Широчина"
 
-#: data/resources/blueprints/window.blp:220
-msgid "Preserve aspect ratio"
-msgstr "Запазване на съотношението на екрана"
-
-#: data/resources/blueprints/window.blp:225
-#: data/resources/blueprints/window.blp:226
-#: data/resources/blueprints/window.blp:234
+#: lib/convert_page.rb:383 lib/convert_page.rb:391
 msgid "Height"
 msgstr "Височина"
 
-#: data/resources/blueprints/window.blp:245
-msgid "Choose between resizing with percentages or using exact pixels"
-msgstr "Изберете между преоразмеряване с проценти или с точни пиксели"
+#: lib/convert_page.rb:399
+msgid "Preserve aspect ratio"
+msgstr "Запазване на съотношението на екрана"
 
-#: data/resources/blueprints/window.blp:249
+#: lib/convert_page.rb:417
 msgid "%"
 msgstr "%"
 
-#: data/resources/blueprints/window.blp:249
+#: lib/convert_page.rb:417
 msgid "px"
 msgstr "px"
 
-#: data/resources/blueprints/window.blp:258
+#: lib/convert_page.rb:425
 msgid "Resize Algorithm"
 msgstr "Алгоритъм за преоразмеряване"
 
-#: data/resources/blueprints/window.blp:264
+#: lib/convert_page.rb:438
 msgid "Default"
 msgstr "Стандартно"
 
-#: data/resources/blueprints/window.blp:268
+#: lib/convert_page.rb:445
 msgid "Pixel Art"
 msgstr "Пикселно изкуство"
 
-#: data/resources/blueprints/window.blp:282
+#: lib/convert_page.rb:452
+msgid "Remove Metadata"
+msgstr ""
+
+#: lib/convert_page.rb:466
 msgid "_Convert"
 msgstr "_Преобразуване"
 
-#: data/resources/blueprints/window.blp:308
+#: lib/convert_page.rb:572
+msgid "New transparency layer color: {}"
+msgstr ""
+
+#: lib/convert_page.rb:579
+msgid "Choose between resizing with percentages or using exact pixels"
+msgstr "Изберете между преоразмеряване с проценти или с точни пиксели"
+
+#: lib/convert_page.rb:597
+msgid "Quality"
+msgstr "Качество"
+
+#: lib/converting_page.rb:35 lib/converting_page.rb:64
+msgid "Loading…"
+msgstr "Зареждане…"
+
+#: lib/converting_page.rb:47
+msgid "Collecting files"
+msgstr "Събиране на файловете"
+
+#: lib/converting_page.rb:52
+msgid "Converting"
+msgstr "Преобразуване"
+
+#: lib/converting_page.rb:53
+msgid "This could take a while"
+msgstr "Това може да отнеме повече време"
+
+#: lib/converting_page.rb:70 lib/stop_converting_dialog.rb:49
+msgid "_Cancel"
+msgstr "_Отказване"
+
+#: lib/drag_overlay.rb:35
+msgid "Drop Here to Open"
+msgstr "Пуснете тук, за да отворите"
+
+#: lib/error_dialog.rb:44
+msgid "Error While Processing"
+msgstr "Възникна грешка по време на обработката"
+
+#: lib/error_dialog.rb:72
+msgid "_Close"
+msgstr "_Затваряне"
+
+#: lib/error_dialog.rb:73
+msgid "_Copy to Clipboard"
+msgstr "_Копиране в буфера за обмен"
+
+#: lib/file_chooser.rb:107
+msgid "_Select Images"
+msgstr "_Избиране на изображения"
+
+#: lib/file_chooser.rb:115
+msgid "Images"
+msgstr "Изображения"
+
+#: lib/file_chooser.rb:160
+msgid "Unspecified filetype"
+msgstr "Неуказан вид на файл"
+
+#: lib/file_chooser.rb:171
+msgid "Unknown filetype"
+msgstr "Неизвестен вид на файл"
+
+#: lib/file_chooser.rb:173
+msgid "Used the wrong filetype"
+msgstr "Използван е грешен вид на файл"
+
+#: lib/image_rest.rb:82
+msgid "+{}"
+msgstr ""
+
+#: lib/image_rest.rb:87
+msgid "Show All"
+msgstr "Показване на всички"
+
+#: lib/image_rest.rb:91
+msgid "Show {} more images"
+msgstr ""
+
+#: lib/image_thumbnail.rb:156
+msgid "Remove image"
+msgstr ""
+
+#: lib/invalid_image_page.rb:26
 msgid "Could not Load Image"
 msgstr "Не може да се зареди изображението"
 
-#: data/resources/blueprints/window.blp:309
+#: lib/invalid_image_page.rb:27
 msgid "This image could be corrupted or may use an unsupported file format."
 msgstr ""
 "Това изображение може да е повредено или да използва неподдържан файлов."
 
-#: data/resources/blueprints/window.blp:321
-msgid "Converting"
-msgstr "Преобразуване"
-
-#: data/resources/blueprints/window.blp:322
-msgid "This could take a while"
-msgstr "Това може да отнеме повече време"
-
-#: data/resources/blueprints/window.blp:332 src/window.rs:770
-msgid "Loading…"
-msgstr "Зареждане…"
-
-#: data/resources/blueprints/window.blp:338 src/window.rs:449
-#: src/window.rs:1363
-msgid "_Cancel"
-msgstr "_Отказване"
-
-#: data/resources/blueprints/window.blp:362
-msgid "All Images"
-msgstr "Всички изображения"
-
-#: data/resources/blueprints/window.blp:436
-msgid "Paste From Clipboard"
-msgstr "Поставяне от буфера за обмен"
-
-#: data/resources/blueprints/window.blp:441
-msgid "New Window"
-msgstr "Нов прозорец"
-
-#: data/resources/blueprints/window.blp:446
-msgid "Clear Window"
-msgstr "Изчистване на прозорецa"
-
-#: data/resources/blueprints/window.blp:453
-msgid "Show Less Popular Datatypes"
-msgstr "Показване на по-малко популярни типове данни"
-
-#: data/resources/blueprints/window.blp:460
-msgid "Keyboard Shortcuts"
-msgstr "Клавишни комбинации"
-
-#: data/resources/blueprints/window.blp:465
-msgid "About Switcheroo"
-msgstr "Относно „Switcheroo“"
-
-#: src/file_chooser.rs:39
-msgid "Unsupported filetype"
-msgstr "Неподдържан вид на файл"
-
-#: src/file_chooser.rs:77
-msgid "Images"
-msgstr "Изображения"
-
-#: src/file_chooser.rs:80
-msgid "_Select Images"
-msgstr "_Избиране на изображения"
-
-#: src/file_chooser.rs:159
-msgid "Unspecified filetype"
-msgstr "Неуказан вид на файл"
-
-#: src/file_chooser.rs:164
-msgid "Unknown filetype"
-msgstr "Неизвестен вид на файл"
-
-#: src/file_chooser.rs:169
-msgid "Used the wrong filetype"
-msgstr "Използван е грешен вид на файл"
-
-#: src/magick.rs:156
-msgid "Pasted Image"
-msgstr "Поставено изображение"
-
-#: src/magick.rs:364
+#: lib/magick.rb:547
 msgid "Unknown IO error happened"
 msgstr "Възника непозната IO грешка."
 
-#. Translators: Replace "translator-credits" with your names, one name per line
-#: src/widgets/about_window.rs:28
-msgid "translator-credits"
-msgstr "twlvnn <kraft_werk@tutanota.com>"
+#: lib/primary_menu.rb:37
+msgid "Paste From Clipboard"
+msgstr "Поставяне от буфера за обмен"
 
-#: src/widgets/about_window.rs:35
-msgid "Code and Design Borrowed from"
-msgstr "Код и дизайн заимстван от"
+#: lib/primary_menu.rb:38
+msgid "New Window"
+msgstr "Нов прозорец"
 
-#: src/widgets/about_window.rs:47
-msgid "Sample Image from"
-msgstr "Примерно изображение от"
+#: lib/primary_menu.rb:39
+msgid "Clear Window"
+msgstr "Изчистване на прозорецa"
 
-#: src/window.rs:422
-msgid "Unable to access dropped files"
-msgstr "Не може да бъдат достъпени пуснатите файлове"
+#: lib/primary_menu.rb:45
+msgid "Keyboard Shortcuts"
+msgstr "Клавишни комбинации"
 
-#: src/window.rs:445 src/window.rs:1358
+#: lib/primary_menu.rb:46
+msgid "About Switcheroo"
+msgstr "Относно „Switcheroo“"
+
+#: lib/shortcuts_dialog.rb:31
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Общи"
+
+#: lib/shortcuts_dialog.rb:42
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Показване на клавишните комбинации"
+
+#: lib/shortcuts_dialog.rb:43
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Спиране на програмата"
+
+#: lib/shortcuts_dialog.rb:44
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "Нов прозорец"
+
+#: lib/shortcuts_dialog.rb:45
+msgctxt "shortcut window"
+msgid "Clear Window"
+msgstr "Изчистване на прозорецa"
+
+#: lib/shortcuts_dialog.rb:46
+msgctxt "shortcut window"
+msgid "Paste From Clipboard"
+msgstr "Поставяне от буфера за обмен"
+
+#: lib/shortcuts_dialog.rb:47
+msgctxt "shortcut window"
+msgid "Add Images"
+msgstr "Добавяне на изображения"
+
+#: lib/stop_converting_dialog.rb:40
 msgid "Stop converting?"
 msgstr "Искате ли да спрете преобразуването?"
 
-#: src/window.rs:446 src/window.rs:1359
+#: lib/stop_converting_dialog.rb:41
 msgid "You will lose all progress."
 msgstr "Всичкият напредък ще бъде загубен."
 
-#: src/window.rs:450 src/window.rs:1363
+#: lib/stop_converting_dialog.rb:50
 msgid "_Stop"
 msgstr "_Спиране"
 
-#: src/window.rs:486
-msgid "Collecting files"
-msgstr "Събиране на файловете"
+#: lib/temp_dir.rb:93
+msgid "Pasted Image"
+msgstr "Поставено изображение"
 
-#: src/window.rs:1286
-msgid "Error While Processing"
-msgstr "Възникна грешка по време на обработката"
+#: lib/welcome_page.rb:34
+msgid "Drag and drop images here"
+msgstr "Изтеглете и пуснете изображения тук"
 
-#: src/window.rs:1307
-msgid "_Close"
-msgstr "_Затваряне"
+#: lib/welcome_page.rb:45
+msgid "_Open Images…"
+msgstr "_Отваряне на изображения…"
 
-#: src/window.rs:1308
-msgid "_Copy to Clipboard"
-msgstr "_Копиране в буфера за обмен"
+#~ msgid "Shows less popular datatypes in the menu"
+#~ msgstr "Показва по-малко популярни типове данни в менюто"
 
-#: src/window.rs:1316
-msgid "Error copied to clipboard"
-msgstr "Грешката е копиран в буфера за обмен"
+#~ msgctxt "shortcut window"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "Показване на по-малко популярни типове данни"
 
-#: src/window.rs:1331
-msgid "Image converted"
-msgstr "Изображението е преобразувано"
-
-#: src/window.rs:1332
-msgid "Open"
-msgstr "Отваряне"
-
-#: src/window.rs:1385
-msgid "Converting Cancelled"
-msgstr "Преобразуването е отменено"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "Показване на по-малко популярни типове данни"

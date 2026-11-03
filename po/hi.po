@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: switcheroo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 13:36-0400\n"
+"POT-Creation-Date: 2026-11-03 00:27+0000\n"
 "PO-Revision-Date: 2024-05-06 15:47+0530\n"
 "Last-Translator: Scrambled777 <weblate.scrambled777@simplelogin.com>\n"
 "Language-Team: Hindi\n"
@@ -18,32 +18,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Gtranslator 46.1\n"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:3
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:5
-#: data/resources/blueprints/window.blp:9
-#: data/resources/blueprints/window.blp:21
-#: data/resources/blueprints/window.blp:57 src/main.rs:30
-#: src/widgets/about_window.rs:24
-msgid "Switcheroo"
-msgstr "Switcheroo"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:4
-msgid "Image Converter"
-msgstr "छवि परिवर्तक"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:5
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:11
-msgid "Convert and manipulate images"
-msgstr "छवियों को परिवर्तित और हेरफेर करें"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:11
-msgid "converter;image;convert;converting;processing"
-msgstr "परिवर्तक;छवि;परिवर्तित करें;converting;प्रसंस्करण"
-
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:26
-msgid "Shows less popular datatypes in the menu"
-msgstr "मेनू में कम लोकप्रिय डेटाटाइप दिखाता है"
 
 #: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
 msgid "Window width"
@@ -73,7 +47,16 @@ msgstr "आउटपुट प्रारूप"
 msgid "Compression format"
 msgstr "संपीड़न प्रारूप"
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:17
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:58
+msgid "Resize unit (percentage or pixels)"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:9
+#: data/switcheroo.desktop.in:4
+msgid "Convert and manipulate images"
+msgstr "छवियों को परिवर्तित और हेरफेर करें"
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:15
 msgid "Convert between different image filetypes and resize them easily."
 msgstr "विभिन्न छवि फाइल प्रकारों के बीच परिवर्तित करें और उनका आसानी से आकार बदलें।"
 
@@ -81,295 +64,341 @@ msgstr "विभिन्न छवि फाइल प्रकारों �
 msgid "Converting sample image from PNG to HEIF"
 msgstr "नमूना छवि को PNG से HEIF में परिवर्तित किया जा रहा है"
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:46
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:47
 msgid "Converting multiple sample images from SVG to HEIF"
 msgstr "एकाधिक नमूना छवियों को SVG से HEIF में परिवर्तित किया जा रहा है"
 
-#: data/resources/blueprints/help-overlay.blp:11
+#: data/switcheroo.desktop.in:3
+msgid "Image Converter"
+msgstr "छवि परिवर्तक"
+
+#: data/switcheroo.desktop.in:10
+msgid "converter;image;convert;converting;processing"
+msgstr "परिवर्तक;छवि;परिवर्तित करें;converting;प्रसंस्करण"
+
+#: lib/about_dialog.rb:91
+msgid "translator-credits"
+msgstr "Scrambled777 <weblate.scrambled777@simplelogin.com>"
+
+#: lib/about_dialog.rb:155
+msgid "Create bootable drives"
+msgstr ""
+
+#: lib/about_dialog.rb:155
+#, fuzzy
+#| msgid "Compression format"
+msgid "Impression"
+msgstr "संपीड़न प्रारूप"
+
+#: lib/about_dialog.rb:157
+msgid "Footage"
+msgstr ""
+
+#: lib/about_dialog.rb:157
+msgid "Polish your videos"
+msgstr ""
+
+#: lib/about_dialog.rb:163
+msgid "Code and Design Borrowed from"
+msgstr "कोड और डिज़ाइन इनसे उधार लिया गया"
+
+#: lib/about_dialog.rb:172
+msgid "Sample Image from"
+msgstr "यहां से नमूना छवि"
+
+#: lib/all_images_page.rb:63
+msgid "All Images"
+msgstr "सभी छवियां"
+
+#: lib/all_images_page.rb:74 lib/app_window.rb:163
+msgid "Add Images (Ctrl+O)"
+msgstr "छवियां जोड़ें (Ctrl+O)"
+
+#: lib/app_window.rb:122 lib/file_chooser.rb:44
+msgid "Unsupported filetype"
+msgstr "असमर्थित फाइलप्रकार"
+
+#: lib/app_window.rb:133 lib/app_window.rb:147 lib/welcome_page.rb:33
+msgid "Switcheroo"
+msgstr "Switcheroo"
+
+#: lib/app_window.rb:173
+msgid "Primary Menu"
+msgstr "प्राथमिक मेनू"
+
+#: lib/app_window.rb:479
+msgid "Unable to access dropped files"
+msgstr "छोड़ी गई फाइलों तक पहुँचने में असमर्थ"
+
+#: lib/app_window.rb:923
+msgid "Error copied to clipboard"
+msgstr "त्रुटि क्लिपबोर्ड पर कॉपी की गई"
+
+#: lib/app_window.rb:930
+msgid "Image converted"
+msgstr "छवि परिवर्तित"
+
+#: lib/app_window.rb:931
+msgid "Open"
+msgstr "खोलें"
+
+#: lib/app_window.rb:967
+msgid "Converting Cancelled"
+msgstr "परिवर्तन रद्द किया गया"
+
+#: lib/application.rb:68
+msgid "Open a new window"
+msgstr ""
+
+#: lib/convert_page.rb:276
+msgid "Export Format"
+msgstr "निर्यात प्रारूप"
+
+#: lib/convert_page.rb:283
+msgid "Save as multi-page PDF"
+msgstr "बहु-पृष्ठ PDF के रूप में सहेजें"
+
+#: lib/convert_page.rb:297
+msgid "Save To ZIP"
+msgstr "ZIP में सहेजें"
+
+#: lib/convert_page.rb:333
+msgid "Background Color"
+msgstr "पृष्ठभूमि रंग"
+
+#: lib/convert_page.rb:334
+msgid "Replaces original transparency layer"
+msgstr "मूल पारदर्शिता परत को प्रतिस्थापित करता है"
+
+#: lib/convert_page.rb:354
+msgid "Pixel Density Per Inch"
+msgstr "प्रति इंच पिक्सल घनत्व"
+
+#: lib/convert_page.rb:369
+msgid "Resize"
+msgstr "आकार बदलें"
+
+#: lib/convert_page.rb:379 lib/convert_page.rb:387 lib/convert_page.rb:391
+msgid "Width"
+msgstr "चौड़ाई"
+
+#: lib/convert_page.rb:383 lib/convert_page.rb:391
+msgid "Height"
+msgstr "ऊंचाई"
+
+#: lib/convert_page.rb:399
+msgid "Preserve aspect ratio"
+msgstr "पहलू अनुपात को सुरक्षित रखें"
+
+#: lib/convert_page.rb:417
+msgid "%"
+msgstr "%"
+
+#: lib/convert_page.rb:417
+msgid "px"
+msgstr "px"
+
+#: lib/convert_page.rb:425
+msgid "Resize Algorithm"
+msgstr "पुनर्कार कलनविधि"
+
+#: lib/convert_page.rb:438
+msgid "Default"
+msgstr "तयशुदा"
+
+#: lib/convert_page.rb:445
+msgid "Pixel Art"
+msgstr "पिक्सल कला"
+
+#: lib/convert_page.rb:452
+msgid "Remove Metadata"
+msgstr ""
+
+#: lib/convert_page.rb:466
+msgid "_Convert"
+msgstr "परिवर्तित करें (_C)"
+
+#: lib/convert_page.rb:572
+msgid "New transparency layer color: {}"
+msgstr ""
+
+#: lib/convert_page.rb:579
+msgid "Choose between resizing with percentages or using exact pixels"
+msgstr "प्रतिशत के साथ आकार बदलने या सटीक पिक्सल का उपयोग करने के बीच चयन करें"
+
+#: lib/convert_page.rb:597
+msgid "Quality"
+msgstr "गुणवत्ता"
+
+#: lib/converting_page.rb:35 lib/converting_page.rb:64
+msgid "Loading…"
+msgstr "लोड हो रहा है…"
+
+#: lib/converting_page.rb:47
+msgid "Collecting files"
+msgstr "फाइलें एकत्रित कर रहे हैं"
+
+#: lib/converting_page.rb:52
+msgid "Converting"
+msgstr "परिवर्तित हो रहा है"
+
+#: lib/converting_page.rb:53
+msgid "This could take a while"
+msgstr "इसमें कुछ समय लग सकता है"
+
+#: lib/converting_page.rb:70 lib/stop_converting_dialog.rb:49
+msgid "_Cancel"
+msgstr "रद्द करें (_C)"
+
+#: lib/drag_overlay.rb:35
+msgid "Drop Here to Open"
+msgstr "खोलने के लिए यहां छोड़ें"
+
+#: lib/error_dialog.rb:44
+msgid "Error While Processing"
+msgstr "प्रसंस्करण करते समय त्रुटि"
+
+#: lib/error_dialog.rb:72
+msgid "_Close"
+msgstr "बंद करें (_C)"
+
+#: lib/error_dialog.rb:73
+msgid "_Copy to Clipboard"
+msgstr "क्लिपबोर्ड पर कॉपी करें (_C)"
+
+#: lib/file_chooser.rb:107
+msgid "_Select Images"
+msgstr "छवियां चुनें (_S)"
+
+#: lib/file_chooser.rb:115
+msgid "Images"
+msgstr "छवियां"
+
+#: lib/file_chooser.rb:160
+msgid "Unspecified filetype"
+msgstr "अनिर्दिष्ट फाइलप्रकार"
+
+#: lib/file_chooser.rb:171
+msgid "Unknown filetype"
+msgstr "अज्ञात फाइलप्रकार"
+
+#: lib/file_chooser.rb:173
+msgid "Used the wrong filetype"
+msgstr "गलत फाइलप्रकार का उपयोग किया गया"
+
+#: lib/image_rest.rb:82
+msgid "+{}"
+msgstr ""
+
+#: lib/image_rest.rb:87
+msgid "Show All"
+msgstr "सभी दिखाएं"
+
+#: lib/image_rest.rb:91
+msgid "Show {} more images"
+msgstr ""
+
+#: lib/image_thumbnail.rb:156
+msgid "Remove image"
+msgstr ""
+
+#: lib/invalid_image_page.rb:26
+msgid "Could not Load Image"
+msgstr "छवि लोड नहीं हो सकी"
+
+#: lib/invalid_image_page.rb:27
+msgid "This image could be corrupted or may use an unsupported file format."
+msgstr "यह छवि दूषित हो सकती है या असमर्थित फाइल स्वरूप का उपयोग कर सकती है।"
+
+#: lib/magick.rb:547
+msgid "Unknown IO error happened"
+msgstr "अज्ञात IO त्रुटि हुई"
+
+#: lib/primary_menu.rb:37
+msgid "Paste From Clipboard"
+msgstr "क्लिपबोर्ड से पेस्ट करें"
+
+#: lib/primary_menu.rb:38
+msgid "New Window"
+msgstr "नई विंडो"
+
+#: lib/primary_menu.rb:39
+msgid "Clear Window"
+msgstr "विंडो साफ करें"
+
+#: lib/primary_menu.rb:45
+msgid "Keyboard Shortcuts"
+msgstr "कीबोर्ड शॉर्टकट"
+
+#: lib/primary_menu.rb:46
+msgid "About Switcheroo"
+msgstr "Switcheroo के बारे में"
+
+#: lib/shortcuts_dialog.rb:31
 msgctxt "shortcut window"
 msgid "General"
 msgstr "सामान्य"
 
-#: data/resources/blueprints/help-overlay.blp:14
+#: lib/shortcuts_dialog.rb:42
 msgctxt "shortcut window"
 msgid "Show Shortcuts"
 msgstr "शॉर्टकट दिखाएं"
 
-#: data/resources/blueprints/help-overlay.blp:19
+#: lib/shortcuts_dialog.rb:43
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "छोड़ें"
 
-#: data/resources/blueprints/help-overlay.blp:24
+#: lib/shortcuts_dialog.rb:44
 msgctxt "shortcut window"
 msgid "New Window"
 msgstr "नई विंडो"
 
-#: data/resources/blueprints/help-overlay.blp:29
+#: lib/shortcuts_dialog.rb:45
 msgctxt "shortcut window"
 msgid "Clear Window"
 msgstr "विंडो साफ करें"
 
-#: data/resources/blueprints/help-overlay.blp:34
-msgctxt "shortcut window"
-msgid "Show Less Popular Datatypes"
-msgstr "कम लोकप्रिय डेटाटाइप दिखाएं"
-
-#: data/resources/blueprints/help-overlay.blp:39
+#: lib/shortcuts_dialog.rb:46
 msgctxt "shortcut window"
 msgid "Paste From Clipboard"
 msgstr "क्लिपबोर्ड से पेस्ट करें"
 
-#: data/resources/blueprints/help-overlay.blp:44
+#: lib/shortcuts_dialog.rb:47
 msgctxt "shortcut window"
 msgid "Add Images"
 msgstr "छवियां जोड़ें"
 
-#: data/resources/blueprints/image-rest.blp:21
-msgid "Show All"
-msgstr "सभी दिखाएं"
-
-#: data/resources/blueprints/window.blp:15
-msgid "Drop Here to Open"
-msgstr "खोलने के लिए यहां छोड़ें"
-
-#: data/resources/blueprints/window.blp:29
-#: data/resources/blueprints/window.blp:370
-msgid "Add Images (Ctrl+O)"
-msgstr "छवियां जोड़ें (Ctrl+O)"
-
-#: data/resources/blueprints/window.blp:40
-msgid "Primary Menu"
-msgstr "प्राथमिक मेनू"
-
-#: data/resources/blueprints/window.blp:58
-msgid "Drag and drop images here"
-msgstr "छवियों को यहां खींचें और छोड़ें"
-
-#: data/resources/blueprints/window.blp:69
-msgid "_Open Images…"
-msgstr "छवियां खोलें (_O)…"
-
-#: data/resources/blueprints/window.blp:122
-msgid "Export Format"
-msgstr "निर्यात प्रारूप"
-
-#: data/resources/blueprints/window.blp:127
-msgid "Save as multi-page PDF"
-msgstr "बहु-पृष्ठ PDF के रूप में सहेजें"
-
-#: data/resources/blueprints/window.blp:137
-msgid "Save To ZIP"
-msgstr "ZIP में सहेजें"
-
-#: data/resources/blueprints/window.blp:150
-msgid "Quality"
-msgstr "गुणवत्ता"
-
-#: data/resources/blueprints/window.blp:170
-msgid "Background Color"
-msgstr "पृष्ठभूमि रंग"
-
-#: data/resources/blueprints/window.blp:171
-msgid "Replaces original transparency layer"
-msgstr "मूल पारदर्शिता परत को प्रतिस्थापित करता है"
-
-#: data/resources/blueprints/window.blp:185
-msgid "Pixel Density Per Inch"
-msgstr "प्रति इंच पिक्सल घनत्व"
-
-#: data/resources/blueprints/window.blp:197
-msgid "Resize"
-msgstr "आकार बदलें"
-
-#: data/resources/blueprints/window.blp:202
-#: data/resources/blueprints/window.blp:203
-#: data/resources/blueprints/window.blp:210
-#: data/resources/blueprints/window.blp:212
-#: data/resources/blueprints/window.blp:233
-msgid "Width"
-msgstr "चौड़ाई"
-
-#: data/resources/blueprints/window.blp:220
-msgid "Preserve aspect ratio"
-msgstr "पहलू अनुपात को सुरक्षित रखें"
-
-#: data/resources/blueprints/window.blp:225
-#: data/resources/blueprints/window.blp:226
-#: data/resources/blueprints/window.blp:234
-msgid "Height"
-msgstr "ऊंचाई"
-
-#: data/resources/blueprints/window.blp:245
-msgid "Choose between resizing with percentages or using exact pixels"
-msgstr "प्रतिशत के साथ आकार बदलने या सटीक पिक्सल का उपयोग करने के बीच चयन करें"
-
-#: data/resources/blueprints/window.blp:249
-msgid "%"
-msgstr "%"
-
-#: data/resources/blueprints/window.blp:249
-msgid "px"
-msgstr "px"
-
-#: data/resources/blueprints/window.blp:258
-msgid "Resize Algorithm"
-msgstr "पुनर्कार कलनविधि"
-
-#: data/resources/blueprints/window.blp:264
-msgid "Default"
-msgstr "तयशुदा"
-
-#: data/resources/blueprints/window.blp:268
-msgid "Pixel Art"
-msgstr "पिक्सल कला"
-
-#: data/resources/blueprints/window.blp:282
-msgid "_Convert"
-msgstr "परिवर्तित करें (_C)"
-
-#: data/resources/blueprints/window.blp:308
-msgid "Could not Load Image"
-msgstr "छवि लोड नहीं हो सकी"
-
-#: data/resources/blueprints/window.blp:309
-msgid "This image could be corrupted or may use an unsupported file format."
-msgstr "यह छवि दूषित हो सकती है या असमर्थित फाइल स्वरूप का उपयोग कर सकती है।"
-
-#: data/resources/blueprints/window.blp:321
-msgid "Converting"
-msgstr "परिवर्तित हो रहा है"
-
-#: data/resources/blueprints/window.blp:322
-msgid "This could take a while"
-msgstr "इसमें कुछ समय लग सकता है"
-
-#: data/resources/blueprints/window.blp:332 src/window.rs:770
-msgid "Loading…"
-msgstr "लोड हो रहा है…"
-
-#: data/resources/blueprints/window.blp:338 src/window.rs:449
-#: src/window.rs:1363
-msgid "_Cancel"
-msgstr "रद्द करें (_C)"
-
-#: data/resources/blueprints/window.blp:362
-msgid "All Images"
-msgstr "सभी छवियां"
-
-#: data/resources/blueprints/window.blp:436
-msgid "Paste From Clipboard"
-msgstr "क्लिपबोर्ड से पेस्ट करें"
-
-#: data/resources/blueprints/window.blp:441
-msgid "New Window"
-msgstr "नई विंडो"
-
-#: data/resources/blueprints/window.blp:446
-msgid "Clear Window"
-msgstr "विंडो साफ करें"
-
-#: data/resources/blueprints/window.blp:453
-msgid "Show Less Popular Datatypes"
-msgstr "कम लोकप्रिय डेटाटाइप दिखाएं"
-
-#: data/resources/blueprints/window.blp:460
-msgid "Keyboard Shortcuts"
-msgstr "कीबोर्ड शॉर्टकट"
-
-#: data/resources/blueprints/window.blp:465
-msgid "About Switcheroo"
-msgstr "Switcheroo के बारे में"
-
-#: src/file_chooser.rs:39
-msgid "Unsupported filetype"
-msgstr "असमर्थित फाइलप्रकार"
-
-#: src/file_chooser.rs:77
-msgid "Images"
-msgstr "छवियां"
-
-#: src/file_chooser.rs:80
-msgid "_Select Images"
-msgstr "छवियां चुनें (_S)"
-
-#: src/file_chooser.rs:159
-msgid "Unspecified filetype"
-msgstr "अनिर्दिष्ट फाइलप्रकार"
-
-#: src/file_chooser.rs:164
-msgid "Unknown filetype"
-msgstr "अज्ञात फाइलप्रकार"
-
-#: src/file_chooser.rs:169
-msgid "Used the wrong filetype"
-msgstr "गलत फाइलप्रकार का उपयोग किया गया"
-
-#: src/magick.rs:156
-msgid "Pasted Image"
-msgstr "पेस्ट की गई छवि"
-
-#: src/magick.rs:364
-msgid "Unknown IO error happened"
-msgstr "अज्ञात IO त्रुटि हुई"
-
-#. Translators: Replace "translator-credits" with your names, one name per line
-#: src/widgets/about_window.rs:28
-msgid "translator-credits"
-msgstr "Scrambled777 <weblate.scrambled777@simplelogin.com>"
-
-#: src/widgets/about_window.rs:35
-msgid "Code and Design Borrowed from"
-msgstr "कोड और डिज़ाइन इनसे उधार लिया गया"
-
-#: src/widgets/about_window.rs:47
-msgid "Sample Image from"
-msgstr "यहां से नमूना छवि"
-
-#: src/window.rs:422
-msgid "Unable to access dropped files"
-msgstr "छोड़ी गई फाइलों तक पहुँचने में असमर्थ"
-
-#: src/window.rs:445 src/window.rs:1358
+#: lib/stop_converting_dialog.rb:40
 msgid "Stop converting?"
 msgstr "परिवर्तन बंद करें?"
 
-#: src/window.rs:446 src/window.rs:1359
+#: lib/stop_converting_dialog.rb:41
 msgid "You will lose all progress."
 msgstr "आप सारी प्रगति खो देंगे।"
 
-#: src/window.rs:450 src/window.rs:1363
+#: lib/stop_converting_dialog.rb:50
 msgid "_Stop"
 msgstr "रोकें (_S)"
 
-#: src/window.rs:486
-msgid "Collecting files"
-msgstr "फाइलें एकत्रित कर रहे हैं"
+#: lib/temp_dir.rb:93
+msgid "Pasted Image"
+msgstr "पेस्ट की गई छवि"
 
-#: src/window.rs:1286
-msgid "Error While Processing"
-msgstr "प्रसंस्करण करते समय त्रुटि"
+#: lib/welcome_page.rb:34
+msgid "Drag and drop images here"
+msgstr "छवियों को यहां खींचें और छोड़ें"
 
-#: src/window.rs:1307
-msgid "_Close"
-msgstr "बंद करें (_C)"
+#: lib/welcome_page.rb:45
+msgid "_Open Images…"
+msgstr "छवियां खोलें (_O)…"
 
-#: src/window.rs:1308
-msgid "_Copy to Clipboard"
-msgstr "क्लिपबोर्ड पर कॉपी करें (_C)"
+#~ msgid "Shows less popular datatypes in the menu"
+#~ msgstr "मेनू में कम लोकप्रिय डेटाटाइप दिखाता है"
 
-#: src/window.rs:1316
-msgid "Error copied to clipboard"
-msgstr "त्रुटि क्लिपबोर्ड पर कॉपी की गई"
+#~ msgctxt "shortcut window"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "कम लोकप्रिय डेटाटाइप दिखाएं"
 
-#: src/window.rs:1331
-msgid "Image converted"
-msgstr "छवि परिवर्तित"
-
-#: src/window.rs:1332
-msgid "Open"
-msgstr "खोलें"
-
-#: src/window.rs:1385
-msgid "Converting Cancelled"
-msgstr "परिवर्तन रद्द किया गया"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "कम लोकप्रिय डेटाटाइप दिखाएं"

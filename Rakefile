@@ -224,6 +224,95 @@ namespace :app do
     )
   end
 
+  # The list of extractable sources, read from po/POTFILES.in the way meson's
+  # i18n.gettext() reads it: comment lines dropped, everything else a path
+  # relative to the source root.
+  def app_potfiles
+    File.readlines(File.join(PO_DIR, "POTFILES.in"), chomp: true)
+        .reject { |line| line.start_with?("#") || line.strip.empty? }
+  end
+
+  # Upstream's `switcheroo-pot` target is one xgettext run, because every file
+  # in its POTFILES.in is a language GNU xgettext extracts itself. This port's
+  # sources are Ruby, and GNU xgettext's `--language=Ruby` only shells out to
+  # rxgettext, so the extraction is split in two and joined with msgcat:
+  # rxgettext for lib/*.rb, xgettext for the three metadata files, which are
+  # extracted by the same ITS rules upstream extracts them by.
+  desc "Regenerate po/#{GETTEXT_PACKAGE}.pot from po/POTFILES.in"
+  task :pot do
+    require "fileutils"
+
+    potfiles = app_potfiles
+    ruby_sources = potfiles.grep(/\.rb\z/)
+    data_sources = potfiles - ruby_sources
+    pot = File.join(PO_DIR, "#{GETTEXT_PACKAGE}.pot")
+
+    # The two intermediates are written to the source root rather than to a
+    # temp directory, because rxgettext writes each `#:` reference relative to
+    # the directory its output file lives in: from /tmp that gives
+    # `../../../home/you/…/lib/foo.rb`, and from here it gives `lib/foo.rb`,
+    # which is the form upstream's references take.
+    ruby_pot = File.expand_path(".pot-ruby.tmp", __dir__)
+    data_pot = File.expand_path(".pot-data.tmp", __dir__)
+
+    begin
+      app_sh(
+        "rxgettext",
+        "--output=#{ruby_pot}",
+        "--package-name=#{GETTEXT_PACKAGE}",
+        "--sort-by-file",
+        *ruby_sources,
+      )
+      app_sh(
+        "xgettext",
+        "--output=#{data_pot}",
+        "--from-code=UTF-8",
+        "--package-name=#{GETTEXT_PACKAGE}",
+        "--sort-by-file",
+        *data_sources,
+      )
+      # xgettext leaves `charset=CHARSET` in the header it writes, which every
+      # later tool warns about. The Ruby catalogue's header wins the msgcat
+      # below, but msgcat still reads this one, so name the encoding the
+      # `--from-code` above already asserted.
+      File.write(data_pot, File.read(data_pot).sub("charset=CHARSET", "charset=UTF-8"))
+
+      # --use-first keeps the first catalogue's header rather than stitching
+      # the two headers together, so the result has one well-formed header.
+      app_sh(
+        "msgcat",
+        "--output=#{pot}",
+        "--use-first",
+        "--sort-by-file",
+        ruby_pot,
+        data_pot,
+      )
+    ensure
+      FileUtils.rm_f([ruby_pot, data_pot])
+    end
+
+    warn("wrote #{pot}")
+  end
+
+  # Upstream's commented-out `switcheroo-update-po` target. The language list
+  # is po/LINGUAS, which is what meson's i18n.gettext() iterates and what
+  # app:locale and app:install already iterate, so po/zh_cn.po — present in
+  # the tree but absent from LINGUAS, exactly as upstream has it — is left
+  # alone here too.
+  desc "Merge po/#{GETTEXT_PACKAGE}.pot into every catalogue named in po/LINGUAS"
+  task update_po: :pot do
+    app_linguas.each do |lang|
+      app_sh(
+        "msgmerge",
+        "--update",
+        "--backup=none",
+        "--previous",
+        File.join(PO_DIR, "#{lang}.po"),
+        File.join(PO_DIR, "#{GETTEXT_PACKAGE}.pot"),
+      )
+    end
+  end
+
   desc "Compile po/*.po into a locale/<lang>/LC_MESSAGES/#{GETTEXT_PACKAGE}.mo tree"
   task :locale do
     require "fileutils"
@@ -360,3 +449,9 @@ task locale: "app:locale"
 
 desc "Install the app under PREFIX (alias for app:install)"
 task install: "app:install"
+
+desc "Regenerate po/switcheroo.pot (alias for app:pot)"
+task pot: "app:pot"
+
+desc "Refresh po/switcheroo.pot and merge it into every catalogue (alias for app:update_po)"
+task update_po: "app:update_po"

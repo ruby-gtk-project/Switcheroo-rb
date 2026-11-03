@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 23:34-0700\n"
+"POT-Creation-Date: 2026-11-03 00:27+0000\n"
 "PO-Revision-Date: 2025-05-14 18:17+1000\n"
 "Last-Translator: Quentin PAGÈS\n"
 "Language-Team: \n"
@@ -18,370 +18,396 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.6\n"
 
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:2
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:5
-#: data/resources/blueprints/window.blp:9
-#: data/resources/blueprints/window.blp:21
-#: data/resources/blueprints/window.blp:57 src/main.rs:41
-#: src/widgets/about_window.rs:21
-msgid "Switcheroo"
-msgstr "Switcheroo"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:3
-msgid "Image Converter"
-msgstr "Convertidor d'imatges"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:4
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:11
-msgid "Convert and manipulate images"
-msgstr "Convertir e manipular d’imatges"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:10
-msgid "converter;image;convert;converting;processing"
-msgstr "convertidor;imatge;convertir;conversion;tractament"
-
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:26
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
 msgid "Window width"
 msgstr "Largor de la fenèstra"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:34
 msgid "Image quality"
 msgstr "Qualitat d'imatge"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:34
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:38
 msgid "Image density per inch"
 msgstr "Densitat d’imatge per poce"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:38
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:42
 msgid "Window height"
 msgstr "Nautor de la fenèstra"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:42
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:46
 msgid "Window maximized state"
 msgstr "Estat maximizat de la fenèstra"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:46
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:50
 msgid "Output format"
 msgstr "Format de sortida"
 
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:50
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:54
 msgid "Compression format"
 msgstr "Format de compression"
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:17
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:58
+msgid "Resize unit (percentage or pixels)"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:9
+#: data/switcheroo.desktop.in:4
+msgid "Convert and manipulate images"
+msgstr "Convertir e manipular d’imatges"
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:15
 msgid "Convert between different image filetypes and resize them easily."
 msgstr ""
 "Conversion entre mantun tipe de fichièr d’imatge e las retalhar facilament."
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:43
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:42
 msgid "Converting sample image from PNG to HEIF"
 msgstr "Conversion de l'imatge d'exemple de PNG a HEIF"
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:48
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:47
 msgid "Converting multiple sample images from SVG to HEIF"
 msgstr "Conversion de mantun imatge d'exemple de SVG a HEIF"
 
-#: data/resources/blueprints/help-overlay.blp:11
-msgctxt "shortcut window"
-msgid "General"
-msgstr "General"
+#: data/switcheroo.desktop.in:3
+msgid "Image Converter"
+msgstr "Convertidor d'imatges"
 
-#: data/resources/blueprints/help-overlay.blp:14
-msgctxt "shortcut window"
-msgid "Show Shortcuts"
-msgstr "Afichar los acorchis"
+#: data/switcheroo.desktop.in:10
+msgid "converter;image;convert;converting;processing"
+msgstr "convertidor;imatge;convertir;conversion;tractament"
 
-#: data/resources/blueprints/help-overlay.blp:19
-msgctxt "shortcut window"
-msgid "Quit"
-msgstr "Sortir"
+#: lib/about_dialog.rb:91
+msgid "translator-credits"
+msgstr "Quentin PAGÈS"
 
-#: data/resources/blueprints/help-overlay.blp:24
-msgctxt "shortcut window"
-msgid "New Window"
-msgstr "Fenèstra novèla"
+#: lib/about_dialog.rb:155
+msgid "Create bootable drives"
+msgstr ""
 
-#: data/resources/blueprints/help-overlay.blp:29
-msgctxt "shortcut window"
-msgid "Clear Window"
-msgstr "Voidar la fenèstra"
+#: lib/about_dialog.rb:155
+#, fuzzy
+#| msgid "processing"
+msgid "Impression"
+msgstr "tractament"
 
-#: data/resources/blueprints/help-overlay.blp:34
-msgctxt "shortcut window"
-msgid "Paste From Clipboard"
-msgstr "Pegar a partir del quichapapièrs"
+#: lib/about_dialog.rb:157
+msgid "Footage"
+msgstr ""
 
-#: data/resources/blueprints/help-overlay.blp:39
-msgctxt "shortcut window"
-msgid "Add Images"
-msgstr "Apondre d’imatges"
+#: lib/about_dialog.rb:157
+msgid "Polish your videos"
+msgstr ""
 
-#: data/resources/blueprints/image-rest.blp:21
-msgid "Show All"
-msgstr "Afichar tot"
+#: lib/about_dialog.rb:163
+msgid "Code and Design Borrowed from"
+msgstr "Còdi e design manlevats de"
 
-#: data/resources/blueprints/window.blp:15
-msgid "Drop Here to Open"
-msgstr "Depausatz aicí per dobrir"
+#: lib/about_dialog.rb:172
+msgid "Sample Image from"
+msgstr "Imatge d’exemple de"
 
-#: data/resources/blueprints/window.blp:29
-#: data/resources/blueprints/window.blp:370
+#: lib/all_images_page.rb:63
+msgid "All Images"
+msgstr "Totes los imatges"
+
+#: lib/all_images_page.rb:74 lib/app_window.rb:163
 msgid "Add Images (Ctrl+O)"
 msgstr "Apondre d’imatges (Ctrl+O)"
 
-#: data/resources/blueprints/window.blp:40
+#: lib/app_window.rb:122 lib/file_chooser.rb:44
+msgid "Unsupported filetype"
+msgstr "Fichièr imatge pas pres en carga"
+
+#: lib/app_window.rb:133 lib/app_window.rb:147 lib/welcome_page.rb:33
+msgid "Switcheroo"
+msgstr "Switcheroo"
+
+#: lib/app_window.rb:173
 msgid "Primary Menu"
 msgstr "Menú principal"
 
-#: data/resources/blueprints/window.blp:58
-msgid "Drag and drop images here"
-msgstr "Lissar e depausar los imatges aicí"
+#: lib/app_window.rb:479
+msgid "Unable to access dropped files"
+msgstr "Impossible d'accedir als fichièrs depausats"
 
-#: data/resources/blueprints/window.blp:69
-msgid "_Open Images…"
-msgstr "_Dobrir un imatge…"
+#: lib/app_window.rb:923
+msgid "Error copied to clipboard"
+msgstr "Error copiada al quichapapièrs"
 
-#: data/resources/blueprints/window.blp:122
+#: lib/app_window.rb:930
+msgid "Image converted"
+msgstr "Imatge convertit"
+
+#: lib/app_window.rb:931
+msgid "Open"
+msgstr "Dobrir"
+
+#: lib/app_window.rb:967
+msgid "Converting Cancelled"
+msgstr "Conversion anullada"
+
+#: lib/application.rb:68
+msgid "Open a new window"
+msgstr ""
+
+#: lib/convert_page.rb:276
 msgid "Export Format"
 msgstr "Format d'expòrt"
 
-#: data/resources/blueprints/window.blp:127
+#: lib/convert_page.rb:283
 msgid "Save as multi-page PDF"
 msgstr "Enregistrar coma PDF multipagina"
 
-#: data/resources/blueprints/window.blp:137
+#: lib/convert_page.rb:297
 msgid "Save To ZIP"
 msgstr "Enregistrar en ZIP"
 
-#: data/resources/blueprints/window.blp:150
-msgid "Quality"
-msgstr "Qualitat"
-
-#: data/resources/blueprints/window.blp:170
+#: lib/convert_page.rb:333
 msgid "Background Color"
 msgstr "Color del rèireplan"
 
-#: data/resources/blueprints/window.blp:171
+#: lib/convert_page.rb:334
 msgid "Replaces original transparency layer"
 msgstr "Remplaçar lo jaç de transparéncia d’origina"
 
-#: data/resources/blueprints/window.blp:185
+#: lib/convert_page.rb:354
 msgid "Pixel Density Per Inch"
 msgstr "Densitat de pixèl per poce"
 
-#: data/resources/blueprints/window.blp:197
+#: lib/convert_page.rb:369
 msgid "Resize"
 msgstr "Redimensionar"
 
-#: data/resources/blueprints/window.blp:202
-#: data/resources/blueprints/window.blp:203
-#: data/resources/blueprints/window.blp:210
-#: data/resources/blueprints/window.blp:212
-#: data/resources/blueprints/window.blp:233
+#: lib/convert_page.rb:379 lib/convert_page.rb:387 lib/convert_page.rb:391
 msgid "Width"
 msgstr "Largor"
 
-#: data/resources/blueprints/window.blp:220
-msgid "Preserve aspect ratio"
-msgstr "Servar lo racio"
-
-#: data/resources/blueprints/window.blp:225
-#: data/resources/blueprints/window.blp:226
-#: data/resources/blueprints/window.blp:234
+#: lib/convert_page.rb:383 lib/convert_page.rb:391
 msgid "Height"
 msgstr "Nautor"
 
-#: data/resources/blueprints/window.blp:245
-msgid "Choose between resizing with percentages or using exact pixels"
-msgstr "Causir entre retalhar en utilizant de percentatges o de pixèls exactes"
+#: lib/convert_page.rb:399
+msgid "Preserve aspect ratio"
+msgstr "Servar lo racio"
 
-#: data/resources/blueprints/window.blp:249
+#: lib/convert_page.rb:417
 msgid "%"
 msgstr "%"
 
-#: data/resources/blueprints/window.blp:249
+#: lib/convert_page.rb:417
 msgid "px"
 msgstr "px"
 
-#: data/resources/blueprints/window.blp:258
+#: lib/convert_page.rb:425
 msgid "Resize Algorithm"
 msgstr "Algoritmes per redimensionar"
 
-#: data/resources/blueprints/window.blp:264
+#: lib/convert_page.rb:438
 msgid "Default"
 msgstr "Per defaut"
 
-#: data/resources/blueprints/window.blp:268
+#: lib/convert_page.rb:445
 msgid "Pixel Art"
 msgstr "Pixel Art"
 
-#: data/resources/blueprints/window.blp:282
+#: lib/convert_page.rb:452
+msgid "Remove Metadata"
+msgstr ""
+
+#: lib/convert_page.rb:466
 msgid "_Convert"
 msgstr "_Convertir"
 
-#: data/resources/blueprints/window.blp:308
+#: lib/convert_page.rb:572
+msgid "New transparency layer color: {}"
+msgstr "Color de jaç de transparéncia novèla : {}"
+
+#: lib/convert_page.rb:579
+msgid "Choose between resizing with percentages or using exact pixels"
+msgstr "Causir entre retalhar en utilizant de percentatges o de pixèls exactes"
+
+#: lib/convert_page.rb:597
+msgid "Quality"
+msgstr "Qualitat"
+
+#: lib/converting_page.rb:35 lib/converting_page.rb:64
+msgid "Loading…"
+msgstr "Cargament…"
+
+#: lib/converting_page.rb:47
+msgid "Collecting files"
+msgstr "Recuperacion dels fichièrs"
+
+#: lib/converting_page.rb:52
+msgid "Converting"
+msgstr "Conversion"
+
+#: lib/converting_page.rb:53
+msgid "This could take a while"
+msgstr "Aquò pòt prendre de temps"
+
+#: lib/converting_page.rb:70 lib/stop_converting_dialog.rb:49
+msgid "_Cancel"
+msgstr "_Anullar"
+
+#: lib/drag_overlay.rb:35
+msgid "Drop Here to Open"
+msgstr "Depausatz aicí per dobrir"
+
+#: lib/error_dialog.rb:44
+msgid "Error While Processing"
+msgstr "Error pendent lo tractament"
+
+#: lib/error_dialog.rb:72
+msgid "_Close"
+msgstr "_Tampar"
+
+#: lib/error_dialog.rb:73
+msgid "_Copy to Clipboard"
+msgstr "_Copiar cap al quichapapièr"
+
+#: lib/file_chooser.rb:107
+msgid "_Select Images"
+msgstr "Seleccionar los imatges"
+
+#: lib/file_chooser.rb:115
+msgid "Images"
+msgstr "Imatges"
+
+#: lib/file_chooser.rb:160
+msgid "Unspecified filetype"
+msgstr "Tipe de fichièr pas especificat"
+
+#: lib/file_chooser.rb:171
+msgid "Unknown filetype"
+msgstr "Tipe de fichièr desconegut"
+
+#: lib/file_chooser.rb:173
+msgid "Used the wrong filetype"
+msgstr "Utilizacion del marrit tipe de fichièr"
+
+#: lib/image_rest.rb:82
+msgid "+{}"
+msgstr ""
+
+#: lib/image_rest.rb:87
+msgid "Show All"
+msgstr "Afichar tot"
+
+#: lib/image_rest.rb:91
+msgid "Show {} more images"
+msgstr ""
+
+#: lib/image_thumbnail.rb:156
+msgid "Remove image"
+msgstr ""
+
+#: lib/invalid_image_page.rb:26
 msgid "Could not Load Image"
 msgstr "Cargament impossible de l’imatge"
 
-#: data/resources/blueprints/window.blp:309
+#: lib/invalid_image_page.rb:27
 msgid "This image could be corrupted or may use an unsupported file format."
 msgstr ""
 "Aqueste imatge poiriá èsser corromput o utilizar un format de fichièr pas "
 "pres en carga."
 
-#: data/resources/blueprints/window.blp:321
-msgid "Converting"
-msgstr "Conversion"
-
-#: data/resources/blueprints/window.blp:322
-msgid "This could take a while"
-msgstr "Aquò pòt prendre de temps"
-
-#: data/resources/blueprints/window.blp:332 src/window.rs:935
-msgid "Loading…"
-msgstr "Cargament…"
-
-#: data/resources/blueprints/window.blp:338 src/window.rs:553
-#: src/window.rs:1615
-msgid "_Cancel"
-msgstr "_Anullar"
-
-#: data/resources/blueprints/window.blp:362
-msgid "All Images"
-msgstr "Totes los imatges"
-
-#: data/resources/blueprints/window.blp:436
-msgid "Paste From Clipboard"
-msgstr "Pegar a partir del quichapapièrs"
-
-#: data/resources/blueprints/window.blp:441
-msgid "New Window"
-msgstr "Fenèstra novèla"
-
-#: data/resources/blueprints/window.blp:446
-msgid "Clear Window"
-msgstr "Voidar la fenèstra"
-
-#: data/resources/blueprints/window.blp:453
-msgid "Keyboard Shortcuts"
-msgstr "Acorchis clavièr"
-
-#: data/resources/blueprints/window.blp:458
-msgid "About Switcheroo"
-msgstr "A prepaus de Switcheroo"
-
-#: src/file_chooser.rs:39 src/window.rs:2203
-msgid "Unsupported filetype"
-msgstr "Fichièr imatge pas pres en carga"
-
-#: src/file_chooser.rs:88
-msgid "Images"
-msgstr "Imatges"
-
-#: src/file_chooser.rs:91
-msgid "_Select Images"
-msgstr "Seleccionar los imatges"
-
-#: src/file_chooser.rs:182
-msgid "Unspecified filetype"
-msgstr "Tipe de fichièr pas especificat"
-
-#: src/file_chooser.rs:187
-msgid "Unknown filetype"
-msgstr "Tipe de fichièr desconegut"
-
-#: src/file_chooser.rs:192
-msgid "Used the wrong filetype"
-msgstr "Utilizacion del marrit tipe de fichièr"
-
-#: src/magick.rs:158
-msgid "Pasted Image"
-msgstr "Imatge pegat"
-
-#: src/magick.rs:375
+#: lib/magick.rb:547
 msgid "Unknown IO error happened"
 msgstr "Error de lectura o escritura desconeguda"
 
-#. Translators: Replace "translator-credits" with your names, one name per line
-#: src/widgets/about_window.rs:25
-msgid "translator-credits"
-msgstr "Quentin PAGÈS"
+#: lib/primary_menu.rb:37
+msgid "Paste From Clipboard"
+msgstr "Pegar a partir del quichapapièrs"
 
-#: src/widgets/about_window.rs:32
-msgid "Code and Design Borrowed from"
-msgstr "Còdi e design manlevats de"
+#: lib/primary_menu.rb:38
+msgid "New Window"
+msgstr "Fenèstra novèla"
 
-#: src/widgets/about_window.rs:44
-msgid "Sample Image from"
-msgstr "Imatge d’exemple de"
+#: lib/primary_menu.rb:39
+msgid "Clear Window"
+msgstr "Voidar la fenèstra"
 
-#: src/window.rs:507
-msgid "New transparency layer color: {}"
-msgstr "Color de jaç de transparéncia novèla : {}"
+#: lib/primary_menu.rb:45
+msgid "Keyboard Shortcuts"
+msgstr "Acorchis clavièr"
 
-#: src/window.rs:527
-msgid "Unable to access dropped files"
-msgstr "Impossible d'accedir als fichièrs depausats"
+#: lib/primary_menu.rb:46
+msgid "About Switcheroo"
+msgstr "A prepaus de Switcheroo"
 
-#: src/window.rs:549 src/window.rs:1610
+#: lib/shortcuts_dialog.rb:31
+msgctxt "shortcut window"
+msgid "General"
+msgstr "General"
+
+#: lib/shortcuts_dialog.rb:42
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Afichar los acorchis"
+
+#: lib/shortcuts_dialog.rb:43
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Sortir"
+
+#: lib/shortcuts_dialog.rb:44
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "Fenèstra novèla"
+
+#: lib/shortcuts_dialog.rb:45
+msgctxt "shortcut window"
+msgid "Clear Window"
+msgstr "Voidar la fenèstra"
+
+#: lib/shortcuts_dialog.rb:46
+msgctxt "shortcut window"
+msgid "Paste From Clipboard"
+msgstr "Pegar a partir del quichapapièrs"
+
+#: lib/shortcuts_dialog.rb:47
+msgctxt "shortcut window"
+msgid "Add Images"
+msgstr "Apondre d’imatges"
+
+#: lib/stop_converting_dialog.rb:40
 msgid "Stop converting?"
 msgstr "Arrestar la conversion ?"
 
-#: src/window.rs:550 src/window.rs:1611
+#: lib/stop_converting_dialog.rb:41
 msgid "You will lose all progress."
 msgstr "Perdretz totes vòstres progrèsses."
 
-#: src/window.rs:554 src/window.rs:1615
+#: lib/stop_converting_dialog.rb:50
 msgid "_Stop"
 msgstr "_Arrestar"
 
-#: src/window.rs:594
-msgid "Collecting files"
-msgstr "Recuperacion dels fichièrs"
+#: lib/temp_dir.rb:93
+msgid "Pasted Image"
+msgstr "Imatge pegat"
 
-#: src/window.rs:1285
-msgid ""
-"The 'gs' (GhostScript) command is not available on your system. Please "
-"install GhostScript to convert multiple files to PDF."
-msgstr ""
-"La comanda « gs » (GhostScript)  es pas disponibla sul sistèma. Mercés "
-"d'installar GhostScript per convertir mantun fichièr en PDF."
+#: lib/welcome_page.rb:34
+msgid "Drag and drop images here"
+msgstr "Lissar e depausar los imatges aicí"
 
-#: src/window.rs:1289
-msgid ""
-"The 'zip' command is not available on your system. Please install zip to "
-"convert multiple files to ZIP."
-msgstr ""
-"La comanda « zip » es pas disponibla sul sistèma. Mercés d'installar zip per "
-"convertir mantun fichièr en ZIP."
+#: lib/welcome_page.rb:45
+msgid "_Open Images…"
+msgstr "_Dobrir un imatge…"
 
-#: src/window.rs:1528
-msgid "Error While Processing"
-msgstr "Error pendent lo tractament"
+#~ msgid ""
+#~ "The 'gs' (GhostScript) command is not available on your system. Please "
+#~ "install GhostScript to convert multiple files to PDF."
+#~ msgstr ""
+#~ "La comanda « gs » (GhostScript)  es pas disponibla sul sistèma. Mercés "
+#~ "d'installar GhostScript per convertir mantun fichièr en PDF."
 
-#: src/window.rs:1549
-msgid "_Close"
-msgstr "_Tampar"
-
-#: src/window.rs:1550
-msgid "_Copy to Clipboard"
-msgstr "_Copiar cap al quichapapièr"
-
-#: src/window.rs:1561
-msgid "Error copied to clipboard"
-msgstr "Error copiada al quichapapièrs"
-
-#: src/window.rs:1577
-msgid "Image converted"
-msgstr "Imatge convertit"
-
-#: src/window.rs:1578
-msgid "Open"
-msgstr "Dobrir"
-
-#: src/window.rs:1640
-msgid "Converting Cancelled"
-msgstr "Conversion anullada"
+#~ msgid ""
+#~ "The 'zip' command is not available on your system. Please install zip to "
+#~ "convert multiple files to ZIP."
+#~ msgstr ""
+#~ "La comanda « zip » es pas disponibla sul sistèma. Mercés d'installar zip "
+#~ "per convertir mantun fichièr en ZIP."
 
 #~ msgctxt "shortcut window"
 #~ msgid "Show Less Popular Datatypes"
@@ -404,9 +430,6 @@ msgstr "Conversion anullada"
 
 #~ msgid "converting"
 #~ msgstr "conversion"
-
-#~ msgid "processing"
-#~ msgstr "tractament"
 
 #~ msgctxt "shortcut window"
 #~ msgid "Open New Images"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: switcheroo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-17 15:48-0400\n"
+"POT-Creation-Date: 2026-11-03 00:27+0000\n"
 "PO-Revision-Date: 2024-07-17 15:48+CET\n"
 "Last-Translator: Wolf-Wolf https://gitlab.com/wolf-wolf\n"
 "Language-Team: Czech\n"
@@ -16,32 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:3
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:5
-#: data/resources/blueprints/window.blp:9
-#: data/resources/blueprints/window.blp:21
-#: data/resources/blueprints/window.blp:57 src/main.rs:30
-#: src/widgets/about_window.rs:24
-msgid "Switcheroo"
-msgstr "Switcheroo"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:4
-msgid "Image Converter"
-msgstr "Převodník obrázků"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:5
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:11
-msgid "Convert and manipulate images"
-msgstr "Převést a manipulovat obrázky"
-
-#: data/io.gitlab.adhami3310.Converter.desktop.in.in:11
-msgid "converter;image;convert;converting;processing"
-msgstr "converter;image;convert;converting;processing"
-
-#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:26
-msgid "Shows less popular datatypes in the menu"
-msgstr "Zobrazit méně populární datové typy v menu"
 
 #: data/io.gitlab.adhami3310.Converter.gschema.xml.in:30
 msgid "Window width"
@@ -71,303 +45,363 @@ msgstr "Výstupní formát"
 msgid "Compression format"
 msgstr "Formát pro kompresi"
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:17
+#: data/io.gitlab.adhami3310.Converter.gschema.xml.in:58
+msgid "Resize unit (percentage or pixels)"
+msgstr ""
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:9
+#: data/switcheroo.desktop.in:4
+msgid "Convert and manipulate images"
+msgstr "Převést a manipulovat obrázky"
+
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:15
 msgid "Convert between different image filetypes and resize them easily."
-msgstr "Převádějte mezi různými typy obrázků a měňte jejich velikost jednoduše."
+msgstr ""
+"Převádějte mezi různými typy obrázků a měňte jejich velikost jednoduše."
 
 #: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:42
 msgid "Converting sample image from PNG to HEIF"
 msgstr "Převádění ukázkového obrázku z PNG do HEIF"
 
-#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:46
+#: data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in:47
 msgid "Converting multiple sample images from SVG to HEIF"
 msgstr "Převádění ukázkového obrázku z SVG do HEIF"
 
-#: data/resources/blueprints/help-overlay.blp:11
+#: data/switcheroo.desktop.in:3
+msgid "Image Converter"
+msgstr "Převodník obrázků"
+
+#: data/switcheroo.desktop.in:10
+msgid "converter;image;convert;converting;processing"
+msgstr "converter;image;convert;converting;processing"
+
+#: lib/about_dialog.rb:91
+msgid "translator-credits"
+msgstr "Wolf-Wolf https://gitlab.com/wolf-wolf"
+
+#: lib/about_dialog.rb:155
+msgid "Create bootable drives"
+msgstr ""
+
+#: lib/about_dialog.rb:155
+#, fuzzy
+#| msgid "Compression format"
+msgid "Impression"
+msgstr "Formát pro kompresi"
+
+#: lib/about_dialog.rb:157
+msgid "Footage"
+msgstr ""
+
+#: lib/about_dialog.rb:157
+msgid "Polish your videos"
+msgstr ""
+
+#: lib/about_dialog.rb:163
+msgid "Code and Design Borrowed from"
+msgstr "Kód a návrh vypůjčený z"
+
+#: lib/about_dialog.rb:172
+msgid "Sample Image from"
+msgstr "Ukázkový obrázek z"
+
+#: lib/all_images_page.rb:63
+msgid "All Images"
+msgstr "Všechny obrázky"
+
+#: lib/all_images_page.rb:74 lib/app_window.rb:163
+msgid "Add Images (Ctrl+O)"
+msgstr "Přidat obrázky (Ctrl+O)"
+
+#: lib/app_window.rb:122 lib/file_chooser.rb:44
+msgid "Unsupported filetype"
+msgstr "Nepodporovaný typ souboru"
+
+#: lib/app_window.rb:133 lib/app_window.rb:147 lib/welcome_page.rb:33
+msgid "Switcheroo"
+msgstr "Switcheroo"
+
+#: lib/app_window.rb:173
+msgid "Primary Menu"
+msgstr "Hlavní menu"
+
+#: lib/app_window.rb:479
+msgid "Unable to access dropped files"
+msgstr "Není možné přistoupit k odloženým souborům"
+
+#: lib/app_window.rb:923
+msgid "Error copied to clipboard"
+msgstr "Chyba při kopírování do schránky"
+
+#: lib/app_window.rb:930
+msgid "Image converted"
+msgstr "Obrázek převeden"
+
+#: lib/app_window.rb:931
+msgid "Open"
+msgstr "Otevřít"
+
+#: lib/app_window.rb:967
+msgid "Converting Cancelled"
+msgstr "Převod zastaven"
+
+#: lib/application.rb:68
+msgid "Open a new window"
+msgstr ""
+
+#: lib/convert_page.rb:276
+msgid "Export Format"
+msgstr "Formát pro export"
+
+#: lib/convert_page.rb:283
+msgid "Save as multi-page PDF"
+msgstr "Uložit jako vícestránkové PDF"
+
+#: lib/convert_page.rb:297
+msgid "Save To ZIP"
+msgstr "Uložit do ZIPu"
+
+#: lib/convert_page.rb:333
+msgid "Background Color"
+msgstr "Barva pozadí"
+
+#: lib/convert_page.rb:334
+msgid "Replaces original transparency layer"
+msgstr "Nahradí původní vrstvu průhlednosti"
+
+#: lib/convert_page.rb:354
+msgid "Pixel Density Per Inch"
+msgstr "Hustota pixelů na palec"
+
+#: lib/convert_page.rb:369
+msgid "Resize"
+msgstr "Změnit velikost"
+
+#: lib/convert_page.rb:379 lib/convert_page.rb:387 lib/convert_page.rb:391
+msgid "Width"
+msgstr "Šířka"
+
+#: lib/convert_page.rb:383 lib/convert_page.rb:391
+msgid "Height"
+msgstr "Výška"
+
+#: lib/convert_page.rb:399
+msgid "Preserve aspect ratio"
+msgstr "Zachovat poměr stran"
+
+#: lib/convert_page.rb:417
+msgid "%"
+msgstr "%"
+
+#: lib/convert_page.rb:417
+msgid "px"
+msgstr "px"
+
+#: lib/convert_page.rb:425
+msgid "Resize Algorithm"
+msgstr "Změnit velikost algoritmu"
+
+#: lib/convert_page.rb:438
+msgid "Default"
+msgstr "Výchozí"
+
+#: lib/convert_page.rb:445
+msgid "Pixel Art"
+msgstr "Pixel Art"
+
+#: lib/convert_page.rb:452
+msgid "Remove Metadata"
+msgstr ""
+
+#: lib/convert_page.rb:466
+msgid "_Convert"
+msgstr "_Převést"
+
+#: lib/convert_page.rb:572
+msgid "New transparency layer color: {}"
+msgstr ""
+
+#: lib/convert_page.rb:579
+msgid "Choose between resizing with percentages or using exact pixels"
+msgstr ""
+"Vyberte si mezi změnou velikosti pomocí procent nebo použitím přesného počtu "
+"pixelů"
+
+#: lib/convert_page.rb:597
+msgid "Quality"
+msgstr "Kvalita"
+
+#: lib/converting_page.rb:35 lib/converting_page.rb:64
+msgid "Loading…"
+msgstr "Načítání…"
+
+#: lib/converting_page.rb:47
+msgid "Collecting files"
+msgstr "Sběr souborů"
+
+#: lib/converting_page.rb:52
+msgid "Converting"
+msgstr "Převádění"
+
+#: lib/converting_page.rb:53
+msgid "This could take a while"
+msgstr "Chvíli to bude trvat"
+
+#: lib/converting_page.rb:70 lib/stop_converting_dialog.rb:49
+msgid "_Cancel"
+msgstr "_Zrušit"
+
+#: lib/drag_overlay.rb:35
+msgid "Drop Here to Open"
+msgstr "Otevřete zde"
+
+#: lib/error_dialog.rb:44
+msgid "Error While Processing"
+msgstr "Chyba při provádění procesu"
+
+#: lib/error_dialog.rb:72
+msgid "_Close"
+msgstr "_Zavřít"
+
+#: lib/error_dialog.rb:73
+msgid "_Copy to Clipboard"
+msgstr "_Zkopírovat do schránky"
+
+#: lib/file_chooser.rb:107
+msgid "_Select Images"
+msgstr "_Zvolit obrázky"
+
+#: lib/file_chooser.rb:115
+msgid "Images"
+msgstr "Obrázky"
+
+#: lib/file_chooser.rb:160
+msgid "Unspecified filetype"
+msgstr "Nespecifikovaný typ souboru"
+
+#: lib/file_chooser.rb:171
+msgid "Unknown filetype"
+msgstr "Neznámý typ souboru"
+
+#: lib/file_chooser.rb:173
+msgid "Used the wrong filetype"
+msgstr "Používán nesprávný typ souboru"
+
+#: lib/image_rest.rb:82
+msgid "+{}"
+msgstr ""
+
+#: lib/image_rest.rb:87
+msgid "Show All"
+msgstr "Zobrazit vše"
+
+#: lib/image_rest.rb:91
+msgid "Show {} more images"
+msgstr ""
+
+#: lib/image_thumbnail.rb:156
+msgid "Remove image"
+msgstr ""
+
+#: lib/invalid_image_page.rb:26
+msgid "Could not Load Image"
+msgstr "Obrázek není možné načíst"
+
+#: lib/invalid_image_page.rb:27
+msgid "This image could be corrupted or may use an unsupported file format."
+msgstr ""
+"Tento obrázek je nejspíš poškozený nebo možná používá nepodporovaný "
+"souborový formát."
+
+#: lib/magick.rb:547
+msgid "Unknown IO error happened"
+msgstr "Došlo k neznámé vstupní nebo výstupní chybě"
+
+#: lib/primary_menu.rb:37
+msgid "Paste From Clipboard"
+msgstr "Vložit ze schránky"
+
+#: lib/primary_menu.rb:38
+msgid "New Window"
+msgstr "Nové okno"
+
+#: lib/primary_menu.rb:39
+msgid "Clear Window"
+msgstr "Průhledné okno"
+
+#: lib/primary_menu.rb:45
+msgid "Keyboard Shortcuts"
+msgstr "Klávesové zkratky"
+
+#: lib/primary_menu.rb:46
+msgid "About Switcheroo"
+msgstr "O aplikaci Switcheroo"
+
+#: lib/shortcuts_dialog.rb:31
 msgctxt "shortcut window"
 msgid "General"
 msgstr "Obecné"
 
-#: data/resources/blueprints/help-overlay.blp:14
+#: lib/shortcuts_dialog.rb:42
 msgctxt "shortcut window"
 msgid "Show Shortcuts"
 msgstr "Zobrazit zkratky"
 
-#: data/resources/blueprints/help-overlay.blp:19
+#: lib/shortcuts_dialog.rb:43
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Ukončit"
 
-#: data/resources/blueprints/help-overlay.blp:24
+#: lib/shortcuts_dialog.rb:44
 msgctxt "shortcut window"
 msgid "New Window"
 msgstr "Nové okno"
 
-#: data/resources/blueprints/help-overlay.blp:29
+#: lib/shortcuts_dialog.rb:45
 msgctxt "shortcut window"
 msgid "Clear Window"
 msgstr "Vyčistit okno"
 
-#: data/resources/blueprints/help-overlay.blp:34
-msgctxt "shortcut window"
-msgid "Show Less Popular Datatypes"
-msgstr "Zobrazit méně populární datové typy"
-
-#: data/resources/blueprints/help-overlay.blp:39
+#: lib/shortcuts_dialog.rb:46
 msgctxt "shortcut window"
 msgid "Paste From Clipboard"
 msgstr "Vložit ze schránky"
 
-#: data/resources/blueprints/help-overlay.blp:44
+#: lib/shortcuts_dialog.rb:47
 msgctxt "shortcut window"
 msgid "Add Images"
 msgstr "Přidat obrázky"
 
-#: data/resources/blueprints/image-rest.blp:21
-msgid "Show All"
-msgstr "Zobrazit vše"
-
-#: data/resources/blueprints/window.blp:15
-msgid "Drop Here to Open"
-msgstr "Otevřete zde"
-
-#: data/resources/blueprints/window.blp:29
-#: data/resources/blueprints/window.blp:370
-msgid "Add Images (Ctrl+O)"
-msgstr "Přidat obrázky (Ctrl+O)"
-
-#: data/resources/blueprints/window.blp:40
-msgid "Primary Menu"
-msgstr "Hlavní menu"
-
-#: data/resources/blueprints/window.blp:58
-msgid "Drag and drop images here"
-msgstr "Přetáhněte obrázky sem"
-
-#: data/resources/blueprints/window.blp:69
-msgid "_Open Images…"
-msgstr "_Otevřít obrázky…"
-
-#: data/resources/blueprints/window.blp:122
-msgid "Export Format"
-msgstr "Formát pro export"
-
-#: data/resources/blueprints/window.blp:127
-msgid "Save as multi-page PDF"
-msgstr "Uložit jako vícestránkové PDF"
-
-#: data/resources/blueprints/window.blp:137
-msgid "Save To ZIP"
-msgstr "Uložit do ZIPu"
-
-#: data/resources/blueprints/window.blp:150
-msgid "Quality"
-msgstr "Kvalita"
-
-#: data/resources/blueprints/window.blp:170
-msgid "Background Color"
-msgstr "Barva pozadí"
-
-#: data/resources/blueprints/window.blp:171
-msgid "Replaces original transparency layer"
-msgstr "Nahradí původní vrstvu průhlednosti"
-
-#: data/resources/blueprints/window.blp:185
-msgid "Pixel Density Per Inch"
-msgstr "Hustota pixelů na palec"
-
-#: data/resources/blueprints/window.blp:197
-msgid "Resize"
-msgstr "Změnit velikost"
-
-#: data/resources/blueprints/window.blp:202
-#: data/resources/blueprints/window.blp:203
-#: data/resources/blueprints/window.blp:210
-#: data/resources/blueprints/window.blp:212
-#: data/resources/blueprints/window.blp:233
-msgid "Width"
-msgstr "Šířka"
-
-#: data/resources/blueprints/window.blp:220
-msgid "Preserve aspect ratio"
-msgstr "Zachovat poměr stran"
-
-#: data/resources/blueprints/window.blp:225
-#: data/resources/blueprints/window.blp:226
-#: data/resources/blueprints/window.blp:234
-msgid "Height"
-msgstr "Výška"
-
-#: data/resources/blueprints/window.blp:245
-msgid "Choose between resizing with percentages or using exact pixels"
-msgstr "Vyberte si mezi změnou velikosti pomocí procent nebo použitím přesného počtu pixelů"
-
-#: data/resources/blueprints/window.blp:249
-msgid "%"
-msgstr "%"
-
-#: data/resources/blueprints/window.blp:249
-msgid "px"
-msgstr "px"
-
-#: data/resources/blueprints/window.blp:258
-msgid "Resize Algorithm"
-msgstr "Změnit velikost algoritmu"
-
-#: data/resources/blueprints/window.blp:264
-msgid "Default"
-msgstr "Výchozí"
-
-#: data/resources/blueprints/window.blp:268
-msgid "Pixel Art"
-msgstr "Pixel Art"
-
-#: data/resources/blueprints/window.blp:282
-msgid "_Convert"
-msgstr "_Převést"
-
-#: data/resources/blueprints/window.blp:308
-msgid "Could not Load Image"
-msgstr "Obrázek není možné načíst"
-
-#: data/resources/blueprints/window.blp:309
-msgid "This image could be corrupted or may use an unsupported file format."
-msgstr "Tento obrázek je nejspíš poškozený nebo možná používá nepodporovaný souborový formát."
-
-#: data/resources/blueprints/window.blp:321
-msgid "Converting"
-msgstr "Převádění"
-
-#: data/resources/blueprints/window.blp:322
-msgid "This could take a while"
-msgstr "Chvíli to bude trvat"
-
-#: data/resources/blueprints/window.blp:332 src/window.rs:770
-msgid "Loading…"
-msgstr "Načítání…"
-
-#: data/resources/blueprints/window.blp:338 src/window.rs:449
-#: src/window.rs:1363
-msgid "_Cancel"
-msgstr "_Zrušit"
-
-#: data/resources/blueprints/window.blp:362
-msgid "All Images"
-msgstr "Všechny obrázky"
-
-#: data/resources/blueprints/window.blp:436
-msgid "Paste From Clipboard"
-msgstr "Vložit ze schránky"
-
-#: data/resources/blueprints/window.blp:441
-msgid "New Window"
-msgstr "Nové okno"
-
-#: data/resources/blueprints/window.blp:446
-msgid "Clear Window"
-msgstr "Průhledné okno"
-
-#: data/resources/blueprints/window.blp:453
-msgid "Show Less Popular Datatypes"
-msgstr "Zobrazit méně populární datové typy"
-
-#: data/resources/blueprints/window.blp:460
-msgid "Keyboard Shortcuts"
-msgstr "Klávesové zkratky"
-
-#: data/resources/blueprints/window.blp:465
-msgid "About Switcheroo"
-msgstr "O aplikaci Switcheroo"
-
-#: src/file_chooser.rs:39
-msgid "Unsupported filetype"
-msgstr "Nepodporovaný typ souboru"
-
-#: src/file_chooser.rs:77
-msgid "Images"
-msgstr "Obrázky"
-
-#: src/file_chooser.rs:80
-msgid "_Select Images"
-msgstr "_Zvolit obrázky"
-
-#: src/file_chooser.rs:159
-msgid "Unspecified filetype"
-msgstr "Nespecifikovaný typ souboru"
-
-#: src/file_chooser.rs:164
-msgid "Unknown filetype"
-msgstr "Neznámý typ souboru"
-
-#: src/file_chooser.rs:169
-msgid "Used the wrong filetype"
-msgstr "Používán nesprávný typ souboru"
-
-#: src/magick.rs:156
-msgid "Pasted Image"
-msgstr "Vložený obrázek"
-
-#: src/magick.rs:364
-msgid "Unknown IO error happened"
-msgstr "Došlo k neznámé vstupní nebo výstupní chybě"
-
-#. Translators: Replace "translator-credits" with your names, one name per line
-#: src/widgets/about_window.rs:28
-msgid "translator-credits"
-msgstr "Wolf-Wolf https://gitlab.com/wolf-wolf"
-
-#: src/widgets/about_window.rs:35
-msgid "Code and Design Borrowed from"
-msgstr "Kód a návrh vypůjčený z"
-
-#: src/widgets/about_window.rs:47
-msgid "Sample Image from"
-msgstr "Ukázkový obrázek z"
-
-#: src/window.rs:422
-msgid "Unable to access dropped files"
-msgstr "Není možné přistoupit k odloženým souborům"
-
-#: src/window.rs:445 src/window.rs:1358
+#: lib/stop_converting_dialog.rb:40
 msgid "Stop converting?"
 msgstr "Zastavit převod?"
 
-#: src/window.rs:446 src/window.rs:1359
+#: lib/stop_converting_dialog.rb:41
 msgid "You will lose all progress."
 msgstr "Ztratíte veškerý pokrok."
 
-#: src/window.rs:450 src/window.rs:1363
+#: lib/stop_converting_dialog.rb:50
 msgid "_Stop"
 msgstr "_Zastavit"
 
-#: src/window.rs:486
-msgid "Collecting files"
-msgstr "Sběr souborů"
+#: lib/temp_dir.rb:93
+msgid "Pasted Image"
+msgstr "Vložený obrázek"
 
-#: src/window.rs:1286
-msgid "Error While Processing"
-msgstr "Chyba při provádění procesu"
+#: lib/welcome_page.rb:34
+msgid "Drag and drop images here"
+msgstr "Přetáhněte obrázky sem"
 
-#: src/window.rs:1307
-msgid "_Close"
-msgstr "_Zavřít"
+#: lib/welcome_page.rb:45
+msgid "_Open Images…"
+msgstr "_Otevřít obrázky…"
 
-#: src/window.rs:1308
-msgid "_Copy to Clipboard"
-msgstr "_Zkopírovat do schránky"
+#~ msgid "Shows less popular datatypes in the menu"
+#~ msgstr "Zobrazit méně populární datové typy v menu"
 
-#: src/window.rs:1316
-msgid "Error copied to clipboard"
-msgstr "Chyba při kopírování do schránky"
+#~ msgctxt "shortcut window"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "Zobrazit méně populární datové typy"
 
-#: src/window.rs:1331
-msgid "Image converted"
-msgstr "Obrázek převeden"
-
-#: src/window.rs:1332
-msgid "Open"
-msgstr "Otevřít"
-
-#: src/window.rs:1385
-msgid "Converting Cancelled"
-msgstr "Převod zastaven"
+#~ msgid "Show Less Popular Datatypes"
+#~ msgstr "Zobrazit méně populární datové typy"
