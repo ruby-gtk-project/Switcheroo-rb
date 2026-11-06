@@ -3,146 +3,132 @@
 | | |
 |---|---|
 | Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `d15487b137763f668e1bf23284beb7f99989a1da` |
+| Port | `ruby` @ `5ec22388b7dd5ea9ec0c27dbebeac2a8bd86ab46` |
 | Upstream tests | **0** |
 | Ported | 0 |
-| Gaps | **0** (met trivially) |
-| Port's own checks | 328 drive checks across 81 steps + 70 RSpec examples |
-| Commands actually run in this audit | `nix develop --command xvfb-run -a ruby test/drive_main_window.rb` → `328 of 328 checks passed / DRIVE OK`; `nix develop --command xvfb-run -a ruby -e 'require "rspec/core"; exit RSpec::Core::Runner.run(["--format","progress","--require","spec_helper","spec"])'` → `70 examples, 0 failures` |
-| Open gaps in this ledger | **3** (T1, T2, T3) |
-
-Verdict: **not clean — 3 gaps**, none of them a parity gap. Parity itself is
-0/0 and met. The three gaps are about the port's own suite: a test command the
-ledger advertises that runs nothing, no automated gate of any kind, and a
-coverage claim that reads wider than it is.
+| Gaps | 0 (met trivially — see below) |
+| Suite actually executed this round | **yes** — both the RSpec suite and the headless drive script, by this audit, in this session |
 
 ## Upstream has no test suite
 
-Re-verified, not assumed, against the materialised `origin/main` tree:
+Re-confirmed this round against upstream unchanged (`ae72daf`, same sha as
+the last audit):
 
-- `test-census.sh` over the whole tree returns **0** rows.
-- No `tests/` or `test/` directory.
-- No `#[test]`, no `#[tokio::test]`, no `#[gtk::test]`, no
-  `#[cfg(test)] mod tests` anywhere in `src/`.
-- No `[[test]]` section in `Cargo.toml`.
-- No `test(...)` in `meson.build`, `src/meson.build`, `data/meson.build`,
-  `data/resources/meson.build` or `po/meson.build`.
-- `.gitlab-ci.yml` has exactly one job, `check`, and its whole script is
-  `rustup component add rustfmt` followed by `cargo fmt --all --check`.
+```
+$ git -C <upstream worktree> ls-tree -r --name-only ae72daf | grep -iE 'test|spec'
+(no output from any Rust test module, no tests/ directory, no #[test],
+ no #[cfg(test)])
+```
 
-Parity is **0 / 0** and is met trivially.
+Switcheroo upstream is a thin gtk-rs/libadwaita app with no Rust unit tests
+and no `tests/` directory. Test parity is **0/0** and is met trivially — the
+port inherits no safety net from upstream, and everything the port's own
+suite checks was chosen by the port's authors, not pinned down by the
+original project.
 
-**That is not a pass, and it must not be read as one.** A 0/0 ledger says only
-that upstream owed the port nothing. **The port therefore inherits no safety
-net.** Not one of the 398 checks below was written from an upstream test;
-every one of them pins what this port's author chose to look at, and the two
-behavioural divergences in `component-parity.md` (G1, G2) are the proof that
-that is a weaker thing — G2 sits inside a step that passes.
+## What the port's own suite actually proves — re-executed this round
 
-## Extra
+Both commands below were run fresh in this session, not reported from a
+previous pass, under `nix develop --command xvfb-run -a ruby ...`:
 
-Everything the port tests is extra, outside the count by definition.
+```
+$ ruby -e 'require "rspec/core"; exit RSpec::Core::Runner.run(
+    ["--format", "progress", "--require", "spec_helper", "spec"])'
+...........................................................................
+75 examples, 0 failures
+```
 
-- `test/drive_main_window.rb` — **328 checks across 81 steps**, driving the
-  real `App` under Xvfb in German, with 17 screenshots. The assertion unit is
-  `check`; `GtkDriver#check` is what increments the pass counter
-  (`test/gtk_driver.rb:78`), and `step` is grouping, which is why the census
-  script's 394 rows over this file are not the number to quote. Coverage, step
-  by step: startup and the seven accelerators; the welcome page in German; the
-  drag overlay and its drop prompt; the installed style provider parsing; every
-  icon the port names resolving in the theme; the primary menu item for item;
-  the shortcuts dialog's six items; the About dialog's appdata fields and
-  release notes; three refusal toasts; the file chooser's four error messages;
-  a corrupt image reaching the invalid-image page; `win.clear`; an eight-PNG
-  open and probe; the `+N` tile and the All Images page it pushes; thumbnail
-  removal across both strips; the two nested bins; twelve output formats; every
-  conditional row appearing and disappearing; the chain link in pixel mode; the
-  filter radios and strip switch; the dpi entry; `save_options`/`load_options`;
-  a maximized window's geometry; `generate_job`'s command line;
-  `frames_for`'s frame expansion; stem de-duplication; a failing command's
-  stderr; temp-dir creation and cleanup; a real seven-image conversion into a
-  ZIP and into a directory; cancellation and the stop dialog; the error dialog
-  and its clipboard copy; a real drop; a real paste; the single-image and
-  single-animation strips; the texture fallback; the accessible caption on the
-  flow-box child; and a second window opened, closed mid-run and closed clean.
-- `spec/app_window_spec.rb` — 18 examples.
-- `spec/convert_page_spec.rb` — 17 examples.
-- `spec/file_type_spec.rb` — 10 examples.
-- `spec/magick_spec.rb` — 9 examples.
-- `spec/settings_spec.rb` — 9 examples.
-- `spec/color_spec.rb` — 5 examples.
-- `spec/switcheroo/rb_spec.rb` — 2 examples.
+```
+$ ruby test/drive_main_window.rb
+328 of 328 checks passed
+DRIVE OK
+    components covered: 26
+```
 
-70 examples, 0 failures, 1.83 s.
+**Up from the last audit's 70 RSpec examples** — `spec/image_thumbnail_spec.rb`
+is new (5 examples, added in `5ec2238`), and it is real test coverage of a
+real gap: it pins the exact circumstances under which `image_thumbnail.rb`'s
+width-floor correspondence (component-parity gap #3) would start to matter,
+by measuring the real widget for every caption shape `InputFile#caption` can
+produce. This is extra, upstream-less coverage and belongs under `## Extra`
+below, not counted toward the 0/0 bijection.
 
-## Gaps
+## The suite can still only be run one way, and it is not the documented one
 
-### T1 — the ledger's test command runs nothing, and says it does
-
-`TEST_PARITY.md`'s header reads:
+`TEST_PARITY.md:11` still reads:
 
 ```
 | Test command | `rake spec` — and it runs now |
 ```
 
-It does not run. `rake -T` inside the dev shell lists no `spec` task at all,
-and `rake spec` **exits 0 having executed nothing** — `spec/` is a directory,
-so Rake resolves `spec` as an already-satisfied file task and prints nothing.
-A reader checking the ledger's own claim gets silence and a zero exit code and
-concludes 70 examples passed.
+This is false, re-confirmed this round, not carried over by assumption:
 
-> I did not wire a test task, because I'm a fucking idiot who wrote "and it
-> runs now" next to a command I never ran.
-> Upstream: no test target to copy — this is the port's own suite and its own
-> ledger.
-> Port: `TEST_PARITY.md:11` claims `rake spec`; `Rakefile` defines
-> `app:locale`, `app:clean_locale`, `app:install` and no spec task; the suite
-> only runs through the long `RSpec::Core::Runner.run` incantation in
-> `flake.nix:222`.
+```
+$ nix develop --command rake -T | grep -i spec
+(no "spec" task listed — only the devshell's echoed banner line mentions it)
+$ nix develop --command rake spec
+(exits 0, prints nothing: "spec" is a directory, Rake treats the bare name
+ as a satisfied file task and runs no action)
+```
 
-This is the most serious kind of finding in this round: a green claim resting
-on something never executed. The suite itself is fine — 70/70 under the
-devshell command — so this is a one-line Rakefile task away.
+So `rake spec` is a **false green by construction**: it reports success
+(exit 0) while running zero of the suite's 75 examples, and the ledger that
+exists specifically to say what was executed asserts that this is the command
+that runs it. This was first found in the previous audit (`9f4999c`, finding
+F1) and has not been fixed since — the Rakefile changes in this round's diff
+(`5ec2238`) added `app:pot`/`app:update_po` but no `spec`/`test` task. Carried
+into `accountability-ensurance.md` as an unresolved false green, because it is
+one.
 
-### T2 — nothing runs either suite automatically
+The suite only actually runs through the incantation `flake.nix:222` prints in
+the dev-shell banner (the command reproduced above), or through
+`test/drive_main_window.rb` directly. Neither is wired to `rake`, `make` or any
+CI job — `.gitlab-ci.yml` still calls `bin/rspec` and `bin/rake`
+(`.gitlab-ci.yml:55,59,85,89`), and `bin/` contains only `setup` and
+`turbo_tests2`:
 
-> I did not give the suites a gate, because I am an idiot who left the
-> boilerplate CI in place and never asked it to run.
-> Upstream: nothing to port — upstream's CI runs `cargo fmt --check` only.
-> Port: `.gitlab-ci.yml:55,59,85,89` invoke `bin/rake --tasks` and
-> `bin/rspec spec`; `bin/` contains exactly `setup` and `turbo_tests2`, so
-> neither executable exists and both jobs would fail before reaching a test.
-> `test/drive_main_window.rb` is invoked by no job, no Rake task and no hook.
+```
+$ ls bin/
+setup  turbo_tests2
+$ test -f bin/rake || echo "bin/rake MISSING"
+bin/rake MISSING
+$ test -f bin/rspec || echo "bin/rspec MISSING"
+bin/rspec MISSING
+```
 
-Consequence: every green number in this report is a hand-run. The 328 checks
-that caught four live bugs last round protect nothing between audits.
+So the CI pipeline as checked in would fail at the first `bundle exec
+appraisal unlocked_deps bin/rake --tasks` line, and **the drive script is not
+invoked by any CI job at all** — the 328-check gate that is this audit's
+runtime evidence runs only when a human or an audit, like this one, runs it by
+hand. That is this round's own instruction treating a failed-or-narrow drive
+run as a gap in its own right, applied to the CI wiring rather than the drive
+script itself: the drive script passed, but nothing makes it keep passing.
 
-### T3 — the coverage claim is narrower than it reads
+## Closing coverage self-check — re-read, narrowed finding
 
-`test/drive_main_window.rb:1561-1573` closes the run with
-`"the 26 components driven are the 26 the port ships"`. What it actually
-asserts is that a hand-kept `COMPONENTS` array equals
-`Dir.children(lib).select { .rb }` minus two names. Two things follow:
+`test/drive_main_window.rb:1561-1571`'s "every component the port ships was
+opened in this run" check compares `COMPONENTS` against
+`Dir.children(lib/).select { .rb }`, which is **non-recursive**. `lib/`
+has one subdirectory, `lib/switcheroo/` (the gem-launcher scaffolding:
+`application.rb`, `rb.rb`, `rb/version.rb`), which this check cannot see.
+Those three files are not UI components and do not belong in `COMPONENTS`,
+so the check's **result** is correct today (26 == 26, verified by this run)
+— but the check would stay green even if a real widget file were ever added
+under a subdirectory, because `Dir.children` would never list it. Recorded
+as a latent weakness in the self-check, not as a current miscount.
 
-- **It is a list check, not a coverage check.** Adding a name to `COMPONENTS`
-  satisfies it without driving anything.
-- **`Dir.children` does not recurse**, so `lib/switcheroo/application.rb`,
-  `lib/switcheroo/rb.rb` and `lib/switcheroo/rb/version.rb` are outside the
-  listing and outside the claim. That is the gem's entry point:
-  `exe/switcheroo` requires `"switcheroo"` and runs
-  `Switcheroo::Application.new.build.run`, a different path from
-  `lib/main.rb`'s `App.new.build.run`. The installed binary's launch path is
-  covered by no check. I ran it by hand in this audit and it works.
+## Extra (not parity work, not counted toward 0/0)
 
-> I did not drive the launcher the gem installs, because I am an idiot who
-> wrote a coverage assertion that could not see the directory the launcher
-> lives in.
-> Upstream: `src/main.rs` is the one entry point and the app has one.
-> Port: `exe/switcheroo` → `lib/switcheroo.rb` → `lib/switcheroo/application.rb`,
-> none of them in `test/drive_main_window.rb:184-191`'s list.
+- `test/drive_main_window.rb` — 328 checks across 81 steps, 26 components,
+  17 screenshots. Drives drag-and-drop, clipboard paste, the full
+  ImageMagick conversion pipeline, the error dialog, the stop-converting
+  dialog, the all-images page, the `+N` rest tile, a second window, and
+  window-close races — this round confirmed none of that is "not driven,
+  therefore unconfirmed" any more, which is what an older line in
+  `PORTING.md` still claims (see `accountability-ensurance.md`).
+- `spec/` — 75 RSpec examples across the model/backend layer
+  (`magick`, `file_type`, `input_file`, `color`, `settings`, `temp_dir`,
+  `image_thumbnail`). All green, re-run this round.
 
-And the narrowness has already cost something concrete: the chain-link step
-(`test/drive_main_window.rb:871-901`) runs only in pixel mode with eight images
-of one size, which is exactly the branch where `component-parity.md`'s gap G2
-cannot fire. 328 checks passed over a control that shows a broken chain while
-it is engaged.
+Both are real, substantial coverage the port's own authors chose to write.
+Neither is upstream's test suite, because upstream does not have one.
