@@ -322,20 +322,31 @@ file as `switcheroo.desktop.in` and installed under the app id by the
 ## Blockers
 
 None for component work — every user-facing component upstream declares has a
-`lib/*.rb` counterpart. The open items are behavioural and non-component:
+`lib/*.rb` counterpart. The open items are behavioural and non-component, and
+`COMPONENT_PARITY.md` (updated 2026-11-07, driven against the real app rather
+than only read) has since closed most of what an earlier pass flagged here:
 
-- **Behavioural divergences.** Nine recorded in
-  `.reports/component-parity.md`, including the two missing accessibility
-  `update_property` calls, the generic spawn-failure message that no longer
-  names `magick` or `zip`, the un-raised file-descriptor limit on a large
-  open, and `FileType#output?` rejecting `jpeg`.
-- **Unconfirmed behaviour.** The drop-target reveal, clipboard paste, the full
-  conversion pipeline, the error dialog, the stop dialog, the all-images page
-  and the `+N` tile are not exercised by `test/drive_main_window.rb`.
-- **Tree content not carried.** `COPYING`, the two screenshots the shipped
-  metainfo cites by URL, the two other-app icons the About dialog wants, the
-  Flatpak manifest, `Switcheroo.doap`, `PRESS.md` and
-  `update_translation.sh`.
+- **Tree content — now carried.** `COPYING`, `Switcheroo.doap`, `PRESS.md`,
+  `update_translation.sh` and the two screenshots (`data/screenshots/{0,1}.png`)
+  are all present in this tree; the previous round of this report predates
+  them. The two other-app icons the About dialog's "Other Apps" rows want
+  (`io.gitlab.adhami3310.Impression.svg`, `io.gitlab.adhami3310.Footage.svg`)
+  are also now in `data/icons/hicolor/scalable/apps/`.
+- **Remaining behavioural gaps** (`COMPONENT_PARITY.md` → "Remaining gaps"):
+  `image_thumbnail.rb`'s `size_allocate()` vfunc is not reproducible (Ruby
+  widget vfuncs are not dispatched); the transparency-colour accessible label
+  is announced rather than set (`update_property` raises
+  `NotImplementedError`); there is still no GResource bundle (assets are read
+  from `data/` instead); and the Flatpak manifest (`io.gitlab.adhami3310.Converter.json`)
+  is not started — there is no Ruby SDK extension to build it against, and no
+  `flatpak-builder`/GNOME runtime here to build it even once.
+- **Driven, not merely read.** `spec/` (70 examples) and
+  `test/drive_main_window.rb` now exercise the window, the convert page, the
+  thumbnail measurement and the magick spawn paths against a real headless
+  display (`gtk4-broadwayd`); this caught and fixed a startup crash
+  (`Gtk::IconTheme.for_display` → `get_for_display`) that a reading-only pass
+  had marked parity. The all-images page, the drop-target reveal, clipboard
+  paste and the full ZIP/PDF conversion pipeline are still not driven.
 - **Binding constraints, recorded as correspondences, not gaps.**
   `Adwaita::Application`/`ApplicationWindow` are unusable from Ruby, so the
   port builds on `Gtk::Application`; `Adw.AboutDialog.from_appdata` and the
