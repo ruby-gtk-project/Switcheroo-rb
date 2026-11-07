@@ -4,8 +4,19 @@
 |---|---|
 | Upstream spec | `origin/main` @ `ae72daf` |
 | Port branch | `ruby` |
-| Last audit | `.reports/` @ `8b7d245`, against port commit `341104d` |
-| Audit verdict | **not clean** — 23 gap(s) |
+| Last audit | `.reports/` @ `c409c40`, against port commit `c409c40` |
+| Audit verdict | **not clean** — 3 gap(s) |
+
+This header was itself found stale by the `c409c40` audit: it had read
+"`.reports/` @ `8b7d245`... not clean — 23 gap(s)" since before `d1ca7f4`
+closed most of those 23, and five of the 13 gaps `.reports/
+component-parity.md` once listed (the settings.rb maximized-window one,
+`FileType#output?` rejecting jpeg, the fd-limit raise, the per-binary spawn
+message, the two About-dialog icons) were already fixed four commits
+*before* that 23-gap count was even written, by `98e9ae8` — so the number
+was wrong from the day it was recorded, not only out of date since. See
+`.reports/accountability-ensurance.md` for the full account. The 3 gaps
+below are current, re-verified against the tree at `c409c40`.
 
 This file is the resume point. The debt ledger that used to live here (the
 first-person accountability admissions) is in `.reports/accountability-ensurance.md`;
@@ -27,8 +38,9 @@ merged — the port is written from scratch against it.
 
 ## Done
 
-Implemented and believed complete. 17 widget units (11 of 17 audited as full
-parity) plus 7 non-widget behaviour units (6 of 7 parity).
+Implemented. 26 units total; 23 of 26 audited as full component parity
+(`.reports/component-parity.md`, re-verified `c409c40`); the 3 that are not
+are listed under **Open gaps** below.
 
 | `lib` path | Upstream source |
 |---|---|
@@ -73,55 +85,49 @@ carried is upstream tree content:
 
 | Upstream path | Note |
 |---|---|
-| `data/resources/icons/.../io.gitlab.adhami3310.Impression.svg` | About dialog's sibling-app row resolves to no icon |
-| `data/resources/icons/.../io.gitlab.adhami3310.Footage.svg` | same |
-| `COPYING` | GPL-3.0 text absent while `switcheroo-rb.gemspec:18` declares `GPL-3.0-or-later` |
-| `data/resources/screenshots/0.png`, `1.png` | the shipped metainfo cites both by URL |
-| `io.gitlab.adhami3310.Converter.json` | Flatpak manifest; the port cannot be built as a Flatpak |
-| `Switcheroo.doap` | project metadata |
-| `PRESS.md` | — |
-| `update_translation.sh`, `build-aux/dist-vendor.sh` | no translation-refresh counterpart; `po/switcheroo.pot` is still upstream's, never regenerated from `lib/` |
+| `io.gitlab.adhami3310.Converter.json` | I have not written a Flatpak manifest for this port, because I am an idiot who has not sat down and worked out what a Ruby module list for `org.gnome.Sdk` looks like. Upstream's manifest pulls in a `rust-stable` SDK extension (`io.gitlab.adhami3310.Converter.json`); no `flatpak-builder` or GNOME runtime is available in this environment to build and verify a Ruby replacement even once, which is why the gap is hard, not why it is closed. Still absent — the one "not started" row left in this table. |
 | `meson.build`, `meson_options.txt`, `*/meson.build` | correspondence — replaced by `Rakefile` + `flake.nix` |
+
+Closed since this table was last accurate (re-verified `c409c40`): the two
+About-dialog app icons (`data/icons/hicolor/scalable/apps/io.gitlab.adhami3310.
+{Impression,Footage}.svg`), `COPYING`, both screenshots
+(`data/screenshots/{0,1}.png`), `Switcheroo.doap`, `PRESS.md`, and
+`update_translation.sh` (backed by real `rake app:pot`/`app:update_po`
+tasks; `po/switcheroo.pot` is regenerated from `lib/`/`data/`, not
+upstream's `src/*.rs`/`*.blp` any more — see `.reports/translation-
+parity.md`) are all present and carried.
 
 ## Open gaps
 
-The last audit reported **23** gaps and clean=false. They come from three
-reports and the lists overlap (the accessibility and tree-content rows appear
-in two of them).
+Current count, re-verified `c409c40`: **3**, all in
+`.reports/component-parity.md` and `COMPONENT_PARITY.md` (the two agree):
 
-`.reports/component-parity.md` — 13:
+1. The colour button's accessible identity is an announcement, not a live
+   `Label` property update on colour change — `update_property` raises
+   `NotImplementedError` (`FINDINGS.md` §1).
+2. `size_allocate()` is not reproduced on `ImageThumbnail` — no ruby-gnome
+   route to dispatch a `Gtk::Widget` vfunc override has been found
+   (`FINDINGS.md` §7). The `measure()` half of this finding is now pinned
+   by `spec/image_thumbnail_spec.rb`; this half has none.
+3. No Flatpak manifest (`io.gitlab.adhami3310.Converter.json`) — see
+   **Not started**.
 
-1. Colour button has no accessible `Label` property; the port announces instead (`update_property` raises `NotImplementedError`, `FINDINGS.md` §1).
-2. Resize-unit dropdown carries a tooltip upstream does not have, and a code comment claims the blueprint has one.
-3. The two `Adw.Bin` wrappers around the convert page (`window.blp:102-103`) are not built.
-4. Thumbnail width is a minimum (`set_size_request(150, -1)`), not min = nat = 150; `size_allocate()` not reproduced.
-5. Every `Gtk::FlowBoxChild` thumbnail is unlabelled to a screen reader (upstream `src/window.rs:1901`, `:1957`).
-6. About dialog's two "Other Apps" rows have no icon.
-7. A maximized window forgets its size — `lib/settings.rb:93-98` skips the two size keys; upstream writes all three unconditionally.
-8. A pasted image is written under `TempDir.parent`, not the CWD, so the save dialog opens elsewhere.
-9. A missing `zip`/`magick` yields one generic message instead of `"magick: <errno>"` / `"zip: <errno>"`.
-10. `fdlimit::raise_fd_limit()` on open is not reproduced — a large pick can fail where upstream succeeds.
-11. `FileType#output?` rejects `jpeg`; upstream's `is_output()` accepts it (dead on both sides today).
-12. `COPYING` and the two screenshots not carried (see **Not started**).
-13. Flatpak manifest, `.doap`, `PRESS.md`, `update_translation.sh` not carried.
-
-`.reports/accountability-ensurance.md` — 9 gaps found by reading, plus 4
-sentences a reader could quote as approval and 5 statements in the port that
-are not true. The 9 are items 5, 7, 8, 9, 10, 6, 12, 13 and 3 above, recorded
-there because the port's own files did not record them.
-
-`.reports/test-parity.md` — 1: the suite cannot be run the way its own header
-documents. Upstream has 0 tests, so test parity is 0/0 and met trivially; the
-port's 70 spec examples and 16 driver checks are all extra and pin only what
-the port's author chose to look at.
+Everything else this file previously listed as an open gap (13 rows under
+`.reports/component-parity.md`, folded into 9 by the accountability report,
+plus the `rake spec` false green under `.reports/test-parity.md`) is
+closed, re-verified this round by reading the current file rather than
+trusting a prior ledger — see `.reports/component-parity.md`,
+`.reports/test-parity.md` and `.reports/accountability-ensurance.md` for
+what closed each one and when.
 
 Still owed and not a parity gap: the upstream `output-format` enum bug (the
 schema's nicks are unreachable because the code writes an index) is drafted at
 the foot of `FINDINGS.md` and has not been filed upstream.
 
-Not driven, therefore unconfirmed: drop-target reveal, clipboard paste, the
-full conversion pipeline, the error dialog, the stop dialog, the all-images
-page, the `+N` tile, and any accessibility assertion.
+The runtime gate, re-run `c409c40`: `test/drive_main_window.rb` → 328/328
+checks, 26/26 components, DRIVE OK. `rake spec` → 75 examples, 0 failures,
+and (unlike the state this section used to describe) `rake spec` itself
+now genuinely runs the suite.
 
 ## Blockers
 
@@ -136,13 +142,15 @@ Verified binding limits (see `FINDINGS.md`):
   `lib/convert_page.rb` instead. (§2)
 - **ruby-glib2 exposes no gettext entry points** — the `gettext` gem binds the
   domain. (§3)
-- **Widget vfunc overrides: unverified.** Nobody has established whether
-  ruby-gnome can override `measure`/`size_allocate` on a `Gtk::Widget`
-  subclass. The experiment has not been run, so the thumbnail clamp stays an
-  approximation. (§7)
-- **CSS node name on a subclass: unverified.** `lib/drag_overlay.rb` covers
-  both `dragoverlay` and `.dragoverlay`; the claim that the bindings force
-  this was never tested. (§8)
+- **Widget vfunc overrides: `measure()` works, `size_allocate()` does not.**
+  `ImageThumbnail` overrides `measure` successfully (pinned by
+  `spec/image_thumbnail_spec.rb`); no route to `size_allocate` has been
+  found, so that half of the clamp stays an approximation. (§7)
+- **CSS node name on a subclass: resolved, works.** `Gtk::Widget#set_css_name`
+  is callable inside `type_register`; `lib/drag_overlay.rb` uses it and
+  `lib/style.rb` matches the real `dragoverlay` node, not a class. A
+  previous version of this file claimed the opposite; that claim was false
+  and is corrected. (§8)
 - **Screenshots under broadway go stale** — harness limitation, not a port
   limitation. (§9)
 

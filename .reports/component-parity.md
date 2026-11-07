@@ -3,99 +3,68 @@
 | | |
 |---|---|
 | Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `5ec22388b7dd5ea9ec0c27dbebeac2a8bd86ab46` |
-| Previous audit | `9f4999c` (12 gaps) |
-| This audit | re-verified every prior gap against the current tree, by file:line, plus re-ran the drive gate |
-| Units with full parity | 19 / 26 |
-| Open gaps | **9** (2 of the previous 12 are closed; 1 is reclassified; 0 new found) |
+| Port | `ruby` @ `c409c40a179995cef2c5e895b9748603de5f8a4b` |
+| Previous audit | `50bffc4` (9 gaps, port @ `5ec2238`) |
+| This audit | re-verified every prior gap against the current tree, file:line, plus re-ran the runtime gate independently |
+| Units with full parity | 23 / 26 |
+| Open gaps | **3** |
 
-Runtime gate re-run for this audit (not reported from the last pass):
+Runtime gate re-run for this audit:
 `nix develop --command xvfb-run -a ruby test/drive_main_window.rb` →
-**328 of 328 checks passed, DRIVE OK, 26 components covered.** RSpec:
-**75 examples, 0 failures** (up from 70 — `spec/image_thumbnail_spec.rb` is
-new, see `test-parity.md`).
+**328 of 328 checks passed, DRIVE OK, 26 components covered.**
+`nix develop --command xvfb-run -a rake spec` → **75 examples, 0 failures**,
+and `rake spec` itself now genuinely executes the suite (see
+`test-parity.md`; the last audit's own ledger was still describing the
+pre-fix state where it did not).
 
-## Gaps closed since the last audit
+## Gaps closed since the last audit — each re-verified by reading the current file, not by trusting the commit message
 
-1. **No extraction target.** `9f4999c` found `rake pot` named in `flake.nix`
-   and nowhere defined. `Rakefile` now has `namespace :app` with a real
-   `task :pot` (line 242) and `task update_po: :pot` (line 303), plus
-   top-level aliases `task pot: "app:pot"` / `task update_po: "app:update_po"`
-   (lines 453-457) and `update_translation.sh`. Re-run this round:
-   `nix develop --command rake app:pot` wrote `po/switcheroo.pot` with only
-   the `POT-Creation-Date` header line changed against the committed file —
-   confirmed by diffing before/after and reverting. **Closed, verified by
-   execution, not by reading.**
+| # (last audit) | Gap | Verified closed by |
+|---|---|---|
+| 1 | Application name (`GLib.application_name`) was the unmarked constant `APP_NAME`, never reaching the shipped Arabic/Ukrainian translation of "Switcheroo" | `lib/application.rb:85` now reads `GLib.application_name = _(APP_NAME)` |
+| 2 | `DragOverlay`'s CSS node was a style class standing in for a real GType node name, and `FINDINGS.md` §8 claimed (falsely) that the bindings have no route to set one | `lib/drag_overlay.rb:29-30` calls `set_css_name('dragoverlay')` inside `type_register`; `ProbeCssNamed.new.css_name` re-run this session returns `"dragoverlay"`; `lib/style.rb:33` matches the node directly; `FINDINGS.md` §8 rewritten to state the working route |
+| — | quality-row `GtkAdjustment` fragment carried `value`/`page-increment` that upstream's blueprint does not set | `lib/convert_page.rb`'s `quality_markup` now declares only `lower`, `upper`, `step-increment` — see `component-identification.md` |
+| — | A maximized window forgot its size (`lib/settings.rb:93-98` skipping two keys) | **This was never actually true at the audited commit.** `lib/settings.rb#remember` already wrote `window-width`, `window-height` and `is-maximized` unconditionally at `50bffc4` (`git diff 50bffc4 HEAD -- lib/settings.rb` is empty) and at `98e9ae8`, four commits earlier. The last audit's gap #8 was a misreading, not a regression that got fixed — see `accountability-ensurance.md` for why a wrong gap claim is itself a finding. |
+| — | `FileType#output?` rejected `jpeg` | `lib/file_type.rb:27` — `IS_OUTPUT_KEYS = (OUTPUT_KEYS + %i[jpeg]).freeze`. Also predates the last audit (`98e9ae8`); same misreading as above. |
+| — | `fdlimit::raise_fd_limit()` not reproduced | `lib/app_window.rb:326-330`, `raise_fd_limit`. Predates the last audit. |
+| — | A missing `zip`/`magick` gave one generic message | `lib/magick.rb:557-560`: `"#{command.first}: #{e.message}"` per spawn site. Predates the last audit. |
+| — | Two "Other Apps" rows (Impression, Footage) had no icon | `data/icons/hicolor/scalable/apps/io.gitlab.adhami3310.{Impression,Footage}.svg` exist and `lib/application.rb#add_icon_search_path` registers `Config.icon_directory` (`data/icons`) with the icon theme before the About dialog is ever shown — standard hicolor lookup, so `theme.has_icon?('io.gitlab.adhami3310.Impression')` resolves. Not driven live this round (no headless probe script existed for icon-theme lookup; see caveat below), but the static evidence (file present at the exact lookup path, search path registered at startup) is conclusive. |
+| — | `COPYING`, `Switcheroo.doap`, `PRESS.md`, the two screenshots, `update_translation.sh` not carried | all present; `po/switcheroo.pot` was regenerated via `rake app:pot` and now cites `lib/*.rb`/`data/*` (verified: `grep -c '^#:' po/switcheroo.pot` lines reference `lib/about_dialog.rb` etc., not `src/*.rs`) — see `translation-parity.md` |
 
-2. **False claim about `Gtk::Widget.set_css_name`, re-verified false, but
-   see below — not closed, reclassified.** `9f4999c` found
-   `FINDINGS.md:175-196` and the code comments on `lib/drag_overlay.rb` and
-   `lib/style.rb` asserting no route exists to give a Ruby subclass a real
-   CSS node name, and showed that claim is false. This round re-ran the same
-   probe independently:
-
-   ```ruby
-   class ProbeCssNamed < Adwaita::Bin
-     type_register
-   end
-   ProbeCssNamed.set_css_name('dragoverlay')   # => no error
-   ProbeCssNamed.new.css_name                  # => "dragoverlay"
-   ```
-
-   Confirmed working under `nix develop --command xvfb-run -a ruby`, this
-   session, gtk4/adwaita gems as pinned in `gemset.nix`. **The claim in
-   `FINDINGS.md` §8 is still false and the code still has not been fixed** —
-   `lib/drag_overlay.rb:29-36` still sets `CSS_NAME` as a style class, not a
-   real node name, and `lib/style.rb` still matches both a bare element
-   name and the class as a hedge. This is carried here as an open component
-   gap (the rendered CSS node name is `widget.dragoverlay`, not
-   `dragoverlay`, so any upstream stylesheet or external tooling selecting
-   the bare element name would not match) and separately as the headline
-   finding in `accountability-ensurance.md`, because the false claim itself
-   has now survived two audits unfixed.
-
-## Gaps still open (9)
+## Open gaps (3)
 
 | # | Unit | Gap | Where |
 |---|---|---|---|
-| 1 | `lib/application.rb` | Application name is the unmarked constant `APP_NAME`, not `_(APP_NAME)` / `gettext(APP_NAME)`. Upstream: `glib::set_application_name(&gettext("Switcheroo"))` (`src/main.rs:45`). Arabic and Ukrainian both carry a translated `"Switcheroo"` msgid (`po/ar.po:121`, `po/uk.po:122`) that this call site never reaches. | `lib/application.rb:85`, `lib/config.rb:17` |
-| 2 | `lib/drag_overlay.rb`, `lib/style.rb`, `FINDINGS.md` | CSS node is a style class, not a real GType CSS node name, and the binding limitation this is blamed on does not exist (see above). | `lib/drag_overlay.rb:19-36`, `lib/style.rb:31-33`, `FINDINGS.md:175-196` |
-| 3 | `lib/image_thumbnail.rb` | Width is a floor (`set_size_request(150, -1)`), not upstream's `min = nat = 150` `measure()` clamp. Binding limitation, re-confirmed hard (see `FINDINGS.md` §7) and now has a dedicated spec, `spec/image_thumbnail_spec.rb`, proving the divergence does not currently manifest for any real caption but would the day one does. Correspondence that is honestly flagged, left open. | `lib/image_thumbnail.rb`, `spec/image_thumbnail_spec.rb:1-24` |
-| 4 | `lib/convert_page.rb` | Quality-row builder XML adds two `GtkAdjustment` properties (`value`, `page-increment`) that upstream's blueprint (`window.blp:151-154`) does not set. Unexplained extra, not located as a deliberate correspondence anywhere in the port's own comments. | `lib/convert_page.rb:587-605` vs. `window.blp:148-165` |
-| 5 | (whole app) | No Flatpak manifest (`io.gitlab.adhami3310.Converter.json`). The port cannot be built as a Flatpak; counted here because `PORTING.md`'s own "Not started" section lists it as upstream tree content the port does not carry, and nothing supersedes that. | n/a — absent |
-| 6 | `lib/about_dialog.rb` | Two "Other Apps" rows (Impression, Footage) resolve to no icon — the two referenced SVGs are not carried. | `lib/about_dialog.rb`, `data/resources/icons/` (absent) |
-| 7 | `lib/image_thumbnail.rb`, `lib/app_window.rb` | Every populated `Gtk::FlowBoxChild` is unlabelled to a screen reader via the property route (`update_property` cannot be called, `FINDINGS.md` §1) — the `labelled_flow_box_child` builder-fragment workaround covers the static caption case but the live `update_property` call upstream makes on colour change (`src/window.rs:525-530`) is replaced by an announcement, not a label update. Correspondence, not parity; recorded as such already in `PORTING.md` and `FINDINGS.md` §1/§2, re-verified unchanged this round. | `lib/convert_page.rb` (announce route), `FINDINGS.md:25-76` |
-| 8 | `lib/settings.rb` | A maximized window forgets its size: the two size keys are skipped where upstream writes all three unconditionally. Re-read this round, unchanged. | `lib/settings.rb:93-98` |
-| 9 | `lib/temp_dir.rb` / file-save flow | A pasted image is written under `TempDir.parent`, not the CWD, so the save dialog for it opens elsewhere than upstream's. Re-read this round, unchanged. | per `PORTING.md` item 8 |
+| 1 | `lib/image_thumbnail.rb` | `size_allocate()` is not reproduced. Width is a floor (`set_size_request(150, -1)`), not upstream's `min = nat = 150` `measure()` clamp *and* allocation override. The `measure()` half is now covered (`spec/image_thumbnail_spec.rb`), but upstream's root box is allocated exactly the tile's requested area via `size_allocate`, and nothing in ruby-gnome dispatches a `Gtk::Widget` vfunc override from a Ruby subclass (`FINDINGS.md` §7, re-confirmed not newly tried this round). Binding limitation, recorded as such, left open. | `lib/image_thumbnail.rb`, `FINDINGS.md` §7 |
+| 2 | `lib/convert_page.rb` | The colour button's accessible identity is an announcement (`gtk_accessible_announce`), not a live `Label` property update on colour change. `Gtk::Accessible#update_property` raises `NotImplementedError` from this binding version (`FINDINGS.md` §1, re-confirmed not newly tried this round). The static-caption case is covered via a GtkBuilder `accessibility { label }` fragment; the *dynamic* case upstream's `src/window.rs:525-530` drives on every colour change is not. Correspondence, not parity. | `lib/convert_page.rb`, `FINDINGS.md` §1 |
+| 3 | (whole app) | No Flatpak manifest (`io.gitlab.adhami3310.Converter.json`). Upstream's manifest pulls in a `rust-stable` SDK extension; there is no Ruby SDK extension and no `flatpak-builder`/GNOME runtime available in this environment to build and verify a Ruby equivalent even once. Genuinely not started, not stubbed. | repo root |
 
-Three more from the prior ledger (re-check below) resolved to "still true,
-unchanged, not newly found" and are folded into the table above rather than
-double-counted: the resize-unit dropdown's extraneous tooltip, the two
-`Adw.Bin` wrappers not built, and the colour button's missing accessible
-`Label` (all re-confirmed by reading the cited lines against upstream; no
-code at those lines has changed since `9f4999c`).
+These three gaps, their wording and their file citations match
+`COMPONENT_PARITY.md` at the repo root exactly — that document was already
+updated by `d1ca7f4` and is current; this `.reports/` ledger was not, and is
+now brought into agreement with it rather than left to assert a different
+number.
 
-## What is not a gap
+## Caveat — about-dialog icon lookup not driven live
 
-- **Chain-link open/closed icon branch.** The prior ledger flagged this as
-  "a branch no check exercises," not as a behavioural gap — the code path
-  exists (`lib/convert_page.rb`'s link-axis handling). This round did not find
-  a drive check for it either; re-confirmed absent from
-  `test/drive_main_window.rb`'s check list by grep. Carried forward as an
-  **untested branch**, not a missing feature — listed in `test-parity.md`'s
-  coverage gaps, not duplicated here as a tenth component gap, per the rule
-  that an untested branch and a missing behaviour are different claims.
-- **The `rake app:pot` fix is not yet exercised by any automated check** (it
-  was run by hand, this round, as part of this audit). That is a test-parity
-  observation, not a component gap — the component (the extraction task)
-  exists and works.
+The Impression/Footage icon fix is verified by static evidence (file
+present at the exact `hicolor/scalable/apps/<id>.svg` path the icon theme
+expects, search path registered before the dialog is built) but was not
+exercised through a live `Gtk::IconTheme#has_icon?` probe this round — an
+attempt to write one hit an unrelated `Gio::Application::Flags` binding
+question not worth resolving mid-audit. `COMPONENT_PARITY.md` states "the
+driver checks the icon theme resolves both"; `test/drive_main_window.rb`'s
+328 checks were re-run this round and passed, which is consistent with that
+claim, but this report does not independently re-derive which of the 328
+checks that is. Flagged rather than silently assumed.
 
 ## Rules followed
 
 - Every gap above is cited by file and line on both sides, not asserted.
-- The `set_css_name` finding was re-run from scratch rather than trusted from
-  the previous audit's commit message — a prior audit's claim is a lead, not
-  a verdict for this one either.
-- Nothing here treats "a binding limitation" as closing a gap. Where one is
-  real (image_thumbnail's clamp, the accessible Label), it is cited to
-  `FINDINGS.md` and the row stays open.
+- Every "closed" row was re-read from the current file this round, not
+  trusted from a commit message or the previous audit's narrative.
+- One previously-reported gap (`settings.rb`, maximized window) is recorded
+  above as never having been true at the commit it was reported against —
+  see `accountability-ensurance.md` for the implication of that.
+- Nothing here treats a binding limitation as closing a gap; both open
+  binding-limitation rows are cited to `FINDINGS.md` and stay open.

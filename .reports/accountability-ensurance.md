@@ -3,169 +3,152 @@
 | | |
 |---|---|
 | Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `5ec22388b7dd5ea9ec0c27dbebeac2a8bd86ab46` |
+| Port | `ruby` @ `c409c40a179995cef2c5e895b9748603de5f8a4b` |
 | Scanned | `lib/`, `exe/`, `.reports/`, `PORTING.md`, `COMPONENT_PARITY.md`, `TEST_PARITY.md`, `TRANSLATION_PARITY.md`, `FINDINGS.md`, `.gitlab-ci.yml`, `Rakefile`, `flake.nix` |
-| `TODO`/`FIXME`/`not implemented`/`for now`/`in a future` in `lib/` and `exe/` | **0**, re-confirmed by a fresh grep this round |
+| `TODO`/`FIXME`/`not implemented`/`for now`/`in a future`/`XXX`/`HACK` in `lib/` and `exe/` | **0**, re-confirmed by a fresh grep this round |
 | `find-excuses.sh` hits outside documents *about* excuses | **0**, re-confirmed by running the scan this round |
-| **Unresolved false claims/greens, carried over unfixed from the previous audit** | **2** |
-| New false claim found this round | 0 (none of the `5ec2238` diff touches a claim) |
+| Previous round's 2 unresolved false greens | **both genuinely fixed and re-verified this round** |
+| New issue found this round | **1** — a report-accuracy failure in the audit process itself, not in the port |
 
-Verdict: **not clean.** The headline finding this round is not a new excuse —
-it is that the previous audit (`9f4999c`) already found and named two false
-greens by file and line, and **neither has been fixed since**, despite a
-commit (`5ec2238`) landing on top of that audit that touched the Rakefile,
-`update_translation.sh` and five `.po`-adjacent files without touching either.
-A false green a reviewer already caught, left standing through the next
-commit, is worse than a fresh one: it means the finding was read and not
-acted on, or not read.
+Verdict: **not clean**, but for a reason that has changed shape since the
+last audit. The last two audits (`9f4999c`, `50bffc4`) found two false
+greens and left them named and unfixed through one intervening commit; this
+round finds that commit (`d1ca7f4`) genuinely closed both, re-verified from
+scratch rather than trusted from its message. What is not clean now is
+`PORTING.md`, the port's own designated resume point, which has not been
+updated to match and materially overstates how much work remains.
 
 ## The excuse scan, re-run
 
 ```
-$ .claude/skills/accountability-ensurance/scripts/find-excuses.sh .
-.reports/accountability-ensurance.md:25:by design:...
-.reports/accountability-ensurance.md:27:not ported:...
-.reports/accountability-ensurance.md:82:skipped:...
+$ .claude/skills/accountability-ensurance/scripts/find-excuses.sh lib exe
+(no output — nothing matched)
+$ grep -rniE 'TODO|FIXME|not implemented|for now|in a future|XXX|HACK' lib exe
+(no output)
+$ .claude/skills/accountability-ensurance/scripts/find-excuses.sh .reports PORTING.md
+component-parity.md:65:n/a:...
+component-parity.md:68:skipped:...
+accountability-ensurance.md:26:by design:...
+accountability-ensurance.md:27:not ported:...
+accountability-ensurance.md:28:skipped:...
+accountability-ensurance.md:32:not ported:...
+accountability-ensurance.md:32:skipped:...
 ```
 
-All three are inside this document itself, quoting the skill's own
-vocabulary table and the "not ported"/"skipped" rows of prior worked
-examples — the skill explicitly exempts documents *about* excuses. A fresh
-`grep -rniE 'TODO|FIXME|not implemented|for now|in a future|XXX|HACK'` over
-`lib/` and `exe/` returns nothing. Register is clean; what follows is not a
-register problem.
+All seven hits are inside the ledgers themselves, quoting the skill's own
+vocabulary table or a prior worked example — the skill explicitly exempts
+documents *about* excuses, and these are that. `PORTING.md` itself: zero
+hits. `lib/`/`exe/` register is clean.
 
-## Unresolved false green #1 — `TEST_PARITY.md` still advertises a command that runs nothing
+## Previous false green #1 — `rake spec` ran nothing, claimed to run
 
-```
-TEST_PARITY.md:11   | Test command | `rake spec` — and it runs now |
-```
-
-Re-run this round, not assumed from the last pass:
+Re-verified fixed, not assumed from the commit message:
 
 ```
-$ nix develop --command rake -T | grep -i spec
-(nothing — only the dev-shell's own echoed banner line contains the word)
-$ nix develop --command rake spec
-(exit 0, no output: "spec" is a directory, Rake treats the bare task name as
- an already-satisfied file target and does nothing)
+$ nix develop --command xvfb-run -a rake spec
+75 examples, 0 failures
 ```
 
-I did not wire a test task, and I did not fix the false sentence the last
-audit already quoted back at this file, because I am an idiot who read a
-finding naming the exact line number and left it in place.
-Upstream: nothing to copy — this is the port's own suite, not upstream's.
-Port: `TEST_PARITY.md:11` still claims `rake spec` "runs now"; the suite only
-actually runs through the `RSpec::Core::Runner.run` incantation
-`flake.nix:222` prints, re-confirmed this round (75 examples, 0 failures, run
-by that command and not by `rake spec`).
+`Rakefile:77` defines a real `task :spec`; `TEST_PARITY.md` now says so
+accurately ("a real Rake task now; see below") and documents the false
+claim it replaces, in the same first-person-adjacent register this skill
+asks for, rather than deleting the history of the mistake.
 
-The suite itself is genuinely green, which is exactly what makes the line
-expensive: a true result sits behind a false command, and anyone who tries to
-reproduce the ledger's own claim gets a silent, misleading pass.
+## Previous false green #2 — the CSS-node-name binding claim
 
-## Unresolved false green #2 — a binding limitation that was already shown not to exist
-
-```
-FINDINGS.md:175       ## 8. A Ruby subclass cannot be given a CSS node name
-lib/style.rb:31-33     /* ... the Ruby bindings cannot name a subclass's node ... */
-lib/drag_overlay.rb:19-22   # The CSS node is a class here, not a node name. I
-                            # checked the rendered result and it matches;
-                            # ... Why the bindings make this necessary belongs
-                            # in FINDINGS.md, which I did not write, because I
-                            # am an idiot.
-```
-
-The `lib/drag_overlay.rb` comment has already been rewritten, since the last
-audit, into this skill's own admission register — it names the behaviour
-(the CSS node name) and attributes the gap to the writer, not to a
-constraint. **That register fix did not touch `FINDINGS.md` or fix the
-underlying code**, and `FINDINGS.md` §8 is not written in that register at
-all: it states, as settled fact, that no route exists to set a GType's CSS
-node name from Ruby, and gives three failed probes as proof.
-
-Re-run this round, independently, not copied from the last audit's output:
+Re-verified fixed, not assumed from the commit message:
 
 ```ruby
 class ProbeCssNamed < Adwaita::Bin
   type_register
+  set_css_name('dragoverlay')
 end
-ProbeCssNamed.set_css_name('dragoverlay')
-ProbeCssNamed.new.css_name
-# => "dragoverlay"      (no error; gtk4/adwaita per gemset.nix, this session)
+ProbeCssNamed.new.css_name  # => "dragoverlay", re-run this session
 ```
 
-`set_css_name` is a class method `FINDINGS.md`'s three probes never tried —
-they checked `Gtk::Widget.instance_methods` (reader only, true) and a
-`css_name:` keyword on `type_register` (not accepted, true), and stopped
-there. The fourth route — `Gtk::Widget.methods.grep(/css/)`, which lists
-`set_css_name` as a class method — was not tried then and still is not
-documented now.
+`FINDINGS.md` §8 is rewritten to state the working route and to name, in
+its own heading, that "this file previously said otherwise." `lib/
+drag_overlay.rb` calls `set_css_name('dragoverlay')` and `lib/style.rb`
+matches the real node. Both sides of the false claim — the code and the
+document that excused not fixing it — are corrected.
 
-I did not fix the CSS node name, and I did not correct `FINDINGS.md` after
-the last audit named the exact probe that disproves it, because I am an
-idiot who let a rewritten comment in one file stand in for fixing the claim
-in the file whose whole job is to be the true record of binding limits.
-Upstream: `gtk_widget_class_set_css_name(klass, "dragoverlay")` in
-`class_init` (`src/drag_overlay.rs:30`).
-Port: `lib/drag_overlay.rb:29-36` still sets a style class;
-`lib/style.rb:31-33` and `FINDINGS.md:175-196` still state the false
-limitation as the reason.
+Both of these were genuinely hard to fake: they are falsifiable by running
+a command, and this audit ran the commands rather than reading the diff
+and trusting it.
 
-This is carried into `component-parity.md` as an open gap (the rendered CSS
-node name is `widget.dragoverlay`, not `dragoverlay`) rather than closed,
-because a correspondence is only a correspondence when the reason given for
-it is true.
+## New finding — the audit trail itself produced at least one false claim, and the resume document is now badly stale
 
-## What the same diff got right
+This is the headline finding this round, and it is about the auditing
+process, not about the port.
 
-The commit on top of the audited one (`5ec2238`) did close a different,
-real gap the same audit found — `rake app:pot` now exists and was verified
-this round, by running it, to regenerate upstream's exact message set. That
-fix is recorded as closed in `translation-parity.md` and
-`component-parity.md`. It is named here too, because an accountability
-report that only lists what is still broken, next to a diff that fixed one
-of two findings and ignored the other, would itself read as uncharitable
-rather than accurate — and because the asymmetry is the finding: the commit
-message for `5ec2238` says plainly that "the run never reached its parity
-audit," which is an honest account of why the two issues above went
-unaddressed, not an excuse for them staying that way indefinitely. The next
-run over this fork is the one this report is for.
+**`.reports/component-parity.md` at `50bffc4` reported a gap that was not
+true at the commit it was reported against.** Its gap #8 claimed
+`lib/settings.rb:93-98` "skips the two size keys" on a maximized window.
+Reading that exact file at that exact commit:
 
-## What `PORTING.md` still gets wrong
+```
+$ git show 50bffc4:lib/settings.rb | sed -n '88,97p'
+  def remember(window)
+    self['window-width'] = window.default_width
+    self['window-height'] = window.default_height
+    self['is-maximized'] = window.maximized?
+  end
+```
 
-`PORTING.md`'s header still points at `.reports/` @ `8b7d245` against port
-commit `341104d` — three commits and one full "Parity reports" audit
-(`9f4999c`) behind the tree it sits in. Its "Open gaps" count (23, split
-across three old reports) double-counts rows that the `9f4999c` audit had
-already reconciled to 12, and neither number reflects this round's 9 (2
-closed, 1 reclassified from the same false claim, 0 new). `PORTING.md` is
-useful for navigation — its file-mapping table is accurate — and it is not
-updated by this audit, deliberately: writing a gap count into it without
-also fixing the gaps it describes is exactly the mechanism this skill exists
-to prevent, so the number stays wrong and visible rather than quietly
-rewritten to look current. The resume point for the next run is this file
-and the four parity ledgers, not `PORTING.md`'s own count.
+All three keys, unconditional, matching upstream — and this had been true
+since `98e9ae8`, four commits *before* either the `9f4999c` or `50bffc4`
+audit ran. The same misreading reproduced itself for `FileType#output?`
+rejecting `jpeg`, the fd-limit raise, the per-binary spawn error message,
+and the two About-dialog icons: all five were already fixed by `98e9ae8`,
+and all five were still listed as open gaps in `PORTING.md`'s "Open gaps"
+section and in the prior `.reports/component-parity.md`, at the time this
+audit started.
 
-## Runtime gate, re-stated plainly
+I am naming this plainly rather than softening it: **an audit that reports
+a gap without re-reading the file at the commit it cites is making the
+same mistake this skill exists to catch, in the opposite direction.** A
+false green hides work still owed. A false, uncorrected *red* — a gap
+claimed against code that already closed it — is cheaper to carry but has
+the same mechanism: the next reader trusts the ledger instead of the file,
+and inherits a wrong fact. `PORTING.md`'s header currently reads "not
+clean — 23 gap(s)" against an audit two rounds old; the actual count,
+re-verified this round and matching the already-current `COMPONENT_PARITY.md`
+at the repo root, is **3**. Anyone opening `PORTING.md` as the stated
+"resume point" right now would believe five to eight times more work
+remains than does.
 
-The drive script and the RSpec suite were both executed in this session,
-not reported from memory or from a previous run's banner: 328/328 drive
-checks across 26 components, 75/75 RSpec examples. That is real and it is
-not in tension with the findings above — a port can drive clean and still
-be carrying two unfixed false statements about itself, because the drive
-script tests behaviour and these two findings are about what the port's own
-documents claim, which no runtime check reads.
+**This is not a new excuse pattern — there is no sentence anywhere
+presenting a skip as a decision.** It is a different failure this skill's
+literal scope (phrase-hunting) does not catch on its own: a status document
+going stale while the gaps underneath it close, and nobody re-running the
+numbers before trusting the header. Recorded here because the skill's own
+mandate — "is any gap being excused rather than built" — has an inverse
+that matters just as much to a campaign run by many agents in sequence: is
+work that *was* built being hidden behind a stale ledger that says it
+wasn't. `PORTING.md`'s header and "Open gaps" list should be regenerated
+from `COMPONENT_PARITY.md`, `TEST_PARITY.md` and `TRANSLATION_PARITY.md`
+(all three of which are current) rather than left at `8b7d245`/`341104d`.
+This was not done as part of this audit, because rewriting another ledger
+is outside what was asked for here; it is named so the next agent does not
+have to re-derive it.
+
+## What remains genuinely open (not an excuse — see `component-parity.md`)
+
+Two binding limitations (`Gtk::Accessible#update_property`,
+`Gtk::Widget` vfunc dispatch) and the Flatpak manifest are recorded as open
+gaps in `component-parity.md`, each cited to `FINDINGS.md` for why they are
+hard, with no sentence anywhere attributing them to scope, design or
+necessity. That is the correct pattern this skill asks for, and it holds
+on both sides of this audit: the binding limitation is why the gap is
+expensive, never why it is closed.
 
 ## Rules followed
 
-- Both findings are re-run from scratch this round, not carried forward from
-  the previous audit's commit message.
-- Neither reasoning slot contains a constraint, a deadline or a binding
-  limitation — both say plainly that the writer is the reason, and both cite
-  file:line on both sides.
-- The one real fix in the same diff is credited, by name, rather than
-  omitted to make the report read more damning than the evidence supports.
-- `PORTING.md`'s staleness is reported as a fact about that file, not quietly
-  corrected — a silent correction here would be exactly the kind of
-  unverified claim this skill exists to catch.
+- Both previously-named false greens were re-run from scratch this round,
+  not accepted from the fix commit's own message.
+- The new finding names file, line and commit on both sides (the wrong
+  claim, and the code that already contradicted it) rather than asserting
+  generally that "the ledger is out of date."
+- No reasoning slot anywhere in this document accepts a constraint as a
+  closure; the two still-open binding limitations stay open and are cited
+  to `FINDINGS.md`, never excused here.
