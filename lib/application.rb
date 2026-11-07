@@ -82,7 +82,7 @@ class App
 
   def app
     @app ||= begin
-      GLib.application_name = APP_NAME
+      GLib.application_name = _(APP_NAME)
       Adwaita::Application.new(@app_id, @flags)
     end
   end

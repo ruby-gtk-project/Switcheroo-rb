@@ -38,11 +38,25 @@ workflow:
     # For tags, create a pipeline.
     - if: '$CI_COMMIT_TAG'
 
+.gtk_system_deps: &gtk_system_deps
+  # The suite and the drive script both load `adwaita`, which needs GTK4,
+  # libadwaita and the GObject-Introspection typelibs on the system the gem
+  # extensions build against, plus a display `xvfb-run` can stand in for and
+  # the `magick`/`zip` binaries the app shells out to. None of this ships in
+  # the plain `ruby:${RUBY_VERSION}` image.
+  - apt-get update -qq
+  - >
+    apt-get install -y --no-install-recommends
+    libgtk-4-dev libadwaita-1-dev gobject-introspection
+    libgirepository1.0-dev pkg-config xvfb imagemagick zip gettext
+    > /dev/null
+
 .test_template-current: &test_definition-current
   stage: test
   script:
     # || true so we don't fail here, because it'll probably work even if the gem update fails
     - gem update --silent --system > /dev/null 2>&1 || true
+    - *gtk_system_deps
     - mkdir -p vendor/bundle
     - bundle config set path 'vendor/bundle'
     - chmod +t -R vendor/bundle
@@ -51,15 +65,21 @@ workflow:
     - bundle install
     # Bundle a specific appraisal
     - bundle exec appraisal unlocked_deps bundle install
-    # Light smoke test
-    - bundle exec appraisal unlocked_deps bin/rake --tasks
-    # Run tests, skipping those that won't work in CI
+    # Light smoke test — bin/rake and bin/rspec are not binstubs this repo
+    # carries, so this goes through bundler, which resolves the same gems.
+    - bundle exec appraisal unlocked_deps bundle exec rake --tasks
+    # Run tests, skipping those that won't work in CI. `rake spec` is a real
+    # task (see Rakefile and TEST_PARITY.md), so this is the same run
+    # `nix develop`'s devshell banner names.
     - >
-      bundle exec appraisal unlocked_deps \
-        bin/rspec spec \
+      xvfb-run -a bundle exec appraisal unlocked_deps \
+        bundle exec rspec spec \
           --tag \~ci_skip \
           --format progress \
           --format RspecJunitFormatter
+    # The UI drive script: a headless run of the whole app under the same
+    # virtual display, the same way `nix develop`'s devshell runs it.
+    - xvfb-run -a bundle exec appraisal unlocked_deps bundle exec ruby test/drive_main_window.rb
   cache:
     key: ${CI_JOB_IMAGE}
     paths:
@@ -73,6 +93,7 @@ workflow:
     - gem install rubygems-update -v ${RUBYGEMS_VERSION} || true
     # Actually updates both RubyGems and Bundler!
     - update_rubygems
+    - *gtk_system_deps
     - mkdir -p vendor/bundle
     - bundle config set path 'vendor/bundle'
     - chmod +t -R vendor/bundle
@@ -81,15 +102,17 @@ workflow:
     - bundle install
     # Bundle a specific appraisal
     - bundle exec appraisal ${APPRAISAL} bundle install
-    # Light smoke test
-    - bundle exec appraisal ${APPRAISAL} bin/rake --tasks
-    # Run tests, skipping those that won't work in CI
+    # Light smoke test — bin/rake and bin/rspec are not binstubs this repo
+    # carries, so this goes through bundler, which resolves the same gems.
+    - bundle exec appraisal ${APPRAISAL} bundle exec rake --tasks
+    # Run tests, skipping those that won't work in CI.
     - >
-      bundle exec appraisal ${APPRAISAL} \
-        bin/rspec spec \
+      xvfb-run -a bundle exec appraisal ${APPRAISAL} \
+        bundle exec rspec spec \
           --tag \~ci_skip \
           --format progress \
           --format RspecJunitFormatter
+    - xvfb-run -a bundle exec appraisal ${APPRAISAL} bundle exec ruby test/drive_main_window.rb
   cache:
     key: ${CI_JOB_IMAGE}
     paths:

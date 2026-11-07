@@ -28,11 +28,9 @@ module Style
       font-size: 11pt;
     }
 
-    /* Upstream names the DragOverlay widget's CSS node "dragoverlay"; the
-       Ruby bindings cannot name a subclass's node, so the widget carries a
-       style class of the same name and this selector matches either. */
-    dragoverlay,
-    .dragoverlay {
+    /* DragOverlay's real CSS node name, matching upstream's class_init
+       (src/drag_overlay.rs:30). See lib/drag_overlay.rb. */
+    dragoverlay {
       box-shadow: none;
     }
 

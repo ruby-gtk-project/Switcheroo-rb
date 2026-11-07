@@ -272,7 +272,7 @@ GtkDriver.drive(APP, shots: SHOTS) do |d, app|
   d.step("the drag overlay wraps the whole window, as upstream's does") do
     window.drag_overlay.then do |overlay|
       d.check("it is the window's content") { window.root_box.first_child.equal?(overlay) }
-      d.check("it carries upstream's css name") { overlay.has_css_class?("dragoverlay") }
+      d.check("it carries upstream's css name") { overlay.css_name == "dragoverlay" }
       d.check("the toast overlay is inside it") do
         overlay.overlay.child.equal?(window.toast_overlay)
       end

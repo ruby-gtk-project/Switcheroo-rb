@@ -172,28 +172,34 @@ leaves the natural width to the picture inside. That is the closest the
 bindings allow, and `COMPONENT_PARITY.md` keeps it listed as a gap — now with
 a tested reason rather than an untested excuse.
 
-## 8. A Ruby subclass cannot be given a CSS node name
+## 8. A Ruby subclass **can** be given a CSS node name — this file previously said otherwise
 
-Upstream sets the widget's CSS node name to `dragoverlay` in `class_init`
-(`src/drag_overlay.rs:30`). Three routes exist in C and none is reachable:
+A prior round of this file claimed `gtk_widget_class_set_css_name` has no
+route from Ruby and that a registered subclass is stuck with the generic
+`widget` node name. That was never checked against the instance method
+`Gtk::Widget#set_css_name`, which is bound and callable from inside a
+`type_register` block, where `self` is the class being registered:
 
 ```ruby
-Gtk::WidgetClass                       # => NameError (no such class)
-Gtk::Widget.instance_methods.grep(/^css_name/)  # => [:css_name]  (reader only)
 class ProbeCssNamed < Adwaita::Bin
-  type_register('ProbeCssNamed', css_name: 'dragoverlay')
+  type_register
+  set_css_name('dragoverlay')
 end
-# ArgumentError: wrong number of arguments (given 2, expected 0..1)
+ProbeCssNamed.new.css_name  # => "dragoverlay"
 ```
 
-`gtk_widget_class_set_css_name` lives on the class struct, which ruby-gnome
-does not expose; `css_name` is bound as a read-only instance property; and
-`type_register` takes a type name and nothing else, so there is no hook to
-pass one through. A registered subclass reports the name `widget`.
+This was driven under this version of the bindings before this entry was
+corrected. The previous entry's probe (`type_register('ProbeCssNamed',
+css_name: 'dragoverlay')`) only shows that `type_register` does not take a
+`css_name:` keyword — it says nothing about whether the node name can be set
+some other way, and no other way was tried before the finding was written.
 
-**What the port does instead.** `lib/drag_overlay.rb` adds a `dragoverlay`
-style class and `lib/style.rb` matches both `dragoverlay` and `.dragoverlay`
-with upstream's rule body, so the rendered result is the same.
+**What the port does now.** `lib/drag_overlay.rb`'s `DragOverlay` calls
+`set_css_name('dragoverlay')` right after `type_register`, so the widget's
+CSS node really is named `dragoverlay`, matching upstream's `class_init`
+(`src/drag_overlay.rs:30`) exactly. `lib/style.rb`'s `dragoverlay` rule
+targets that node directly; the compensating `.dragoverlay` class selector
+and the style class it matched are gone.
 
 ## 9. Screenshots under broadway go stale — a harness limitation
 

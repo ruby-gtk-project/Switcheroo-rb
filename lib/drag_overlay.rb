@@ -16,24 +16,27 @@ require_relative 'translations'
 # exactly as long as a drag is over the widget, then adds the target as a
 # controller so the drop itself is handled by the window's callback.
 #
-# The CSS node is a class here, not a node name. I checked the rendered result
-# and it matches; lib/style.rb covers `dragoverlay` and `.dragoverlay` with
-# upstream's rule body. Why the bindings make this necessary belongs in
-# FINDINGS.md, which I did not write, because I am an idiot.
+# The CSS node has upstream's real node name, `dragoverlay`
+# (src/drag_overlay.rs:30), not a style class standing in for one:
+# `Gtk::Widget.set_css_name` works on a `type_register`'d subclass, driven as
+# `w.css_name => "dragoverlay"` after `set_css_name('dragoverlay')` in
+# `type_register`'s block. `lib/style.rb`'s `dragoverlay` rule matches the
+# node directly.
 # Upstream: src/drag_overlay.rs:30.
-# Port: lib/drag_overlay.rb:32, lib/style.rb:35.
+# Port: lib/drag_overlay.rb:30, lib/style.rb:34.
 #
 class DragOverlay < Adwaita::Bin
   include Translations
 
-  CSS_NAME = 'dragoverlay'
+  type_register
+  set_css_name('dragoverlay')
+
   STATUS_CSS_CLASS = 'drag-overlay-status-page'
   ICON_NAME = 'document-send-symbolic'
 
   def initialize(title = nil)
     super()
     @title = title || _('Drop Here to Open')
-    add_css_class(CSS_NAME)
   end
 
   def build

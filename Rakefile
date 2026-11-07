@@ -66,6 +66,23 @@ task :default do
   puts "Default task complete."
 end
 
+# Without this, the `spec/` directory on disk makes Rake resolve the bare
+# name `spec` as an up-to-date file task (it predates every spec file under
+# it), so `rake spec` exited 0 having run nothing, and kettle-dev's own `spec`
+# task never loaded in this environment to pre-empt it (see
+# TEST_PARITY.md). `:spec` here is a real task, not a file, so it always runs,
+# and it runs the same RSpec::Core::Runner incantation flake.nix's devshell
+# banner prints by hand.
+desc "Run RSpec code examples"
+task :spec do
+  require "rspec/core"
+  result = RSpec::Core::Runner.run(["--format", "progress", "--require", "spec_helper", "spec"])
+  exit(result) unless result.zero?
+end
+
+desc "Run tests (alias for spec)"
+task test: :spec
+
 # Without this, a generated docs/ directory makes Rake resolve the bare
 # name `docs` as an up-to-date file task, so `rake docs` exits 0 having
 # regenerated nothing.

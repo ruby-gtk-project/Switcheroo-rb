@@ -7,8 +7,8 @@
 | Upstream tests | **0** |
 | Ported | 0 |
 | Gaps | **0** (met trivially) |
-| Port tests of its own | **70 examples**, plus a 16-check UI drive |
-| Test command | `rake spec` — and it runs now |
+| Port tests of its own | **75 examples**, plus a 16-check UI drive |
+| Test command | `rake spec` — a real Rake task now; see below |
 
 ## Upstream has no test suite
 
@@ -19,6 +19,31 @@ Re-verified, not assumed: no `tests/` or `test/` directory, no `#[test]`, no
 That is the whole of the parity claim, and it must not be read as a pass. A
 0/0 ledger says only that upstream owed the port nothing. Everything below is
 `## Extra`.
+
+## `rake spec` was a false green, and now is a real task
+
+A previous round claimed "`rake spec` — and it runs now" without checking
+what task `spec` resolved to. It resolved to none: `rake -T` listed no `spec`
+task, because kettle-dev's own `spec` task (named in the Rakefile's own
+`rake -T` comment header) never loads in this environment —
+`require "kettle/dev"` raises `LoadError` here, which the Rakefile already
+catches and warns about. With no task named `spec`, Rake fell back to
+treating the bare name as a file task: the `spec/` directory on disk
+predates every file under it, so `rake spec` reported the task up to date and
+exited 0 having run nothing. The same false green hit `bin/rake --tasks` and
+`bin/rspec spec` in `.gitlab-ci.yml`, which named binstubs this repo has
+never shipped. This exact `rake spec` claim, by file and line, was already
+named by the previous audit and was still unfixed one commit later.
+
+The Rakefile now defines `task :spec` for real — the same
+`RSpec::Core::Runner.run(["--format", "progress", "--require", "spec_helper",
+"spec"])` call `flake.nix`'s devshell banner prints — plus `task test: :spec`
+as an alias. Driven: `nix develop --command xvfb-run -a bundle exec rake
+spec` runs the 75 examples below and exits 0 only because they pass, not
+because nothing ran. `.gitlab-ci.yml` now calls `bundle exec rake` and
+`bundle exec rspec` instead of the nonexistent binstubs, under `xvfb-run` and
+the system GTK4/libadwaita packages the gem extensions need, and also runs
+`test/drive_main_window.rb` under the same virtual display.
 
 ## The harness could not run, and now does
 

@@ -131,15 +131,19 @@ schema.
 welcome page, loading page, invalid-image page, converting page, all-images
 page, drag overlay, shortcuts dialog, primary menu, stop-converting alert,
 error alert, file chooser: widgets, CSS, signals and actions were already
-parity; their only failure was text, and the text is marked. **parity**, except
-the drag overlay's CSS node, which stays a **correspondence** — and its binding
-claim is now tested: there is no `Gtk::WidgetClass`, `css_name` is bound
-read-only, and `type_register` takes no css-name option (`FINDINGS.md` §8).
+parity; their only failure was text, and the text is marked. **parity**,
+including the drag overlay's CSS node, which is a real node name now:
+`DragOverlay` calls `Gtk::Widget#set_css_name('dragoverlay')` from inside its
+`type_register` block, so `css_name` reports `dragoverlay` rather than the
+generic `widget`. A previous round claimed this binding had no route and left
+that claim both in `FINDINGS.md` §8 and here uncorrected; it is corrected in
+both places now (`FINDINGS.md` §8).
 
 ### Stylesheet
 
 Unchanged: identical rule for rule to upstream's `data/resources/style.css`,
-with `dragoverlay, .dragoverlay` covering both forms. **parity**.
+now matching the `dragoverlay` node directly rather than through a
+compensating `.dragoverlay` class selector. **parity**.
 
 ## Closed this round
 
@@ -154,6 +158,8 @@ with `dragoverlay, .dragoverlay` covering both forms. **parity**.
 | a pasted image landed in the temp directory | it is written to `JobFile#filename` relative, i.e. the working directory, so the save dialog that follows suggests the same folder upstream suggests (`src/window.rs:634-637`) |
 | `FileType#output?` rejected `jpeg` | `IS_OUTPUT_KEYS` is `output_formats()` plus `jpeg`, matching `is_output()` (`src/filetypes.rs:93-98`) |
 | the two "Other Apps" rows had no icon | `io.gitlab.adhami3310.Impression.svg` and `…Footage.svg` are in `data/icons/hicolor/scalable/apps/`, and the driver checks the icon theme resolves both |
+| the `dragoverlay` CSS node was a style class, and `FINDINGS.md` §8 claimed the bindings have no route to a real node name | `Gtk::Widget#set_css_name` is callable from inside `type_register`; `DragOverlay` now calls it and `lib/style.rb` matches the node directly — `FINDINGS.md` §8, `lib/drag_overlay.rb` |
+| `lib/application.rb`'s `GLib.application_name = APP_NAME` never went through gettext, unlike upstream's `glib::set_application_name(&gettext("Switcheroo"))` | wrapped as `_(APP_NAME)`, reaching the same `Switcheroo` msgid the window title and the welcome page already use |
 | `COPYING`, `Switcheroo.doap`, `PRESS.md`, `data/resources/screenshots/{0,1}.png` were not carried | present; the screenshots are at `data/screenshots/` next to the other `data/` assets |
 | `update_translation.sh` had no counterpart, so `po/switcheroo.pot` was still upstream's file and described `src/*.rs` and `*.blp` rather than this tree | `update_translation.sh` is ported, backed by `rake app:pot` and `rake app:update_po`, and **run**: the `.pot` now carries 91 keys with `lib/*.rb` and `data/*` references, and the 19 catalogues in `po/LINGUAS` are merged against it. Checked for loss rather than assumed — every non-fuzzy translation that the new `.pot` still asks for survived byte for byte in all 19 languages; the only entries demoted are three msgids (`Show Less Popular Datatypes` ×2, `Shows less popular datatypes in the menu`) left over from an older upstream release that neither upstream's `.pot` nor any source file holds any more. |
 | `measure()`'s horizontal clamp was an untested gap | measured; see the image-thumbnail row |
@@ -164,6 +170,5 @@ with `dragoverlay, .dragoverlay` covering both forms. **parity**.
 |---|---|
 | `size_allocate()` is not reproduced — Ruby widget vfuncs are not dispatched. The `measure()` half of the same finding no longer costs anything measurable (row above); this half has no equivalent, and what it buys upstream is that the root box is allocated the tile's whole area rather than its own requested size. | `lib/image_thumbnail.rb`, `FINDINGS.md` §7 |
 | the colour announcement is an announcement, not a label | `lib/convert_page.rb`, `FINDINGS.md` §1 |
-| the `dragoverlay` CSS node is a style class | `lib/drag_overlay.rb`, `FINDINGS.md` §8 |
 | no GResource bundle | `lib/`, assets read from `data/` |
 | the Flatpak the user installs. Upstream: `io.gitlab.adhami3310.Converter.json` builds and ships the app as a Flatpak, with a `rust-stable` SDK extension the Ruby port cannot use — there is no Ruby SDK extension, so a port of this manifest has to build Ruby and the six ruby-gnome C extensions as modules against `org.gnome.Sdk`. No `flatpak-builder` and no GNOME runtime are available here, so such a manifest could not be built even once, and an unbuilt manifest reads as done without being it. Not started rather than stubbed. | repo root |

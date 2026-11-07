@@ -589,9 +589,7 @@ class ConvertPage
           <object class="GtkAdjustment" id="percentage">
             <property name="lower">#{QUALITY_MINIMUM}</property>
             <property name="upper">#{QUALITY_MAXIMUM}</property>
-            <property name="value">#{QUALITY_MAXIMUM}</property>
             <property name="step-increment">1</property>
-            <property name="page-increment">10</property>
           </object>
           <object class="AdwActionRow" id="quality_row">
             <property name="title">#{escape_markup(_('Quality'))}</property>
