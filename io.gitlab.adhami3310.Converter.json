@@ -1,0 +1,270 @@
+{
+    "app-id": "io.gitlab.adhami3310.Converter",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "47",
+    "sdk": "org.gnome.Sdk",
+    "command": "switcheroo",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--device=dri",
+        "--socket=wayland"
+    ],
+    "build-options": {
+        "append-path": "/app/bin",
+        "env": {
+            "GEM_HOME": "/app/lib/ruby/gems"
+        }
+    },
+    "cleanup": [
+        "/include",
+        "/lib/cmake",
+        "/lib/pkgconfig",
+        "/lib/ruby/gems/*/cache",
+        "/lib/ruby/gems/*/doc",
+        "/lib/ruby/gems/*/extensions",
+        "/share/doc",
+        "/share/man",
+        "*.la",
+        "*.a"
+    ],
+    "modules": [
+        {
+            "name": "mozjpeg",
+            "buildsystem": "cmake",
+            "config-opts": [
+                "-DENABLE_STATIC=FALSE",
+                "-DPNG_SUPPORTED=TRUE",
+                "-DWITH_JPEG8=TRUE",
+                "-DCMAKE_INSTALL_LIBDIR=/app/lib",
+                "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/mozilla/mozjpeg/archive/refs/tags/v4.1.1.tar.gz",
+                    "sha256": "66b1b8d6b55d263f35f27f55acaaa3234df2a401232de99b6d099e2bb0a9d196"
+                }
+            ]
+        },
+        {
+            "name": "ghostscript",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10071/ghostscript-10.07.1.tar.xz",
+                    "sha256": "1cdb766de8db8f1e589c817f09c5855ea5f65dfc8540e465a69ac14c18416025"
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "cp -p /usr/share/automake-*/config.{sub,guess} freetype/builds/unix/",
+                        "cp -p /usr/share/automake-*/config.{sub,guess} ijs/",
+                        "cp -p /usr/share/automake-*/config.{sub,guess} jpeg/",
+                        "cp -p /usr/share/automake-*/config.{sub,guess} libpng/",
+                        "cp -p /usr/share/automake-*/config.{sub,guess} lcms2mt/",
+                        "cp -p /usr/share/automake-*/config.{sub,guess} tiff/config/",
+                        "rm -rf libpng/pngread.c"
+                    ]
+                }
+            ],
+            "config-opts": [
+                "--disable-cups",
+                "--disable-gtk",
+                "--without-tesseract",
+                "--without-libpaper",
+                "--without-pdftoraster"
+            ],
+            "make-args": [
+                "so"
+            ],
+            "make-install-args": [
+                "soinstall"
+            ],
+            "cleanup": [
+                "/bin",
+                "/share"
+            ]
+        },
+        {
+            "name": "magick",
+            "buildsystem": "autotools",
+            "config-opts": [
+                "--with-heic=yes",
+                "--with-jxl=yes",
+                "--with-rsvg=yes",
+                "--with-gslib=yes"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/ImageMagick/ImageMagick.git",
+                    "tag": "7.1.2-25",
+                    "commit": "04a04eaaa22f721f204c4bf4c6b24b08b1afe5c5"
+                }
+            ]
+        },
+        {
+            "name": "ruby",
+            "buildsystem": "simple",
+            "build-commands": [
+                "./configure --prefix=/app --disable-install-doc --enable-shared",
+                "make -j${FLATPAK_BUILDER_N_JOBS:-1}",
+                "make install"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://cache.ruby-lang.org/pub/ruby/3.4/ruby-3.4.9.tar.gz",
+                    "sha256": "7bb4d4f5e807cc27251d14d9d6086d182c5b25875191e44ab15b709cd7a7dd9c"
+                }
+            ]
+        },
+        {
+            "name": "ruby-gnome",
+            "buildsystem": "simple",
+            "build-commands": [
+                "gem install --local --no-document --verbose pkg-config-1.6.5.gem",
+                "gem install --local --no-document --verbose native-package-installer-1.1.9.gem",
+                "gem install --local --no-document --verbose gobject-introspection-4.3.9.gem",
+                "gem install --local --no-document --verbose glib2-4.3.9.gem",
+                "gem install --local --no-document --verbose gio2-4.3.9.gem",
+                "gem install --local --no-document --verbose atk-4.3.9.gem",
+                "gem install --local --no-document --verbose cairo-1.18.5.gem",
+                "gem install --local --no-document --verbose cairo-gobject-4.3.9.gem",
+                "gem install --local --no-document --verbose pango-4.3.9.gem",
+                "gem install --local --no-document --verbose gdk_pixbuf2-4.3.9.gem",
+                "gem install --local --no-document --verbose graphene1-4.3.9.gem",
+                "gem install --local --no-document --verbose gdk4-4.3.9.gem",
+                "gem install --local --no-document --verbose gsk4-4.3.9.gem",
+                "gem install --local --no-document --verbose gtk4-4.3.9.gem",
+                "gem install --local --no-document --verbose adwaita-4.3.9.gem",
+                "gem install --local --no-document --verbose locale-2.1.5.gem",
+                "gem install --local --no-document --verbose text-1.3.1.gem",
+                "gem install --local --no-document --verbose gettext-3.5.2.gem",
+                "gem install --local --no-document --verbose rexml-3.4.4.gem"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/pkg-config-1.6.5.gem",
+                    "sha256": "33f9f81c5322983d22b439b8b672f27777b406fea23bfec74ff14bbeb42ec733"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/native-package-installer-1.1.9.gem",
+                    "sha256": "fbb41b6b22750791a4304f0a0aeea3dd837668892117f49c4caf2e8e0f4e792f"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/gobject-introspection-4.3.9.gem",
+                    "sha256": "509c0e69b99fb171683f28ea3172f82a46950b032f4628986330418771bdd56b"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/glib2-4.3.9.gem",
+                    "sha256": "32c1db447e812e5e34f9e62f1f2103e2cb4a5d0d03217a886b2a2877639549cd"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/gio2-4.3.9.gem",
+                    "sha256": "6ddcbaec05beb20332fcfd1ca598dcf46392541aeb0b5d4b8df2306adffc0acc"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/atk-4.3.9.gem",
+                    "sha256": "f6d43be5dc1546a3a096124c0ec7518c266c225c88a91fd8ac857463beea3469"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/cairo-1.18.5.gem",
+                    "sha256": "e57356141c91748061b10260e185735bd6e2288ab81ab300a6de3adfa270a623"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/cairo-gobject-4.3.9.gem",
+                    "sha256": "f093931812898edd87416691b8e3315c61a0c8a6d531519fbc6c64e97b6d85c8"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/pango-4.3.9.gem",
+                    "sha256": "1f7b023adec7f3d692d7f6a6c87994231dd597802761a9a42debebe69f677a98"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/gdk_pixbuf2-4.3.9.gem",
+                    "sha256": "1b78f2b21de7d4dcef6b351895d1bc22099a53d987f005d4b09f62b6816b3cbc"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/graphene1-4.3.9.gem",
+                    "sha256": "3ebaeb7bcf85244a9db5d7e7ced32493d5d786e7fd8ed840ce2df9d85f2c8c05"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/gdk4-4.3.9.gem",
+                    "sha256": "232b8350ad148bd2a45661cc90638d782fd439c872d8eb866f2c5fbb800c8d4b"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/gsk4-4.3.9.gem",
+                    "sha256": "8f1f560f1ec08fa2c1a503d468c705ff254db4633ca2d72c93654e2a180b2ea6"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/gtk4-4.3.9.gem",
+                    "sha256": "3e749542e347ef703e6691552047254612ef54d430b308264e96f330fd3e453b"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/adwaita-4.3.9.gem",
+                    "sha256": "09271d077b9c9d3a3919bde40bc475e58fd31f83b319f4b305bfc4dc086fcee8"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/locale-2.1.5.gem",
+                    "sha256": "1c6803e8aa6bdb2c29e91945d095050601bf6d58474993575adf6f3b89b32ef4"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/text-1.3.1.gem",
+                    "sha256": "2fbbbc82c1ce79c4195b13018a87cbb00d762bda39241bb3cdc32792759dd3f4"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/gettext-3.5.2.gem",
+                    "sha256": "ada02c59aa7e9f56bd2522faedaed16421dd2f3ddb5fe28628c0be5abcbf3c74"
+                },
+                {
+                    "type": "file",
+                    "url": "https://rubygems.org/downloads/rexml-3.4.4.gem",
+                    "sha256": "19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142"
+                }
+            ]
+        },
+        {
+            "name": "switcheroo",
+            "buildsystem": "simple",
+            "build-commands": [
+                "gem build switcheroo-rb.gemspec",
+                "gem install --local --no-document switcheroo-rb-*.gem",
+                "mkdir -p /app/share/applications /app/share/metainfo /app/share/dbus-1/services /app/share/glib-2.0/schemas /app/share/icons",
+                "for lang in $(cat po/LINGUAS); do mkdir -p /app/share/locale/$lang/LC_MESSAGES && msgfmt --check-format -o /app/share/locale/$lang/LC_MESSAGES/switcheroo.mo po/$lang.po; done",
+                "sed 's/@icon@/io.gitlab.adhami3310.Converter/' data/switcheroo.desktop.in > tmp-switcheroo.desktop.in",
+                "msgfmt --desktop --template=tmp-switcheroo.desktop.in -d po -o /app/share/applications/io.gitlab.adhami3310.Converter.desktop",
+                "sed -e 's/@app-id@/io.gitlab.adhami3310.Converter/g' -e 's/@gettext-package@/switcheroo/g' data/io.gitlab.adhami3310.Converter.metainfo.xml.in.in > tmp-metainfo.xml.in",
+                "msgfmt --xml --template=tmp-metainfo.xml.in -d po -o /app/share/metainfo/io.gitlab.adhami3310.Converter.metainfo.xml",
+                "sed -e 's/@app-id@/io.gitlab.adhami3310.Converter/g' -e 's#@bindir@#/app/bin#g' data/io.gitlab.adhami3310.Converter.service.in > /app/share/dbus-1/services/io.gitlab.adhami3310.Converter.service",
+                "sed -e 's/@app-id@/io.gitlab.adhami3310.Converter/g' -e 's/@gettext-package@/switcheroo/g' data/io.gitlab.adhami3310.Converter.gschema.xml.in > /app/share/glib-2.0/schemas/io.gitlab.adhami3310.Converter.gschema.xml",
+                "glib-compile-schemas /app/share/glib-2.0/schemas",
+                "cp -r data/icons/hicolor /app/share/icons/"
+            ],
+            "sources": [
+                {
+                    "type": "dir",
+                    "path": "."
+                }
+            ]
+        }
+    ]
+}

@@ -85,7 +85,7 @@ carried is upstream tree content:
 
 | Upstream path | Note |
 |---|---|
-| `io.gitlab.adhami3310.Converter.json` | I have not written a Flatpak manifest for this port, because I am an idiot who has not sat down and worked out what a Ruby module list for `org.gnome.Sdk` looks like. Upstream's manifest pulls in a `rust-stable` SDK extension (`io.gitlab.adhami3310.Converter.json`); no `flatpak-builder` or GNOME runtime is available in this environment to build and verify a Ruby replacement even once, which is why the gap is hard, not why it is closed. Still absent — the one "not started" row left in this table. |
+| `io.gitlab.adhami3310.Converter.json` | Written this round. Upstream's manifest pulls in a `rust-stable` SDK extension; there is no equivalent Ruby SDK extension, so the port's manifest builds Ruby 3.4.9 from source as its own module (real tarball, sha256 verified against the upstream download), installs the ruby-gnome gem stack (`pkg-config`, `native-package-installer`, `gobject-introspection`, `glib2`, `gio2`, `atk`, `cairo`, `cairo-gobject`, `pango`, `gdk_pixbuf2`, `graphene1`, `gdk4`, `gsk4`, `gtk4`, `adwaita`, `locale`, `text`, `gettext`, `rexml`) from `.gem` files fetched from rubygems.org with real sha256 checksums I downloaded and hashed myself, then builds and installs `switcheroo-rb` and lays down the desktop entry, AppStream metainfo, D-Bus service file, GSettings schema and icon the same way `rake app:install` does. **Unverified**: `flatpak-builder` and a Flatpak `org.gnome.Platform`/`org.gnome.Sdk` runtime are not available in this environment, so the manifest has never actually been run through `flatpak-builder --force-clean build-dir io.gitlab.adhami3310.Converter.json` — the gem native extensions, the GObject-introspection typelib lookups inside the sandbox, and the final desktop/metainfo substitution are all unexercised. Treat it as a from-the-spec draft, not a proven build. |
 | `meson.build`, `meson_options.txt`, `*/meson.build` | correspondence — replaced by `Rakefile` + `flake.nix` |
 
 Closed since this table was last accurate (re-verified `c409c40`): the two
@@ -109,8 +109,10 @@ Current count, re-verified `c409c40`: **3**, all in
    route to dispatch a `Gtk::Widget` vfunc override has been found
    (`FINDINGS.md` §7). The `measure()` half of this finding is now pinned
    by `spec/image_thumbnail_spec.rb`; this half has none.
-3. No Flatpak manifest (`io.gitlab.adhami3310.Converter.json`) — see
-   **Not started**.
+3. `io.gitlab.adhami3310.Converter.json` now exists but is unverified — no
+   `flatpak-builder` or Flatpak runtime is available in this environment, so
+   the manifest has never been run; see **Not started** for exactly what it
+   does and does not prove.
 
 Everything else this file previously listed as an open gap (13 rows under
 `.reports/component-parity.md`, folded into 9 by the accountability report,
@@ -142,10 +144,15 @@ Verified binding limits (see `FINDINGS.md`):
   `lib/convert_page.rb` instead. (§2)
 - **ruby-glib2 exposes no gettext entry points** — the `gettext` gem binds the
   domain. (§3)
-- **Widget vfunc overrides: `measure()` works, `size_allocate()` does not.**
-  `ImageThumbnail` overrides `measure` successfully (pinned by
-  `spec/image_thumbnail_spec.rb`); no route to `size_allocate` has been
-  found, so that half of the clamp stays an approximation. (§7)
+- **Neither `measure()` nor `size_allocate()` can be overridden as a real
+  `Gtk::Widget` vfunc.** FINDINGS.md §7's probe shows GTK dispatching none of
+  the three override spellings for `measure` either, so `ImageThumbnail`
+  does not carry upstream's vfunc at all — it approximates the one outcome
+  that vfunc exists to produce (`min = nat = 150` on the horizontal
+  orientation) with a plain `set_size_request(150, -1)` call, which is not a
+  vfunc override and does not touch `size_allocate` in any way.
+  `spec/image_thumbnail_spec.rb` pins that approximation's *output*, not a
+  working override. (§7)
 - **CSS node name on a subclass: resolved, works.** `Gtk::Widget#set_css_name`
   is callable inside `type_register`; `lib/drag_overlay.rb` uses it and
   `lib/style.rb` matches the real `dragoverlay` node, not a class. A
