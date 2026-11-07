@@ -3,16 +3,16 @@
 | | |
 |---|---|
 | Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` (unchanged) |
-| Port | `ruby` @ `fb196babe2113d47395c5efc48bf491b447190cc` |
+| Port | `ruby` @ `c5f0dbd08393214d7614d776155388a4624aaad2` |
 | Upstream tests | **0** |
 | Ported | 0 |
 | Gaps | 0 (met trivially — see below) |
-| Suite actually executed this round | **yes** — RSpec, the headless drive script, and `rake spec` itself, all run fresh in this session |
+| Suite actually executed this round | **yes** — RSpec and the headless drive script, both run fresh in this session, from scratch |
 
 ## Upstream has no test suite
 
 Re-confirmed this round against upstream unchanged (`ae72daf`, same sha as
-the last two audits):
+every prior audit):
 
 ```
 $ git ls-tree -r --name-only origin/main | grep -iE 'test|spec'
@@ -21,35 +21,10 @@ $ git grep -n '#\[test\]\|#\[cfg(test)\]\|mod tests' origin/main -- '*.rs'
 (no output)
 ```
 
-Switcheroo upstream is a thin gtk-rs/libadwaita app with no Rust unit tests.
-Test parity is **0/0** and met trivially — the port inherits no safety net
-from upstream; everything the port's own suite checks was chosen by the
-port's authors, not pinned down by the original project.
+Test parity is **0/0** and met trivially. A 0/0 ledger says only that
+upstream owed the port nothing; it is not itself evidence the port works.
 
-## `rake spec` — re-verified genuinely fixed, not just claimed fixed
-
-The previous audit (`9f4999c`, carried into `50bffc4`'s own ledger text)
-found `rake spec` was a false green: `spec/` being a directory made Rake
-treat the bare task name as an up-to-date file target, so `rake spec`
-exited 0 having run nothing, while `TEST_PARITY.md` claimed it "runs now."
-That was fixed in `d1ca7f4`. Re-run from scratch this round, not trusted
-from the commit message:
-
-```
-$ nix develop --command xvfb-run -a rake spec
-Randomized with seed ...
-.........................  (x75)
-Finished in 3.8 seconds (files took 4.69 seconds to load)
-75 examples, 0 failures
-```
-
-Genuinely executes 75 examples, 0 failures. `Rakefile:77` now defines a
-real `task :spec` running `RSpec::Core::Runner.run`, and `task test: :spec`
-aliases it. The `.reports/test-parity.md` left by the *previous* audit
-still described the false-green state as current fact (see
-`accountability-ensurance.md`); this document replaces that description.
-
-## The headless drive script, re-run independently
+## Both gates, re-run fresh this session (not copied from a prior report)
 
 ```
 $ nix develop --command xvfb-run -a ruby test/drive_main_window.rb
@@ -62,85 +37,63 @@ $ nix develop --command xvfb-run -a ruby test/drive_main_window.rb
 DRIVE OK
 ```
 
-328/328, 26/26 components, re-run fresh this session rather than taken from
-either the previous audit's report or the task's stated runtime gate. The
-two numbers agree, which is itself worth stating: the gate this round was
-not re-derived from a cached result.
+```
+$ nix develop --command xvfb-run -a ruby -e 'require "rspec/core"; exit RSpec::Core::Runner.run(["--format", "progress", "--require", "spec_helper", "spec"])'
+Randomized with seed 22051
+....................................
+.......................................
+Finished in 2.96 seconds (files took 4.31 seconds to load)
+75 examples, 0 failures
+```
 
-## What the port's own suite proves, and what it does not
+328/328 checks, 26/26 components, DRIVE OK; 75 examples, 0 failures. Matches
+the task's stated runtime gate exactly, and matches the last three audit
+rounds' numbers. Both commands were actually executed in this session against
+a live `xvfb` display, not inferred from file contents.
 
-- `spec/*.rb` (75 examples): model-level and unit coverage —
-  `Color`, `FileType`, `Settings`, `ConvertPage` helpers, `ImageThumbnail`'s
-  horizontal-measure clamp (the one spec added since the last round,
-  pinning the gap recorded in `component-parity.md` #1 so it does not
-  silently regress further).
-- `test/drive_main_window.rb` (328 checks across 81 numbered steps): a
-  live, headless run of the actual GTK app — every page, every dialog
-  (about, shortcuts, error, stop-converting), drag-and-drop, clipboard
+## What the suite proves, and what it does not
+
+- `spec/*.rb` (75 examples): model-level and unit coverage — `Color`,
+  `FileType`, `Settings`, `ConvertPage` helpers, `ImageThumbnail`'s
+  horizontal-measure clamp.
+- `test/drive_main_window.rb` (328 checks across 81 numbered steps): a live,
+  headless run of the real GTK app under `gtk4-broadwayd` — every page, every
+  dialog (about, shortcuts, error, stop-converting), drag-and-drop, clipboard
   paste, the full convert → converting → all-images flow, a second window,
-  and accessibility fragments. This is substantial behavioural coverage
-  that a unit-test suite alone would not give.
+  and accessibility fragments.
 - **None of it is upstream's test suite**, because upstream does not have
-  one. It is all extra, by this skill's own accounting, and it is listed
-  here as extra rather than as parity:
+  one. Both are extra, by this skill's own accounting, not parity with
+  anything upstream pinned down.
 
-## Extra
+## `rake spec`, re-run directly as well
 
-- `spec/color_spec.rb`, `spec/file_type_spec.rb`, `spec/settings_spec.rb`,
-  `spec/convert_page_spec.rb`, `spec/image_thumbnail_spec.rb`,
-  `spec/app_window_spec.rb`, `spec/switcheroo/rb_spec.rb` — 75 examples
-  total, 0 failures, re-run this round.
-- `test/drive_main_window.rb` — 328 checks across 81 steps driving every
-  shipped page, dialog and the two-window case, re-run this round, DRIVE OK.
-
-Upstream has no safety net to inherit, so every one of these checks pins
-only what this port's own authors decided was worth pinning — which is
-sizeable, genuinely green, and genuinely run, but is not test *parity* in
-the sense this skill measures, because there is no upstream test to be at
-parity with.
-
-## One correction to the previous audit's own coverage claim
-
-`component-parity.md`'s `50bffc4` pass carried forward a claim, inherited
-from `9f4999c`, that the chain-link open/closed icon branch in
-`lib/convert_page.rb`'s link-axis handling was "a branch no check
-exercises." Re-grepped this round:
-
-```
-$ grep -n "chain link\|link_axis" test/drive_main_window.rb
-871:  d.step("the chain link keeps the two axes in proportion") do
-873:    d.check("the link is offered, since the images share a size") { ... }
-874:    d.check("it starts linked") { page.link_axis.active? }
-875:    d.check("and shows the closed-chain icon") { page.link_axis.icon_name == ConvertPage::LINKED_ICON }
-885:    d.check("unlinking shows the loose-chain icon") { page.link_axis.icon_name == ConvertPage::LOOSE_ICON }
-```
-
-It is driven, both icon states, and has been since at least `d15487b`
-(unchanged in the diff since). The "untested branch" claim carried in two
-prior audits was false — recorded here because a wrong "this is untested"
-claim is the same category of inaccuracy as a wrong "this passes" claim:
-both misdescribe what the suite actually covers, and both would have sent
-the next agent to re-test something already pinned.
-
-## This round: re-run fresh again, nothing new in the suite
-
-The only change on the port side since the last parity-report commit
-(`01c68e8`) is `fb196ba`, which adds a Flatpak manifest and edits
-`PORTING.md`. Neither touches `spec/`, `lib/`, `exe/` or `test/`, so there is
-no new code for a test to cover and no reason to expect the numbers to move.
-Re-run from scratch rather than assumed unchanged:
+Both the dev shell's documented RSpec-runner invocation and `rake spec`
+itself were run fresh this round:
 
 ```
 $ nix develop --command xvfb-run -a rake spec
 75 examples, 0 failures
-$ nix develop --command xvfb-run -a ruby test/drive_main_window.rb
-328 of 328 checks passed
-DRIVE OK
 ```
 
-Same 75/0 and 328/0/26 as the task's stated runtime gate and as the last
-three audit rounds. Nothing in this round's one commit (`fb196ba`) is
-exercised by any check — it is a Flatpak manifest, and no `flatpak-builder`
-is available here to run it even once (see `component-parity.md` gap #3
-and `accountability-ensurance.md`). That absence of coverage is recorded
-there as an open gap, not hidden by this suite's unrelated green.
+Identical result. `Rakefile:77`'s `task :spec` still wires up correctly; the
+false-green state fixed in `d1ca7f4` (`spec/` being a directory made the bare
+task name look up to date, so `rake spec` ran nothing and exited 0) has not
+regressed.
+
+## Extra (re-run this round)
+
+- `spec/color_spec.rb`, `spec/file_type_spec.rb`, `spec/settings_spec.rb`,
+  `spec/convert_page_spec.rb`, `spec/image_thumbnail_spec.rb`,
+  `spec/app_window_spec.rb`, `spec/switcheroo/rb_spec.rb` — 75 examples
+  total, 0 failures.
+- `test/drive_main_window.rb` — 328 checks across 81 steps, DRIVE OK.
+
+## Root `TEST_PARITY.md` is stale and internally inconsistent — see `accountability-ensurance.md`
+
+Root `TEST_PARITY.md`'s own header (line 10) reads "75 examples, plus a
+16-check UI drive," and its own body (line 86) reads "70 examples, 0
+failures" — neither figure matches the other, and neither matches the
+328-check/75-example reality re-verified live in this round and in the three
+rounds before it. This is a documentation-accuracy defect in a root-level,
+prominently-named file, not a test-suite defect; it is reported in full under
+`accountability-ensurance.md` rather than duplicated here.
