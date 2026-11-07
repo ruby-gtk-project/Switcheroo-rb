@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `c409c40a179995cef2c5e895b9748603de5f8a4b` |
+| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` (unchanged) |
+| Port | `ruby` @ `fb196babe2113d47395c5efc48bf491b447190cc` |
 | Upstream messages (distinct `(msgctxt, msgid)`) | **91** |
 | Produced by the port | **91** |
 | Gaps (key-set) | **0** |
@@ -72,6 +72,33 @@ either side. This is a spot-check, not a re-derivation of the full 91-row
 census — the full row-by-row mapping lives in `TRANSLATION_PARITY.md` at
 the repo root, which this report does not duplicate, only re-verifies the
 totals and the regeneration claim against.
+
+## New this round: upstream's own committed `.pot` is stale, and the port's is not
+
+Diffing `po/switcheroo.pot` msgid-for-msgid against `origin/main`'s own
+`po/switcheroo.pot` (not against the port) surfaces 5 strings present in the
+port's `.pot` and absent from upstream's committed one: `"+{}"`, `"Open a
+new window"`, `"Remove image"`, `"Resize unit (percentage or pixels)"`,
+`"Show {} more images"`. Before counting these as a port-side extra, each
+was traced back into upstream's own **source**, not its `.pot`:
+
+```
+$ git grep -n "Open a new window" origin/main -- src   → src/application.rs:47, gettext(...)
+$ git grep -n "Remove image" origin/main -- data        → image-thumbnail.blp:47, _("Remove image")
+$ git grep -n "Show {} more images" origin/main -- src  → image_rest.rs:65, gettext(...)
+$ git grep -n "Resize unit" origin/main -- data          → gschema.xml.in:58, <summary>
+```
+
+All five are real, live upstream strings that upstream's own `po/
+switcheroo.pot` has simply never had `update_translation.sh`/`ninja
+switcheroo-pot` re-run against since they were added — upstream's shipped
+`.pot` is stale relative to upstream's own source. The port's regenerated
+`.pot` (via its own `rake app:pot`) correctly captures all of them, which is
+why the key-set re-derivation above counts 91 on both sides when the two
+*committed .pot files* disagree by 5: the comparison that matters is against
+live source strings, not against whichever `.pot` snapshot happens to be
+checked in. No gap here — if anything this is the port's `.pot` being more
+current than the file it was supposedly ported from.
 
 ## Rules followed
 

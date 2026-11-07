@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `c409c40a179995cef2c5e895b9748603de5f8a4b` |
+| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` (unchanged) |
+| Port | `ruby` @ `fb196babe2113d47395c5efc48bf491b447190cc` |
 | Upstream tests | **0** |
 | Ported | 0 |
 | Gaps | 0 (met trivially — see below) |
@@ -121,3 +121,26 @@ prior audits was false — recorded here because a wrong "this is untested"
 claim is the same category of inaccuracy as a wrong "this passes" claim:
 both misdescribe what the suite actually covers, and both would have sent
 the next agent to re-test something already pinned.
+
+## This round: re-run fresh again, nothing new in the suite
+
+The only change on the port side since the last parity-report commit
+(`01c68e8`) is `fb196ba`, which adds a Flatpak manifest and edits
+`PORTING.md`. Neither touches `spec/`, `lib/`, `exe/` or `test/`, so there is
+no new code for a test to cover and no reason to expect the numbers to move.
+Re-run from scratch rather than assumed unchanged:
+
+```
+$ nix develop --command xvfb-run -a rake spec
+75 examples, 0 failures
+$ nix develop --command xvfb-run -a ruby test/drive_main_window.rb
+328 of 328 checks passed
+DRIVE OK
+```
+
+Same 75/0 and 328/0/26 as the task's stated runtime gate and as the last
+three audit rounds. Nothing in this round's one commit (`fb196ba`) is
+exercised by any check — it is a Flatpak manifest, and no `flatpak-builder`
+is available here to run it even once (see `component-parity.md` gap #3
+and `accountability-ensurance.md`). That absence of coverage is recorded
+there as an open gap, not hidden by this suite's unrelated green.

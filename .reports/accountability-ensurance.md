@@ -2,21 +2,22 @@
 
 | | |
 |---|---|
-| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `c409c40a179995cef2c5e895b9748603de5f8a4b` |
-| Scanned | `lib/`, `exe/`, `.reports/`, `PORTING.md`, `COMPONENT_PARITY.md`, `TEST_PARITY.md`, `TRANSLATION_PARITY.md`, `FINDINGS.md`, `.gitlab-ci.yml`, `Rakefile`, `flake.nix` |
+| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` (unchanged) |
+| Port | `ruby` @ `fb196babe2113d47395c5efc48bf491b447190cc` |
+| Scanned | `lib/`, `exe/`, `.reports/`, `PORTING.md`, `COMPONENT_PARITY.md`, `TEST_PARITY.md`, `TRANSLATION_PARITY.md`, `FINDINGS.md`, `.gitlab-ci.yml`, `Rakefile`, `flake.nix`, `io.gitlab.adhami3310.Converter.json` |
 | `TODO`/`FIXME`/`not implemented`/`for now`/`in a future`/`XXX`/`HACK` in `lib/` and `exe/` | **0**, re-confirmed by a fresh grep this round |
 | `find-excuses.sh` hits outside documents *about* excuses | **0**, re-confirmed by running the scan this round |
-| Previous round's 2 unresolved false greens | **both genuinely fixed and re-verified this round** |
-| New issue found this round | **1** — a report-accuracy failure in the audit process itself, not in the port |
+| Previous round's issues | **both resolved and re-verified again this round** |
+| New issue found this round | **1** — a report-accuracy failure in the audit documents, not in the port |
 
-Verdict: **not clean**, but for a reason that has changed shape since the
-last audit. The last two audits (`9f4999c`, `50bffc4`) found two false
-greens and left them named and unfixed through one intervening commit; this
-round finds that commit (`d1ca7f4`) genuinely closed both, re-verified from
-scratch rather than trusted from its message. What is not clean now is
-`PORTING.md`, the port's own designated resume point, which has not been
-updated to match and materially overstates how much work remains.
+Verdict: **not clean** — a genuine, correctly-labelled, correctly-excused-
+nowhere runtime gap count of 3 (restated above and in `component-parity.md`),
+plus a documentation-accuracy defect carried forward from last round
+(below). The last two audits (`9f4999c`, `50bffc4`) found two false greens
+in the *port's own claims*; `d1ca7f4` genuinely closed both, re-verified
+from scratch again this round rather than trusted a second time from a
+commit message. The open issue this round is entirely in the **audit
+trail's own documents**, not in the application.
 
 ## The excuse scan, re-run
 
@@ -142,6 +143,56 @@ necessity. That is the correct pattern this skill asks for, and it holds
 on both sides of this audit: the binding limitation is why the gap is
 expensive, never why it is closed.
 
+## New finding this round — root `COMPONENT_PARITY.md` is stale against the Flatpak manifest, and self-contradicts on the GResource item
+
+Since the last `.reports/` round (`01c68e8`), exactly one commit landed:
+`fb196ba`, which writes `io.gitlab.adhami3310.Converter.json` (a Flatpak
+manifest) and edits `PORTING.md` to describe it honestly as **written,
+unverified** — no `flatpak-builder` or GNOME runtime is available in this
+environment, so the manifest has never been run even once. `PORTING.md`
+itself does this correctly: its new row says "Unverified" in bold and
+spells out exactly which three things (gem native extensions, GI typelib
+lookups in the sandbox, desktop/metainfo substitution) were never exercised.
+
+Root `COMPONENT_PARITY.md`, by contrast, **was not touched by `fb196ba`** and
+still reads, at line 173, unchanged since `d1ca7f4`:
+
+> "...Not started rather than stubbed."
+
+That was true before `fb196ba` and is not true after it — a manifest now
+exists, is a real, careful translation of upstream's SDK-extension shape
+into a from-source Ruby build, and is cited by file and line in `PORTING.md`
+and in this round's `component-parity.md`. This is the **inverse** of a
+false green (same category this report's previous round named for
+`PORTING.md`'s gap count): a status document describing less progress than
+has actually happened, left stale because the commit that did the work
+edited one ledger (`PORTING.md`) and not the other (`COMPONENT_PARITY.md`).
+Recorded here rather than silently fixed, because rewriting
+`COMPONENT_PARITY.md` is outside this report's job — but the next agent
+should not re-derive this: **`COMPONENT_PARITY.md` line 173 needs updating
+to reflect that the manifest exists and is unverified, not absent.**
+
+Separately, and independent of the above: `COMPONENT_PARITY.md` classifies
+the same fact — the port has no GResource bundle, assets are read from
+`data/` directly — three different ways in one document. Lines 45 and 110
+call it **correspondence** (a different mechanism, not a gap, because
+nothing user-visible differs). Line 173 lists it a third time, now inside
+the **"Remaining gaps"** table, with no sentence reconciling the
+contradiction. `component-parity.md` (this round) does not carry the
+GResource item forward as gap #4 — read against `lib/style.rb`,
+`lib/main.rb` and `lib/about_dialog.rb`, the absence is a packaging-mechanism
+difference with no observable behavioural gap, consistent with the
+*correspondence* classification, not the *gap* one. The document holding
+two answers to the same question, unreconciled, is itself the finding:
+whichever answer is right, `COMPONENT_PARITY.md` currently asserts both.
+
+Neither of these is a false green **in the port** — the port's own behavior
+is unaffected by either, and no sentence in `lib/`, `exe/` or `PORTING.md`
+excuses a skip as a decision. Both are false claims **in a status document
+about the port**, which is the category this skill treats as "the most
+serious finding," because the next reader — human or agent — trusts the
+ledger over the file.
+
 ## Rules followed
 
 - Both previously-named false greens were re-run from scratch this round,
@@ -152,3 +203,7 @@ expensive, never why it is closed.
 - No reasoning slot anywhere in this document accepts a constraint as a
   closure; the two still-open binding limitations stay open and are cited
   to `FINDINGS.md`, never excused here.
+- This round's new finding (stale/self-contradicting `COMPONENT_PARITY.md`)
+  is named with file and line on both sides rather than asserted generally,
+  and the fix is described but not performed here, consistent with this
+  report auditing rather than editing other ledgers.

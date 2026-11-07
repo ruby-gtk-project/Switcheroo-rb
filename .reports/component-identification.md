@@ -2,9 +2,22 @@
 
 | | |
 |---|---|
-| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `c409c40a179995cef2c5e895b9748603de5f8a4b` |
+| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` (unchanged) |
+| Port | `ruby` @ `fb196babe2113d47395c5efc48bf491b447190cc` |
 | Scope | whole app (26 shipped `lib/` units) |
+
+## Re-checked this round
+
+The only commit since the last identification pass (`fb196ba`) adds
+`io.gitlab.adhami3310.Converter.json` at the repo root and edits
+`PORTING.md`. Neither is a `lib/*.rb` widget file, and the manifest is JSON
+packaging metadata, not a GTK component — it introduces no new widget, no
+new CSS class, no new signal and no new action. `ls lib/*.rb | wc -l` is
+still 26, `test/drive_main_window.rb`'s own closing check ("the 26
+components driven are the 26 the port ships") still passes (re-run this
+round, see `test-parity.md`). The unit list below is unchanged from the
+last round and is carried forward rather than re-derived from scratch,
+because nothing that would change it happened.
 
 ## What changed since the last census
 

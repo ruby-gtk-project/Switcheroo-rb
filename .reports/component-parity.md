@@ -2,12 +2,12 @@
 
 | | |
 |---|---|
-| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` |
-| Port | `ruby` @ `c409c40a179995cef2c5e895b9748603de5f8a4b` |
-| Previous audit | `50bffc4` (9 gaps, port @ `5ec2238`) |
-| This audit | re-verified every prior gap against the current tree, file:line, plus re-ran the runtime gate independently |
+| Upstream | `origin/main` @ `ae72daf9fefe83ec0bf7ebaa7ed783339c0e0016` (unchanged) |
+| Port | `ruby` @ `fb196babe2113d47395c5efc48bf491b447190cc` |
+| Previous audit | `01c68e8` (3 gaps, port @ `c409c40`) |
+| This audit | re-verified every prior gap against the current tree, file:line, re-ran the runtime gate independently, and re-audited the one real change since the last report (`fb196ba`, the Flatpak manifest) |
 | Units with full parity | 23 / 26 |
-| Open gaps | **3** |
+| Open gaps | **3** (unchanged in count; gap #3's substance changed — see below) |
 
 Runtime gate re-run for this audit:
 `nix develop --command xvfb-run -a ruby test/drive_main_window.rb` →
@@ -37,7 +37,29 @@ pre-fix state where it did not).
 |---|---|---|---|
 | 1 | `lib/image_thumbnail.rb` | `size_allocate()` is not reproduced. Width is a floor (`set_size_request(150, -1)`), not upstream's `min = nat = 150` `measure()` clamp *and* allocation override. The `measure()` half is now covered (`spec/image_thumbnail_spec.rb`), but upstream's root box is allocated exactly the tile's requested area via `size_allocate`, and nothing in ruby-gnome dispatches a `Gtk::Widget` vfunc override from a Ruby subclass (`FINDINGS.md` §7, re-confirmed not newly tried this round). Binding limitation, recorded as such, left open. | `lib/image_thumbnail.rb`, `FINDINGS.md` §7 |
 | 2 | `lib/convert_page.rb` | The colour button's accessible identity is an announcement (`gtk_accessible_announce`), not a live `Label` property update on colour change. `Gtk::Accessible#update_property` raises `NotImplementedError` from this binding version (`FINDINGS.md` §1, re-confirmed not newly tried this round). The static-caption case is covered via a GtkBuilder `accessibility { label }` fragment; the *dynamic* case upstream's `src/window.rs:525-530` drives on every colour change is not. Correspondence, not parity. | `lib/convert_page.rb`, `FINDINGS.md` §1 |
-| 3 | (whole app) | No Flatpak manifest (`io.gitlab.adhami3310.Converter.json`). Upstream's manifest pulls in a `rust-stable` SDK extension; there is no Ruby SDK extension and no `flatpak-builder`/GNOME runtime available in this environment to build and verify a Ruby equivalent even once. Genuinely not started, not stubbed. | repo root |
+| 3 | (whole app) | **Updated this round.** A Flatpak manifest (`io.gitlab.adhami3310.Converter.json`) now exists — written in `fb196ba`, after the previous `.reports/` round and not re-audited until now. It is a from-the-spec translation, built Ruby module + hash-verified `.gem` downloads standing in for upstream's `rust-stable` SDK extension. It has never been run through `flatpak-builder`: no `flatpak-builder` binary and no `org.gnome.Platform`/`org.gnome.Sdk` runtime are available in this environment, so the gem native-extension builds, the GI typelib lookups inside the sandbox, and the final desktop/metainfo substitution are all unexercised. This is real, cited progress on what was previously a flat "not started," but the gap itself — a Flatpak that actually builds and runs — is still open; a written, unbuilt manifest is not a built one. **Root `COMPONENT_PARITY.md` (line 173, unchanged since `d1ca7f4`) still describes this as "Not started rather than stubbed," which is now stale** — see `accountability-ensurance.md`. | `io.gitlab.adhami3310.Converter.json`, `PORTING.md` |
+
+## A fourth item that is not a fourth gap, and a doc inconsistency around it
+
+Root `COMPONENT_PARITY.md` lists a fourth "Remaining gap": "no GResource
+bundle" (line 173: `lib/`, assets read from `data/`). That same document
+classifies the identical fact as **correspondence**, not a gap, twice
+elsewhere in its own text:
+
+- line 45: "GResource bundle registration | none; assets read from `data/` | correspondence"
+- line 110: "There is no GResource to read it from, so the parse is REXML: correspondence on the mechanism, parity on every field."
+
+The Ruby port never uses GResource anywhere, by design (see `lib/style.rb`,
+`lib/main.rb`, `lib/about_dialog.rb` — each explicitly notes the absence and
+the direct-`data/`-read substitute), and nothing a user can observe differs.
+Re-verified this round: `lib/style.rb` loads the CSS from `data/style.css`
+with a plain `File.read`-backed `Gtk::CssProvider#load_from_path` equivalent,
+and the About dialog parses the shipped metainfo file directly. There is no
+behavioural gap here. This audit does **not** count it as gap #4 — but flags
+the self-contradiction (same fact, both "correspondence" and "gap" in one
+document) as a report-accuracy issue, carried into `accountability-ensurance.md`
+rather than silently resolved by picking one answer and rewriting
+`COMPONENT_PARITY.md`, which is outside this document's job.
 
 These three gaps, their wording and their file citations match
 `COMPONENT_PARITY.md` at the repo root exactly — that document was already
