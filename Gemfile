@@ -60,11 +60,7 @@ eval_gemfile "gemfiles/modular/x_std_libs.gemfile"
 # See unlocked_deps appraisal for more details on irb inclusion
 gem "irb", "~> 1.17" # ruby >= 2.7
 gem "gem_kit"
-gem "gtk4"
-gem "gettext"
-gem "rexml"
 
 group :development do
   gem "rubocop"
 end
-gem "adwaita"
